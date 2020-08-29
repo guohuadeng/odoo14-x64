@@ -63,3 +63,21 @@
 2020-08-29 13:09:05.528 HKT [828] LOG:  worker process: logical replication launcher (PID 14016) exited with exit code 1
 2020-08-29 13:09:05.528 HKT [8328] LOG:  shutting down
 2020-08-29 13:09:05.576 HKT [828] LOG:  database system is shut down
+2020-08-29 13:27:46.077 HKT [16956] LOG:  listening on IPv6 address "::1", port 5432
+2020-08-29 13:27:46.077 HKT [16956] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-08-29 13:27:46.168 HKT [11348] LOG:  database system was shut down at 2020-08-29 13:27:44 HKT
+2020-08-29 13:27:46.233 HKT [16956] LOG:  database system is ready to accept connections
+2020-08-29 13:27:51.974 HKT [16956] LOG:  received fast shutdown request
+2020-08-29 13:27:51.977 HKT [16956] LOG:  aborting any active transactions
+2020-08-29 13:27:51.992 HKT [16956] LOG:  worker process: logical replication launcher (PID 14880) exited with exit code 1
+2020-08-29 13:27:51.993 HKT [16284] LOG:  shutting down
+2020-08-29 13:27:52.041 HKT [16956] LOG:  database system is shut down
+2020-08-29 13:31:56.957 HKT [3508] LOG:  listening on IPv6 address "::1", port 5432
+2020-08-29 13:31:56.957 HKT [3508] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-08-29 13:31:57.049 HKT [8464] LOG:  database system was shut down at 2020-08-29 13:31:55 HKT
+2020-08-29 13:31:57.113 HKT [3508] LOG:  database system is ready to accept connections
+2020-08-29 13:32:03.103 HKT [3508] LOG:  received fast shutdown request
+2020-08-29 13:32:03.106 HKT [3508] LOG:  aborting any active transactions
+2020-08-29 13:32:03.121 HKT [3508] LOG:  worker process: logical replication launcher (PID 18484) exited with exit code 1
+2020-08-29 13:32:03.122 HKT [9840] LOG:  shutting down
+2020-08-29 13:32:03.171 HKT [3508] LOG:  database system is shut down
