@@ -1,0 +1,331 @@
+2019-10-02 19:17:35.513 HKT [11188] ÈÕÖ¾:  listening on IPv6 address "::1", port 5432
+2019-10-02 19:17:35.514 HKT [11188] ÈÕÖ¾:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-02 19:17:35.665 HKT [11580] ÈÕÖ¾:  Êı¾İ¿âÉÏ´Î¹Ø±ÕÊ±¼äÎª 2019-10-02 19:11:28 HKT
+2019-10-02 19:17:35.923 HKT [11188] ÈÕÖ¾:  Êı¾İ¿âÏµÍ³×¼±¸½ÓÊÜÁ¬½Ó
+2019-10-02 19:17:45.341 HKT [6356] ÖÂÃü´íÎó:  ½ÇÉ« "odoo" ²»´æÔÚ
+2019-10-02 19:17:45.673 HKT [2392] ÖÂÃü´íÎó:  ½ÇÉ« "odoo" ²»´æÔÚ
+2019-10-02 19:17:52.656 HKT [11188] ÈÕÖ¾:  ½ÓÊÕµ½¿ìËÙ (fast) Í£Ö¹ÇëÇó
+2019-10-02 19:17:52.659 HKT [11188] ÈÕÖ¾:  ÖĞ¶ÏÈÎºÎ¼¤»îÊÂÎñ
+2019-10-02 19:17:52.673 HKT [11188] ÈÕÖ¾:  ¹¤×÷½ø³Ì: logical replication launcher (PID 7668) ÒÑÍË³ö, ÍË³ö´úÂë 1
+2019-10-02 19:17:52.674 HKT [3740] ÈÕÖ¾:  ÕıÔÚ¹Ø±Õ
+2019-10-02 19:17:52.705 HKT [11188] ÈÕÖ¾:  Êı¾İ¿âÏµÍ³ÒÑ¹Ø±Õ
+2019-10-02 19:18:11.753 HKT [2768] ÈÕÖ¾:  listening on IPv6 address "::1", port 5432
+2019-10-02 19:18:11.755 HKT [2768] ÈÕÖ¾:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-02 19:18:12.046 HKT [10776] ÈÕÖ¾:  Êı¾İ¿âÉÏ´Î¹Ø±ÕÊ±¼äÎª 2019-10-02 19:18:07 HKT
+2019-10-02 19:18:12.373 HKT [2768] ÈÕÖ¾:  Êı¾İ¿âÏµÍ³×¼±¸½ÓÊÜÁ¬½Ó
+2019-10-02 19:20:20.703 HKT [2768] ÈÕÖ¾:  ½ÓÊÕµ½¿ìËÙ (fast) Í£Ö¹ÇëÇó
+2019-10-02 19:20:20.705 HKT [2768] ÈÕÖ¾:  ÖĞ¶ÏÈÎºÎ¼¤»îÊÂÎñ
+2019-10-02 19:20:20.719 HKT [2768] ÈÕÖ¾:  ¹¤×÷½ø³Ì: logical replication launcher (PID 8684) ÒÑÍË³ö, ÍË³ö´úÂë 1
+2019-10-02 19:20:20.720 HKT [8080] ÈÕÖ¾:  ÕıÔÚ¹Ø±Õ
+2019-10-02 19:20:20.798 HKT [2768] ÈÕÖ¾:  Êı¾İ¿âÏµÍ³ÒÑ¹Ø±Õ
+2019-10-03 14:05:13.189 HKT [1020] ÈÕÖ¾:  listening on IPv6 address "::1", port 5432
+2019-10-03 14:05:13.190 HKT [1020] ÈÕÖ¾:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-03 14:05:16.341 HKT [11344] ÈÕÖ¾:  Êı¾İ¿âÉÏ´Î¹Ø±ÕÊ±¼äÎª 2019-10-02 19:20:20 HKT
+2019-10-03 14:05:22.678 HKT [1020] ÈÕÖ¾:  Êı¾İ¿âÏµÍ³×¼±¸½ÓÊÜÁ¬½Ó
+2019-10-03 14:08:09.696 HKT [1020] ÈÕÖ¾:  ½ÓÊÕµ½¿ìËÙ (fast) Í£Ö¹ÇëÇó
+2019-10-03 14:08:09.698 HKT [1020] ÈÕÖ¾:  ÖĞ¶ÏÈÎºÎ¼¤»îÊÂÎñ
+2019-10-03 14:08:09.711 HKT [1020] ÈÕÖ¾:  ¹¤×÷½ø³Ì: logical replication launcher (PID 1892) ÒÑÍË³ö, ÍË³ö´úÂë 1
+2019-10-03 14:08:09.712 HKT [11900] ÈÕÖ¾:  ÕıÔÚ¹Ø±Õ
+2019-10-03 14:08:09.751 HKT [1020] ÈÕÖ¾:  Êı¾İ¿âÏµÍ³ÒÑ¹Ø±Õ
+2019-10-03 14:08:25.730 HKT [1252] ÈÕÖ¾:  listening on IPv6 address "::1", port 5432
+2019-10-03 14:08:25.731 HKT [1252] ÈÕÖ¾:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-03 14:08:25.969 HKT [6004] ÈÕÖ¾:  Êı¾İ¿âÉÏ´Î¹Ø±ÕÊ±¼äÎª 2019-10-03 14:08:09 HKT
+2019-10-03 14:08:26.166 HKT [1252] ÈÕÖ¾:  Êı¾İ¿âÏµÍ³×¼±¸½ÓÊÜÁ¬½Ó
+2019-10-03 14:20:49.784 HKT [1252] ÈÕÖ¾:  ½ÓÊÕµ½¿ìËÙ (fast) Í£Ö¹ÇëÇó
+2019-10-03 14:20:49.785 HKT [1252] ÈÕÖ¾:  ÖĞ¶ÏÈÎºÎ¼¤»îÊÂÎñ
+2019-10-03 14:20:49.786 HKT [7756] è‡´å‘½é”™è¯¯:  ç”±äºç®¡ç†å‘˜å‘½ä»¤ä¸­æ–­è”æ¥
+2019-10-03 14:20:49.786 HKT [2656] è‡´å‘½é”™è¯¯:  ç”±äºç®¡ç†å‘˜å‘½ä»¤ä¸­æ–­è”æ¥
+2019-10-03 14:20:49.787 HKT [10996] è‡´å‘½é”™è¯¯:  ç”±äºç®¡ç†å‘˜å‘½ä»¤ä¸­æ–­è”æ¥
+2019-10-03 14:20:49.787 HKT [14936] è‡´å‘½é”™è¯¯:  ç”±äºç®¡ç†å‘˜å‘½ä»¤ä¸­æ–­è”æ¥
+2019-10-03 14:20:49.802 HKT [1252] ÈÕÖ¾:  ¹¤×÷½ø³Ì: logical replication launcher (PID 2244) ÒÑÍË³ö, ÍË³ö´úÂë 1
+2019-10-03 14:20:50.632 HKT [580] ÈÕÖ¾:  ÕıÔÚ¹Ø±Õ
+2019-10-03 14:20:50.799 HKT [1252] ÈÕÖ¾:  Êı¾İ¿âÏµÍ³ÒÑ¹Ø±Õ
+2019-10-08 21:16:03.918 HKT [3468] LOG:  listening on IPv6 address "::1", port 5432
+2019-10-08 21:16:03.918 HKT [3468] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-08 21:16:04.060 HKT [19428] LOG:  database system was shut down at 2019-10-03 14:20:50 HKT
+2019-10-08 21:16:04.170 HKT [3468] LOG:  database system is ready to accept connections
+2019-10-08 21:17:10.031 HKT [18960] FATAL:  database "app" does not exist
+2019-10-08 21:17:10.177 HKT [17100] FATAL:  database "app" does not exist
+2019-10-08 21:17:50.134 HKT [10088] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2019-10-08 21:17:50.134 HKT [12664] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2019-10-08 21:17:50.134 HKT [6252] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2019-10-08 21:17:50.134 HKT [3376] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2019-10-08 21:18:40.083 HKT [3468] LOG:  received fast shutdown request
+2019-10-08 21:18:40.087 HKT [3468] LOG:  aborting any active transactions
+2019-10-08 21:18:40.087 HKT [14856] FATAL:  terminating connection due to administrator command
+2019-10-08 21:18:40.087 HKT [2252] FATAL:  terminating connection due to administrator command
+2019-10-08 21:18:40.103 HKT [3468] LOG:  worker process: logical replication launcher (PID 9968) exited with exit code 1
+2019-10-08 21:18:40.105 HKT [14744] LOG:  shutting down
+2019-10-08 21:18:40.202 HKT [3468] LOG:  database system is shut down
+2019-10-13 12:01:00.418 HKT [23128] LOG:  listening on IPv6 address "::1", port 5432
+2019-10-13 12:01:00.418 HKT [23128] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-13 12:01:00.718 HKT [15888] LOG:  database system was shut down at 2019-10-08 21:18:40 HKT
+2019-10-13 12:01:00.832 HKT [23128] LOG:  database system is ready to accept connections
+2019-10-13 12:02:08.128 HKT [23868] ERROR:  could not serialize access due to concurrent update
+2019-10-13 12:02:08.128 HKT [23868] STATEMENT:  DELETE FROM ir_attachment WHERE id IN (720)
+2019-10-13 12:05:27.041 HKT [23128] LOG:  server process (PID 17312) was terminated by exception 0xC000013A
+2019-10-13 12:05:27.041 HKT [23128] DETAIL:  Failed process was running: COMMIT
+2019-10-13 12:05:27.041 HKT [23128] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2019-10-13 12:05:27.041 HKT [23128] LOG:  terminating any other active server processes
+2019-10-13 12:05:27.042 HKT [3140] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.042 HKT [3140] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.042 HKT [3140] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.042 HKT [6800] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.042 HKT [6800] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.042 HKT [6800] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.042 HKT [3132] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.042 HKT [3132] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.042 HKT [3132] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.042 HKT [10056] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.042 HKT [10056] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.042 HKT [10056] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.043 HKT [20016] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.043 HKT [20016] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.043 HKT [20016] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.043 HKT [23868] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.043 HKT [23868] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.043 HKT [23868] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.043 HKT [21748] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.043 HKT [21748] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.043 HKT [21748] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.044 HKT [9548] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.044 HKT [9548] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.044 HKT [9548] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.045 HKT [5996] WARNING:  terminating connection because of crash of another server process
+2019-10-13 12:05:27.045 HKT [5996] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2019-10-13 12:05:27.045 HKT [5996] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2019-10-13 12:05:27.082 HKT [23128] LOG:  all server processes terminated; reinitializing
+2019-10-13 12:05:27.282 HKT [18992] LOG:  database system was interrupted; last known up at 2019-10-13 12:02:26 HKT
+2019-10-13 12:05:29.605 HKT [18992] LOG:  database system was not properly shut down; automatic recovery in progress
+2019-10-13 12:05:29.614 HKT [18992] LOG:  redo starts at 0/69CF950
+2019-10-13 12:05:30.819 HKT [18992] LOG:  invalid record length at 0/7771450: wanted 24, got 0
+2019-10-13 12:05:30.819 HKT [18992] LOG:  redo done at 0/7771418
+2019-10-13 12:05:30.819 HKT [18992] LOG:  last completed transaction was at log time 2019-10-13 12:03:59.543828+08
+2019-10-13 12:05:30.836 HKT [23128] LOG:  received fast shutdown request
+2019-10-13 12:05:31.908 HKT [23128] LOG:  abnormal database system shutdown
+2019-10-13 12:05:31.913 HKT [23128] LOG:  database system is shut down
+2019-10-28 00:26:42.450 HKT [13724] LOG:  listening on IPv6 address "::1", port 5432
+2019-10-28 00:26:42.450 HKT [13724] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-28 00:26:42.595 HKT [12932] LOG:  database system was interrupted; last known up at 2019-10-13 12:05:31 HKT
+2019-10-28 00:26:44.377 HKT [12932] LOG:  database system was not properly shut down; automatic recovery in progress
+2019-10-28 00:26:44.382 HKT [12932] LOG:  invalid record length at 0/77714C0: wanted 24, got 0
+2019-10-28 00:26:44.382 HKT [12932] LOG:  redo is not required
+2019-10-28 00:26:44.475 HKT [13724] LOG:  database system is ready to accept connections
+2019-10-28 00:27:16.425 HKT [13724] LOG:  received fast shutdown request
+2019-10-28 00:27:16.428 HKT [13724] LOG:  aborting any active transactions
+2019-10-28 00:27:16.442 HKT [13724] LOG:  worker process: logical replication launcher (PID 5880) exited with exit code 1
+2019-10-28 00:27:16.443 HKT [11600] LOG:  shutting down
+2019-10-28 00:27:16.488 HKT [13724] LOG:  database system is shut down
+2019-10-28 00:27:19.353 HKT [5472] LOG:  listening on IPv6 address "::1", port 5432
+2019-10-28 00:27:19.353 HKT [5472] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-28 00:27:19.514 HKT [13184] LOG:  database system was shut down at 2019-10-28 00:27:16 HKT
+2019-10-28 00:27:19.610 HKT [5472] LOG:  database system is ready to accept connections
+2019-10-28 00:28:23.076 HKT [15256] ERROR:  could not obtain lock on row in relation "ir_cron"
+2019-10-28 00:28:23.076 HKT [15256] STATEMENT:  SELECT *
+	                                       FROM ir_cron
+	                                       WHERE numbercall != 0
+	                                          AND active
+	                                          AND nextcall <= (now() at time zone 'UTC')
+	                                          AND id=3
+	                                       FOR UPDATE NOWAIT
+2019-10-28 00:28:23.322 HKT [15256] ERROR:  could not obtain lock on row in relation "ir_cron"
+2019-10-28 00:28:23.322 HKT [15256] STATEMENT:  SELECT *
+	                                       FROM ir_cron
+	                                       WHERE numbercall != 0
+	                                          AND active
+	                                          AND nextcall <= (now() at time zone 'UTC')
+	                                          AND id=3
+	                                       FOR UPDATE NOWAIT
+2019-10-28 00:28:33.606 HKT [14608] FATAL:  database "e1" does not exist
+2019-10-28 00:28:42.399 HKT [3600] FATAL:  database "demo" does not exist
+2019-10-28 00:28:56.042 HKT [5472] LOG:  received fast shutdown request
+2019-10-28 00:28:56.045 HKT [5472] LOG:  aborting any active transactions
+2019-10-28 00:28:56.061 HKT [5472] LOG:  worker process: logical replication launcher (PID 9804) exited with exit code 1
+2019-10-28 00:28:56.062 HKT [10132] LOG:  shutting down
+2019-10-28 00:28:56.119 HKT [5472] LOG:  database system is shut down
+2019-10-28 00:29:15.753 HKT [14756] LOG:  listening on IPv6 address "::1", port 5432
+2019-10-28 00:29:15.753 HKT [14756] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2019-10-28 00:29:15.996 HKT [12564] LOG:  database system was shut down at 2019-10-28 00:29:12 HKT
+2019-10-28 00:29:16.085 HKT [14756] LOG:  database system is ready to accept connections
+2019-10-28 00:31:01.300 HKT [14756] LOG:  received fast shutdown request
+2019-10-28 00:31:01.304 HKT [14756] LOG:  aborting any active transactions
+2019-10-28 00:31:01.304 HKT [7052] FATAL:  terminating connection due to administrator command
+2019-10-28 00:31:01.305 HKT [13796] FATAL:  terminating connection due to administrator command
+2019-10-28 00:31:01.305 HKT [14608] FATAL:  terminating connection due to administrator command
+2019-10-28 00:31:01.321 HKT [14756] LOG:  worker process: logical replication launcher (PID 14344) exited with exit code 1
+2019-10-28 00:31:01.331 HKT [9100] LOG:  shutting down
+2019-10-28 00:31:02.186 HKT [14756] LOG:  database system is shut down
+2020-03-11 16:38:06.127 HKT [15308] LOG:  listening on IPv6 address "::1", port 5432
+2020-03-11 16:38:06.127 HKT [15308] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-03-11 16:38:06.288 HKT [8268] LOG:  database system was shut down at 2019-10-28 00:31:02 HKT
+2020-03-11 16:38:06.436 HKT [15308] LOG:  database system is ready to accept connections
+2020-03-11 16:38:38.061 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_ui_menu" page 0
+2020-03-11 16:38:38.061 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_ui_menu" page 1
+2020-03-11 16:38:38.191 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 0
+2020-03-11 16:38:38.191 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 1
+2020-03-11 16:38:38.191 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 2
+2020-03-11 16:38:38.192 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 3
+2020-03-11 16:38:38.192 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 4
+2020-03-11 16:38:38.192 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 5
+2020-03-11 16:38:38.192 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 6
+2020-03-11 16:38:38.192 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 7
+2020-03-11 16:38:38.192 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 8
+2020-03-11 16:38:38.192 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 9
+2020-03-11 16:38:38.192 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 10
+2020-03-11 16:38:38.194 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 11
+2020-03-11 16:38:38.194 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 12
+2020-03-11 16:38:38.195 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 13
+2020-03-11 16:38:38.195 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 14
+2020-03-11 16:38:38.195 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model" page 15
+2020-03-11 16:38:38.281 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_model_fields" page 51
+2020-03-11 16:38:38.514 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 0
+2020-03-11 16:38:38.515 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 1
+2020-03-11 16:38:38.515 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 2
+2020-03-11 16:38:38.515 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 3
+2020-03-11 16:38:38.515 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 4
+2020-03-11 16:38:38.515 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 5
+2020-03-11 16:38:38.515 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 6
+2020-03-11 16:38:38.515 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 7
+2020-03-11 16:38:38.516 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module_dependency" page 8
+2020-03-11 16:38:38.743 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_currency" page 0
+2020-03-11 16:38:38.743 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_currency" page 1
+2020-03-11 16:38:38.743 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_currency" page 2
+2020-03-11 16:38:38.743 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_currency" page 3
+2020-03-11 16:38:38.744 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_currency" page 4
+2020-03-11 16:38:38.822 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_ui_view" page 69
+2020-03-11 16:38:38.897 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_category" page 0
+2020-03-11 16:38:38.940 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_module_module" page 48
+2020-03-11 16:38:39.118 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_partner" page 0
+2020-03-11 16:38:39.119 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_partner" page 1
+2020-03-11 16:38:39.119 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_partner" page 2
+2020-03-11 16:38:39.119 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "res_partner" page 3
+2020-03-11 16:38:39.217 HKT [8632] WARNING:  page is not marked all-visible but visibility map bit is set in relation "ir_translation" page 175
+2020-03-11 16:40:19.084 HKT [8452] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2020-03-11 16:40:19.084 HKT [11140] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2020-03-11 16:40:19.084 HKT [13628] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2020-03-11 16:40:42.836 HKT [19500] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2020-03-19 19:41:42.504 HKT [6060] LOG:  listening on IPv6 address "::1", port 5432
+2020-03-19 19:41:42.504 HKT [6060] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-03-19 19:41:42.645 HKT [13520] LOG:  database system was interrupted; last known up at 2020-03-11 16:38:06 HKT
+2020-03-19 19:41:43.354 HKT [13520] LOG:  database system was not properly shut down; automatic recovery in progress
+2020-03-19 19:41:43.359 HKT [13520] LOG:  redo starts at 0/2CF0F80
+2020-03-19 19:41:43.420 HKT [13520] LOG:  invalid record length at 0/2E68260: wanted 24, got 0
+2020-03-19 19:41:43.420 HKT [13520] LOG:  redo done at 0/2E68228
+2020-03-19 19:41:43.420 HKT [13520] LOG:  last completed transaction was at log time 2020-03-11 16:39:14.147233+08
+2020-03-19 19:41:43.698 HKT [6060] LOG:  database system is ready to accept connections
+2020-03-19 19:42:13.347 HKT [6060] LOG:  received fast shutdown request
+2020-03-19 19:42:13.351 HKT [6060] LOG:  aborting any active transactions
+2020-03-19 19:42:13.352 HKT [4964] FATAL:  terminating connection due to administrator command
+2020-03-19 19:42:13.352 HKT [2016] FATAL:  terminating connection due to administrator command
+2020-03-19 19:42:13.352 HKT [7016] ERROR:  canceling statement due to user request
+2020-03-19 19:42:13.352 HKT [10732] FATAL:  terminating connection due to administrator command
+2020-03-19 19:42:13.353 HKT [1324] ERROR:  canceling statement due to user request
+2020-03-19 19:42:13.368 HKT [6060] LOG:  worker process: logical replication launcher (PID 7016) exited with exit code 1
+2020-03-19 19:42:13.370 HKT [13624] LOG:  shutting down
+2020-03-19 19:42:13.458 HKT [6060] LOG:  database system is shut down
+2020-05-19 05:01:13.125 HKT [4464] LOG:  listening on IPv6 address "::1", port 5432
+2020-05-19 05:01:13.125 HKT [4464] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-05-19 05:01:13.210 HKT [6084] LOG:  database system was shut down at 2020-03-19 19:42:13 HKT
+2020-05-19 05:01:13.281 HKT [4464] LOG:  database system is ready to accept connections
+2020-05-19 05:01:15.954 HKT [4464] LOG:  received fast shutdown request
+2020-05-19 05:01:15.957 HKT [4464] LOG:  aborting any active transactions
+2020-05-19 05:01:15.973 HKT [4464] LOG:  worker process: logical replication launcher (PID 8116) exited with exit code 1
+2020-05-19 05:01:15.974 HKT [15224] LOG:  shutting down
+2020-05-19 05:01:16.021 HKT [4464] LOG:  database system is shut down
+2020-05-25 11:37:54.658 HKT [15180] LOG:  listening on IPv6 address "::1", port 5432
+2020-05-25 11:37:54.659 HKT [15180] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-05-25 11:37:54.858 HKT [6236] LOG:  database system was shut down at 2020-05-25 11:37:51 HKT
+2020-05-25 11:37:55.058 HKT [15180] LOG:  database system is ready to accept connections
+2020-05-25 11:39:32.072 HKT [15180] LOG:  received fast shutdown request
+2020-05-25 11:39:32.075 HKT [15180] LOG:  aborting any active transactions
+2020-05-25 11:39:32.090 HKT [15180] LOG:  worker process: logical replication launcher (PID 20756) exited with exit code 1
+2020-05-25 11:39:32.090 HKT [19696] LOG:  shutting down
+2020-05-25 11:39:32.145 HKT [15180] LOG:  database system is shut down
+2020-05-25 11:39:34.873 HKT [4992] LOG:  listening on IPv6 address "::1", port 5432
+2020-05-25 11:39:34.873 HKT [4992] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-05-25 11:39:34.991 HKT [3400] LOG:  database system was shut down at 2020-05-25 11:39:32 HKT
+2020-05-25 11:39:35.073 HKT [4992] LOG:  database system is ready to accept connections
+2020-05-25 11:44:36.646 HKT [18164] ERROR:  canceling statement due to user request
+2020-05-25 11:44:36.653 HKT [4992] LOG:  worker process: logical replication launcher (PID 18164) exited with exit code 1
+2020-05-25 11:44:36.656 HKT [4992] LOG:  statistics collector process (PID 22684) was terminated by exception 0xC000013A
+2020-05-25 11:44:36.656 HKT [4992] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2020-05-25 11:44:36.671 HKT [4992] LOG:  autovacuum launcher process (PID 5472) was terminated by exception 0xC000013A
+2020-05-25 11:44:36.671 HKT [4992] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2020-05-25 11:44:36.671 HKT [4992] LOG:  terminating any other active server processes
+^C2020-05-25 16:32:30.900 HKT [23420] LOG:  listening on IPv6 address "::1", port 5432
+2020-05-25 16:32:30.901 HKT [23420] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-05-25 16:32:30.993 HKT [19924] LOG:  database system was interrupted; last known up at 2020-05-25 11:44:35 HKT
+2020-05-25 16:32:31.284 HKT [19924] LOG:  database system was not properly shut down; automatic recovery in progress
+2020-05-25 16:32:31.287 HKT [19924] LOG:  redo starts at 0/162A338
+2020-05-25 16:32:31.287 HKT [19924] LOG:  invalid record length at 0/162A3E0: wanted 24, got 0
+2020-05-25 16:32:31.287 HKT [19924] LOG:  redo done at 0/162A370
+2020-05-25 16:32:31.365 HKT [23420] LOG:  database system is ready to accept connections
+2020-05-25 16:33:42.654 HKT [23420] LOG:  received fast shutdown request
+2020-05-25 16:33:42.656 HKT [23420] LOG:  aborting any active transactions
+2020-05-25 16:33:42.662 HKT [23420] LOG:  worker process: logical replication launcher (PID 18648) exited with exit code 1
+2020-05-25 16:33:42.674 HKT [16796] LOG:  shutting down
+2020-05-25 16:33:42.721 HKT [23420] LOG:  database system is shut down
+2020-05-26 11:06:16.259 HKT [19720] LOG:  listening on IPv6 address "::1", port 5432
+2020-05-26 11:06:16.259 HKT [19720] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-05-26 11:06:16.356 HKT [19256] LOG:  database system was shut down at 2020-05-25 16:33:42 HKT
+2020-05-26 11:06:16.438 HKT [19720] LOG:  database system is ready to accept connections
+2020-05-26 11:10:45.489 HKT [19720] LOG:  received fast shutdown request
+2020-05-26 11:10:45.492 HKT [19720] LOG:  aborting any active transactions
+2020-05-26 11:10:45.492 HKT [22268] FATAL:  terminating connection due to administrator command
+2020-05-26 11:10:45.492 HKT [6016] FATAL:  terminating connection due to administrator command
+2020-05-26 11:10:45.493 HKT [13284] FATAL:  terminating connection due to administrator command
+2020-05-26 11:10:45.494 HKT [13480] FATAL:  terminating connection due to administrator command
+2020-05-26 11:10:45.494 HKT [19184] FATAL:  terminating connection due to administrator command
+2020-05-26 11:10:45.520 HKT [19720] LOG:  worker process: logical replication launcher (PID 22904) exited with exit code 1
+2020-05-26 11:10:45.525 HKT [15484] LOG:  shutting down
+2020-05-26 11:10:46.355 HKT [19720] LOG:  database system is shut down
+2020-08-29 13:08:34.838 HKT [10228] LOG:  listening on IPv6 address "::1", port 5432
+2020-08-29 13:08:34.838 HKT [10228] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-08-29 13:08:34.935 HKT [22744] LOG:  database system was shut down at 2020-08-14 15:09:20 HKT
+2020-08-29 13:08:35.001 HKT [10228] LOG:  database system is ready to accept connections
+2020-08-29 13:08:44.729 HKT [10228] LOG:  received fast shutdown request
+2020-08-29 13:08:44.732 HKT [10228] LOG:  aborting any active transactions
+2020-08-29 13:08:44.733 HKT [20888] ERROR:  canceling statement due to user request
+2020-08-29 13:08:44.733 HKT [4976] ERROR:  canceling statement due to user request
+2020-08-29 13:08:44.745 HKT [10228] LOG:  worker process: logical replication launcher (PID 20888) exited with exit code 1
+2020-08-29 13:08:44.746 HKT [15408] LOG:  shutting down
+2020-08-29 13:08:44.778 HKT [10228] LOG:  database system is shut down
+2020-08-29 13:09:08.573 HKT [7824] LOG:  listening on IPv6 address "::1", port 5432
+2020-08-29 13:09:08.573 HKT [7824] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-08-29 13:09:08.664 HKT [14980] LOG:  database system was shut down at 2020-08-29 13:09:05 HKT
+2020-08-29 13:09:08.737 HKT [7824] LOG:  database system is ready to accept connections
+2020-08-29 13:16:23.321 HKT [7824] LOG:  received fast shutdown request
+2020-08-29 13:16:23.321 HKT [12504] ERROR:  canceling statement due to user request
+2020-08-29 13:16:23.325 HKT [7824] LOG:  aborting any active transactions
+2020-08-29 13:16:23.326 HKT [22332] FATAL:  terminating connection due to administrator command
+2020-08-29 13:16:23.326 HKT [12472] FATAL:  terminating connection due to administrator command
+2020-08-29 13:16:23.326 HKT [268] FATAL:  terminating connection due to administrator command
+2020-08-29 13:16:23.326 HKT [11388] FATAL:  terminating connection due to administrator command
+2020-08-29 13:16:23.334 HKT [7824] LOG:  worker process: logical replication launcher (PID 12504) exited with exit code 1
+2020-08-29 13:16:23.347 HKT [20932] LOG:  shutting down
+2020-08-29 13:16:23.975 HKT [7824] LOG:  database system is shut down
+2020-08-29 13:16:58.749 HKT [3764] LOG:  listening on IPv6 address "::1", port 5432
+2020-08-29 13:16:58.749 HKT [3764] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-08-29 13:16:58.839 HKT [11784] LOG:  database system was shut down at 2020-08-29 13:16:23 HKT
+2020-08-29 13:16:58.944 HKT [3764] LOG:  database system is ready to accept connections
+2020-08-29 13:17:41.906 HKT [3764] LOG:  received fast shutdown request
+2020-08-29 13:17:41.908 HKT [3764] LOG:  aborting any active transactions
+2020-08-29 13:17:41.908 HKT [13784] FATAL:  terminating connection due to administrator command
+2020-08-29 13:17:41.909 HKT [14508] FATAL:  terminating connection due to administrator command
+2020-08-29 13:17:41.909 HKT [18368] FATAL:  terminating connection due to administrator command
+2020-08-29 13:17:41.909 HKT [8388] FATAL:  terminating connection due to administrator command
+2020-08-29 13:17:41.925 HKT [3764] LOG:  worker process: logical replication launcher (PID 11212) exited with exit code 1
+2020-08-29 13:17:41.928 HKT [17704] LOG:  shutting down
+2020-08-29 13:17:41.986 HKT [3764] LOG:  database system is shut down
+2020-08-29 13:20:24.595 HKT [7512] LOG:  listening on IPv6 address "::1", port 5432
+2020-08-29 13:20:24.595 HKT [7512] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-08-29 13:20:24.689 HKT [17588] LOG:  database system was shut down at 2020-08-29 13:17:41 HKT
+2020-08-29 13:20:24.781 HKT [7512] LOG:  database system is ready to accept connections
