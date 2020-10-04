@@ -375,7 +375,7 @@ QUnit.test('activity details toggle', async function (assert) {
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
     const activity = this.env.models['mail.activity'].create({
-        creator: [['insert', { id: 1, partnerDisplayName: "Admin" }]],
+        creator: [['insert', { id: 1, display_name: "Admin" }]],
         dateCreate: date_to_str(today),
         dateDeadline: date_to_str(tomorrow),
         state: 'planned',
@@ -425,8 +425,8 @@ QUnit.test('activity details layout', async function (assert) {
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
     const activity = this.env.models['mail.activity'].create({
-        assignee: [['insert', { id: 10, partnerDisplayName: "Pauvre pomme" }]],
-        creator: [['insert', { id: 1, partnerDisplayName: "Admin" }]],
+        assignee: [['insert', { id: 10, display_name: "Pauvre pomme" }]],
+        creator: [['insert', { id: 1, display_name: "Admin" }]],
         dateCreate: date_to_str(today),
         dateDeadline: date_to_str(tomorrow),
         state: 'planned',
@@ -1066,6 +1066,54 @@ QUnit.test('activity mark done popover click on discard', async function (assert
         document.body,
         '.o_ActivityMarkDonePopover',
         "Discard button clicked should have closed the mark done popover"
+    );
+});
+
+QUnit.test('data-oe-id & data-oe-model link redirection on click', async function (assert) {
+    assert.expect(7);
+
+    const bus = new Bus();
+    bus.on('do-action', null, payload => {
+        assert.strictEqual(
+            payload.action.type,
+            'ir.actions.act_window',
+            "action should open view"
+        );
+        assert.strictEqual(
+            payload.action.res_model,
+            'some.model',
+            "action should open view on 'some.model' model"
+        );
+        assert.strictEqual(
+            payload.action.res_id,
+            250,
+            "action should open view on 250"
+        );
+        assert.step('do-action:openFormView_some.model_250');
+    });
+    await this.start({ env: { bus } });
+    const activity = this.env.models['mail.activity'].create({
+        canWrite: true,
+        category: 'not_upload_file',
+        id: 12,
+        note: `<p><a href="#" data-oe-id="250" data-oe-model="some.model">some.model_250</a></p>`,
+    });
+    await this.createActivityComponent(activity);
+    assert.containsOnce(
+        document.body,
+        '.o_Activity_note',
+        "activity should have a note"
+    );
+    assert.containsOnce(
+        document.querySelector('.o_Activity_note'),
+        'a',
+        "activity note should have a link"
+    );
+
+    document.querySelector(`.o_Activity_note a`).click();
+    assert.verifySteps(
+        ['do-action:openFormView_some.model_250'],
+        "should have open form view on related record after click on link"
     );
 });
 

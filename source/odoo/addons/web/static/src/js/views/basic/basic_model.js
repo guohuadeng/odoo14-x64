@@ -1515,7 +1515,9 @@ var BasicModel = AbstractModel.extend({
         }
 
         if (options.notifyChange === false) {
-            return Promise.resolve(_.keys(changes));
+            return Promise.all(defs).then(function () {
+                return Promise.resolve(_.keys(changes));
+            });
         }
 
         return Promise.all(defs).then(function () {
@@ -1581,7 +1583,8 @@ var BasicModel = AbstractModel.extend({
 
         const field = record.fields[fieldName];
         const coModel = field.type === 'reference' ? data.model : field.relation;
-        if (field.type === 'many2one' && !data.id && data.display_name) {
+        const allowedTypes = ['many2one', 'reference'];
+        if (allowedTypes.includes(field.type) && !data.id && data.display_name) {
             // only display_name given -> do a name_create
             const result = await this._rpc({
                 model: coModel,
@@ -4602,6 +4605,14 @@ var BasicModel = AbstractModel.extend({
                             // sub-groups
                             // Also keep data if we only reload groups' own data
                             updatedProps.data = oldGroup.data;
+                            if (options.onlyGroups) {
+                                // keep count and res_ids as in this case the group
+                                // won't be search_read again. This situation happens
+                                // when using kanban quick_create where the record is manually
+                                // added to the datapoint before getting here.
+                                updatedProps.res_ids = oldGroup.res_ids;
+                                updatedProps.count = oldGroup.count;
+                            }
                         }
                         _.extend(newGroup, updatedProps);
                         // set the limit such that all previously loaded records

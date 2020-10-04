@@ -162,6 +162,31 @@ QUnit.module('Views', {
         list.destroy();
     });
 
+    QUnit.test('on_attach_callback is properly called', async function (assert) {
+        assert.expect(3);
+
+        testUtils.mock.patch(ListRenderer, {
+            on_attach_callback() {
+                assert.step('on_attach_callback');
+                this._super(...arguments);
+            },
+        });
+
+        const list = await createView({
+            View: ListView,
+            model: 'foo',
+            data: this.data,
+            arch: '<tree><field name="display_name"/></tree>',
+        });
+
+        assert.verifySteps(['on_attach_callback']);
+        await list.reload();
+        assert.verifySteps([]);
+
+        testUtils.mock.unpatch(ListRenderer);
+        list.destroy();
+    });
+
     QUnit.test('list with create="0"', async function (assert) {
         assert.expect(2);
 
@@ -220,8 +245,40 @@ QUnit.module('Views', {
         list.destroy();
     });
 
+    QUnit.test('export feature in list for users not in base.group_allow_export', async function (assert) {
+        assert.expect(5);
+
+        const list = await createView({
+            View: ListView,
+            model: 'foo',
+            data: this.data,
+            viewOptions: { hasActionMenus: true },
+            arch: '<tree><field name="foo"/></tree>',
+            session: {
+                async user_has_group(group) {
+                    if (group === 'base.group_allow_export') {
+                        return false;
+                    }
+                    return this._super(...arguments);
+                },
+            },
+        });
+
+        assert.containsNone(list.el, 'div.o_control_panel .o_cp_action_menus');
+        assert.ok(list.$('tbody td.o_list_record_selector').length, 'should have at least one record');
+        assert.containsNone(list.el, 'div.o_control_panel .o_cp_buttons .o_list_export_xlsx');
+
+        await testUtils.dom.click(list.$('tbody td.o_list_record_selector:first input'));
+        assert.containsOnce(list.el, 'div.o_control_panel .o_cp_action_menus');
+        await cpHelpers.toggleActionMenu(list);
+        assert.deepEqual(cpHelpers.getMenuItemTexts(list), ['Delete'],
+            'action menu should not contain the Export button');
+
+        list.destroy();
+    });
+
     QUnit.test('list with export button', async function (assert) {
-        assert.expect(4);
+        assert.expect(5);
 
         const list = await createView({
             View: ListView,
@@ -241,6 +298,7 @@ QUnit.module('Views', {
 
         assert.containsNone(list.el, 'div.o_control_panel .o_cp_action_menus');
         assert.ok(list.$('tbody td.o_list_record_selector').length, 'should have at least one record');
+        assert.containsOnce(list.el, 'div.o_control_panel .o_cp_buttons .o_list_export_xlsx');
 
         await testUtils.dom.click(list.$('tbody td.o_list_record_selector:first input'));
         assert.containsOnce(list.el, 'div.o_control_panel .o_cp_action_menus');
@@ -262,6 +320,14 @@ QUnit.module('Views', {
             model: 'foo',
             data: this.data,
             arch: '<tree><field name="foo"/></tree>',
+            session: {
+                async user_has_group(group) {
+                    if (group === 'base.group_allow_export') {
+                        return true;
+                    }
+                    return this._super(...arguments);
+                },
+            },
         });
 
         assert.containsN(list, '.o_data_row', 4);
@@ -287,6 +353,14 @@ QUnit.module('Views', {
             data: this.data,
             arch: '<tree><field name="foo"/></tree>',
             domain: [["id", "<", 0]], // such that no record matches the domain
+            session: {
+                async user_has_group(group) {
+                    if (group === 'base.group_allow_export') {
+                        return true;
+                    }
+                    return this._super(...arguments);
+                },
+            },
         });
 
         assert.isNotVisible(list.el.querySelector('.o_list_export_xlsx'));
@@ -4483,6 +4557,30 @@ QUnit.module('Views', {
         assert.doesNotHaveClass(list, 'o_view_sample_data');
         assert.containsNone(list, '.o_list_table');
         assert.containsOnce(list, '.o_nocontent_help');
+        list.destroy();
+    });
+
+    QUnit.test('Do not display nocontent when it is an empty html tag', async function (assert) {
+        assert.expect(2);
+
+        this.data.foo.records = [];
+
+        var list = await createView({
+            View: ListView,
+            model: 'foo',
+            data: this.data,
+            arch: '<tree><field name="foo"/></tree>',
+            viewOptions: {
+                action: {
+                    help: '<p class="hello"></p>'
+                }
+            },
+        });
+
+        assert.containsNone(list, '.o_view_nocontent',
+            "should not display the no content helper");
+
+        assert.containsOnce(list, 'table', "should have a table in the dom");
 
         list.destroy();
     });
@@ -7381,6 +7479,45 @@ QUnit.module('Views', {
         await testUtils.dom.click($('.modal .btn-primary'));
         assert.strictEqual(list.$('.o_data_row:eq(0) .o_data_cell').text(), 'yop10', "changes should be discarded");
         assert.containsN(list, '.o_list_record_selector input:enabled', 5);
+
+        list.destroy();
+    });
+
+    QUnit.test('multi edition: many2many_tags in many2many field', async function (assert) {
+        assert.expect(5);
+
+        for (let i = 4; i <= 10; i++) {
+            this.data.bar.records.push({ id: i, display_name: "Value" + i});
+        }
+
+        const list = await createView({
+            View: ListView,
+            model: 'foo',
+            data: this.data,
+            arch: '<tree multi_edit="1"><field name="m2m" widget="many2many_tags"/></tree>',
+            archs: {
+                'bar,false,list': '<tree><field name="name"/></tree>',
+                'bar,false,search': '<search></search>',
+            },
+        });
+
+        assert.containsN(list, '.o_list_record_selector input:enabled', 5);
+
+        // select two records and enter edit mode
+        await testUtils.dom.click(list.$('.o_data_row:eq(0) .o_list_record_selector input'));
+        await testUtils.dom.click(list.$('.o_data_row:eq(1) .o_list_record_selector input'));
+        await testUtils.dom.click(list.$('.o_data_row:eq(0) .o_data_cell'));
+
+        await testUtils.fields.many2one.clickOpenDropdown("m2m");
+        await testUtils.fields.many2one.clickItem("m2m", "Search More");
+        assert.containsOnce(document.body, '.modal .o_list_view', "should have open the modal");
+
+        await testUtils.dom.click($('.modal .o_list_view .o_data_row:first'));
+
+        assert.containsOnce(document.body, ".modal [role='alert']", "should have open the confirmation modal");
+        assert.containsN(document.body, ".modal .o_field_many2manytags .badge", 3);
+        assert.strictEqual($(".modal .o_field_many2manytags .badge:last").text().trim(), "Value 3",
+            "should have display_name in badge");
 
         list.destroy();
     });
@@ -10530,7 +10667,7 @@ QUnit.module('Views', {
 
     QUnit.test('list view with field component: mounted and willUnmount calls', async function (assert) {
         // this test could be removed as soon as the list view will be written in Owl
-        assert.expect(3);
+        assert.expect(7);
 
         let mountedCalls = 0;
         let willUnmountCalls = 0;
@@ -10553,10 +10690,16 @@ QUnit.module('Views', {
         });
 
         assert.containsN(list, '.o_data_row', 4);
-        list.destroy();
-
         assert.strictEqual(mountedCalls, 4);
+        assert.strictEqual(willUnmountCalls, 0);
+
+        await list.reload();
+        assert.strictEqual(mountedCalls, 8);
         assert.strictEqual(willUnmountCalls, 4);
+
+        list.destroy();
+        assert.strictEqual(mountedCalls, 8);
+        assert.strictEqual(willUnmountCalls, 8);
     });
 
     QUnit.test('editable list view: multi edition of owl field component', async function (assert) {

@@ -118,6 +118,7 @@
     <link rel="stylesheet" type="text/scss" href="/website/static/src/scss/website.edit_mode.scss"/>
 
     <script type="text/javascript" src="/website/static/src/js/editor/editor.js"/>
+    <script type="text/javascript" src="/website/static/src/js/editor/mega_menu.js"/>
     <script type="text/javascript" src="/website/static/src/js/editor/snippets.editor.js"/>
     <script type="text/javascript" src="/website/static/src/js/editor/rte.summernote.js"/>
     <script type="text/javascript" src="/website/static/src/js/editor/snippets.options.js"/>
@@ -142,6 +143,8 @@
     <script type="text/javascript" src="/website/static/src/js/editor/wysiwyg_multizone.js"/>
     <script type="text/javascript" src="/website/static/src/js/editor/wysiwyg_multizone_translate.js"/>
     <script type="text/javascript" src="/website/static/src/js/editor/widget_link.js"/>
+
+    <script type="text/javascript" src="/website/static/src/js/widgets/media.js"/>
 </template>
 
 <template id="website.assets_editor" name="Website Editor Assets (used in website editor)">
@@ -160,8 +163,8 @@
     <script type="text/javascript" src="/website/static/src/js/menu/new_content.js"/>
     <script type="text/javascript" src="/website/static/src/js/menu/seo.js"/>
     <script type="text/javascript" src="/website/static/src/js/menu/translate.js"/>
-
-    <script type="text/javascript" src="/website/static/src/js/tours/banner.js"/>
+    <script type="text/javascript" src="/website/static/src/js/tours/homepage.js"/>
+    <script type="text/javascript" src="/website/static/src/js/tours/tour_utils.js"/>
 
     <script type="text/javascript" src="/website/static/src/js/widgets/ace.js"/>
 </template>

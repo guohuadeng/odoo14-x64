@@ -90,7 +90,18 @@ QUnit.test('reply: discard on pressing escape', async function (assert) {
     );
 
     await afterNextRender(() => {
+        document.querySelector(`.o_ComposerTextInput_textarea`).focus();
         document.execCommand('insertText', false, "@");
+        document.querySelector(`.o_ComposerTextInput_textarea`)
+            .dispatchEvent(new window.KeyboardEvent('keydown'));
+        document.querySelector(`.o_ComposerTextInput_textarea`)
+            .dispatchEvent(new window.KeyboardEvent('keyup'));
+        document.execCommand('insertText', false, "T");
+        document.querySelector(`.o_ComposerTextInput_textarea`)
+            .dispatchEvent(new window.KeyboardEvent('keydown'));
+        document.querySelector(`.o_ComposerTextInput_textarea`)
+            .dispatchEvent(new window.KeyboardEvent('keyup'));
+        document.execCommand('insertText', false, "e");
         document.querySelector(`.o_ComposerTextInput_textarea`)
             .dispatchEvent(new window.KeyboardEvent('keydown'));
         document.querySelector(`.o_ComposerTextInput_textarea`)
@@ -98,7 +109,7 @@ QUnit.test('reply: discard on pressing escape', async function (assert) {
     });
     assert.containsOnce(
         document.body,
-        '.o_ComposerTextInput_mentionDropdownPropositionList',
+        '.o_ComposerSuggestion',
         "mention suggestion should be opened after typing @"
     );
 
@@ -108,7 +119,7 @@ QUnit.test('reply: discard on pressing escape', async function (assert) {
     });
     assert.containsNone(
         document.body,
-        '.o_ComposerTextInput_mentionDropdownPropositionList',
+        '.o_ComposerSuggestion',
         "mention suggestion should be closed after pressing escape on mention suggestion"
     );
     assert.containsOnce(
@@ -312,11 +323,12 @@ QUnit.test('"reply to" composer should log note if message replied to is a note'
         "Send button text should be 'Log'"
     );
 
-    await afterNextRender(() => {
-        document.execCommand('insertText', false, "Test");
-        document.querySelector(`.o_ComposerTextInput_textarea`)
-            .dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Enter' }));
-    });
+    await afterNextRender(() =>
+        document.execCommand('insertText', false, "Test")
+    );
+    await afterNextRender(() =>
+        document.querySelector('.o_Composer_buttonSend').click()
+    );
     assert.verifySteps(['message_post']);
 });
 
@@ -363,11 +375,12 @@ QUnit.test('"reply to" composer should send message if message replied to is not
         "Send button text should be 'Send'"
     );
 
-    await afterNextRender(() => {
-        document.execCommand('insertText', false, "Test");
-        document.querySelector(`.o_ComposerTextInput_textarea`)
-            .dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Enter' }));
-    });
+    await afterNextRender(() =>
+        document.execCommand('insertText', false, "Test")
+    );
+    await afterNextRender(() =>
+        document.querySelector('.o_Composer_buttonSend').click()
+    );
     assert.verifySteps(['message_post']);
 });
 

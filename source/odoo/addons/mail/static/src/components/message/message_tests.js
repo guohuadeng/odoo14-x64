@@ -9,6 +9,7 @@ const {
     afterNextRender,
     beforeEach,
     createRootComponent,
+    nextAnimationFrame,
     start,
 } = require('mail/static/src/utils/test_utils.js');
 
@@ -189,7 +190,8 @@ QUnit.test('Notification Sent', async function (assert) {
     assert.expect(9);
 
     await this.start();
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -204,10 +206,10 @@ QUnit.test('Notification Sent', async function (assert) {
             notification_type: 'email',
             partner: [['insert', { id: 12, name: "Someone" }]],
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -217,7 +219,7 @@ QUnit.test('Notification Sent', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -232,7 +234,7 @@ QUnit.test('Notification Sent', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.containsOnce(
         document.body,
@@ -280,7 +282,8 @@ QUnit.test('Notification Error', async function (assert) {
     });
 
     await this.start({ env: { bus } });
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -294,10 +297,10 @@ QUnit.test('Notification Error', async function (assert) {
             notification_status: 'exception',
             notification_type: 'email',
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -307,7 +310,7 @@ QUnit.test('Notification Error', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -322,7 +325,7 @@ QUnit.test('Notification Error', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.verifySteps(
         ['do_action'],
@@ -346,7 +349,10 @@ QUnit.test("'channel_fetch' notification received is correctly handled", async f
         ],
         model: 'mail.channel',
     });
-    const threadView = this.env.models['mail.thread_view'].create({ thread: [['link', thread]] });
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
+        thread: [['link', thread]],
+    });
     const message = this.env.models['mail.message'].create({
         author: [['link', currentPartner]],
         body: "<p>Test</p>",
@@ -354,7 +360,9 @@ QUnit.test("'channel_fetch' notification received is correctly handled", async f
         originThread: [['link', thread]],
     });
 
-    await this.createMessageComponent(message, { threadViewLocalId: threadView.localId });
+    await this.createMessageComponent(message, {
+        threadViewLocalId: threadViewer.threadView.localId,
+    });
 
     assert.containsOnce(
         document.body,
@@ -402,14 +410,19 @@ QUnit.test("'channel_seen' notification received is correctly handled", async fu
         ],
         model: 'mail.channel',
     });
-    const threadView = this.env.models['mail.thread_view'].create({ thread: [['link', thread]] });
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
+        thread: [['link', thread]],
+    });
     const message = this.env.models['mail.message'].create({
         author: [['link', currentPartner]],
         body: "<p>Test</p>",
         id: 100,
         originThread: [['link', thread]],
     });
-    await this.createMessageComponent(message, { threadViewLocalId: threadView.localId });
+    await this.createMessageComponent(message, {
+        threadViewLocalId: threadViewer.threadView.localId,
+    });
 
     assert.containsOnce(
         document.body,
@@ -457,14 +470,19 @@ QUnit.test("'channel_fetch' notification then 'channel_seen' received  are corre
         ],
         model: 'mail.channel',
     });
-    const threadView = this.env.models['mail.thread_view'].create({ thread: [['link', thread]] });
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
+        thread: [['link', thread]],
+    });
     const message = this.env.models['mail.message'].create({
         author: [['link', currentPartner]],
         body: "<p>Test</p>",
         id: 100,
         originThread: [['link', thread]],
     });
-    await this.createMessageComponent(message, { threadViewLocalId: threadView.localId });
+    await this.createMessageComponent(message, {
+        threadViewLocalId: threadViewer.threadView.localId,
+    });
 
     assert.containsOnce(
         document.body,
@@ -525,26 +543,29 @@ QUnit.test('do not show messaging seen indicator if not authored by me', async f
         id: 11,
         partnerSeenInfos: [['create', [
             {
-                id: this.env.session.partner_id,
-                lastFetchedMessage: [['insert', {id: 100}]],
-                partner: [['insert', {id: this.env.messaging.currentPartner.id}]],
+                channelId: 11,
+                lastFetchedMessage: [['insert', { id: 100 }]],
+                partnerId: this.env.messaging.currentPartner.id,
             },
             {
-                id: 100,
-                lastFetchedMessage: [['insert', {id: 100}]],
-                partner: [['link', author]],
+                channelId: 11,
+                lastFetchedMessage: [['insert', { id: 100 }]],
+                partnerId: author.id,
             },
         ]]],
         model: 'mail.channel',
     });
-    const threadView = this.env.models['mail.thread_view'].create({ thread: [['link', thread]] });
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
+        thread: [['link', thread]],
+    });
     const message = this.env.models['mail.message'].insert({
         author: [['link', author]],
         body: "<p>Test</p>",
         id: 100,
         originThread: [['link', thread]],
     });
-    await this.createMessageComponent(message, { threadViewLocalId: threadView.localId });
+    await this.createMessageComponent(message, { threadViewLocalId: threadViewer.threadView.localId });
 
     assert.containsOnce(
         document.body,
@@ -569,12 +590,15 @@ QUnit.test('do not show messaging seen indicator if before last seen by all mess
     const thread = this.env.models['mail.thread'].create({
         id: 11,
         messageSeenIndicators: [['insert', {
-            id: this.env.models['mail.message_seen_indicator'].computeId(99, 11),
-            message: [['insert', {id: 99}]],
+            channelId: 11,
+            messageId: 99,
         }]],
         model: 'mail.channel',
     });
-    const threadView = this.env.models['mail.thread_view'].create({ thread: [['link', thread]] });
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
+        thread: [['link', thread]],
+    });
     const lastSeenMessage = this.env.models['mail.message'].create({
         author: [['link', currentPartner]],
         body: "<p>You already saw me</p>",
@@ -590,18 +614,20 @@ QUnit.test('do not show messaging seen indicator if before last seen by all mess
     thread.update({
        partnerSeenInfos: [['create', [
             {
-                id: currentPartner.id,
+                channelId: 11,
                 lastSeenMessage: [['link', lastSeenMessage]],
-                partner: [['link', currentPartner]],
+                partnerId: this.env.messaging.currentPartner.id,
             },
             {
-                id: 100,
+                channelId: 11,
                 lastSeenMessage: [['link', lastSeenMessage]],
-                partner: [['insert', {id: 100}]],
+                partnerId: 100,
             },
         ]]],
     });
-    await this.createMessageComponent(message, { threadViewLocalId: threadView.localId });
+    await this.createMessageComponent(message, {
+        threadViewLocalId: threadViewer.threadView.localId,
+    });
 
     assert.containsOnce(
         document.body,
@@ -632,31 +658,36 @@ QUnit.test('only show messaging seen indicator if authored by me, after last see
         id: 11,
         partnerSeenInfos: [['create', [
             {
-                id: currentPartner.id,
-                lastSeenMessage: [['insert', {id: 100}]],
-                partner: [['link', currentPartner]],
+                channelId: 11,
+                lastSeenMessage: [['insert', { id: 100 }]],
+                partnerId: this.env.messaging.currentPartner.id,
             },
             {
-                id: 100,
-                partner: [['insert', {id: 100}]],
-                lastFetchedMessage: [['insert', {id: 100}]],
-                lastSeenMessage: [['insert', {id: 99}]],
+                channelId: 11,
+                lastFetchedMessage: [['insert', { id: 100 }]],
+                lastSeenMessage: [['insert', { id: 99 }]],
+                partnerId: 100,
             },
         ]]],
         messageSeenIndicators: [['insert', {
-            id: this.env.models['mail.message_seen_indicator'].computeId(100, 11),
-            message: [['insert', {id: 100}]],
+            channelId: 11,
+            messageId: 100,
         }]],
         model: 'mail.channel',
     });
-    const threadView = this.env.models['mail.thread_view'].create({ thread: [['link', thread]] });
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
+        thread: [['link', thread]],
+    });
     const message = this.env.models['mail.message'].insert({
         author: [['link', currentPartner]],
         body: "<p>Test</p>",
         id: 100,
         originThread: [['link', thread]],
     });
-    await this.createMessageComponent(message, { threadViewLocalId: threadView.localId });
+    await this.createMessageComponent(message, {
+        threadViewLocalId: threadViewer.threadView.localId,
+    });
 
     assert.containsOnce(
         document.body,
@@ -780,6 +811,365 @@ QUnit.test('subtype description should not be displayed if it is similar to body
         document.querySelector(`.o_Message_content`).textContent,
         "Hello",
         "message content should display only body when subtype description is similar"
+    );
+});
+
+QUnit.test('data-oe-id & data-oe-model link redirection on click', async function (assert) {
+    assert.expect(7);
+
+    const bus = new Bus();
+    bus.on('do-action', null, payload => {
+        assert.strictEqual(
+            payload.action.type,
+            'ir.actions.act_window',
+            "action should open view"
+        );
+        assert.strictEqual(
+            payload.action.res_model,
+            'some.model',
+            "action should open view on 'some.model' model"
+        );
+        assert.strictEqual(
+            payload.action.res_id,
+            250,
+            "action should open view on 250"
+        );
+        assert.step('do-action:openFormView_some.model_250');
+    });
+    await this.start({ env: { bus } });
+    const message = this.env.models['mail.message'].create({
+        body: `<p><a href="#" data-oe-id="250" data-oe-model="some.model">some.model_250</a></p>`,
+        id: 100,
+    });
+    await this.createMessageComponent(message);
+    assert.containsOnce(
+        document.body,
+        '.o_Message_content',
+        "message should have content"
+    );
+    assert.containsOnce(
+        document.querySelector('.o_Message_content'),
+        'a',
+        "message content should have a link"
+    );
+
+    document.querySelector(`.o_Message_content a`).click();
+    assert.verifySteps(
+        ['do-action:openFormView_some.model_250'],
+        "should have open form view on related record after click on link"
+    );
+});
+
+QUnit.test('chat with author should be opened after clicking on his avatar', async function (assert) {
+    assert.expect(4);
+
+    this.data['res.partner'].records.push({ id: 10 });
+    this.data['res.users'].records.push({ partner_id: 10 });
+    await this.start({
+        hasChatWindow: true,
+    });
+    const message = this.env.models['mail.message'].create({
+        author: [['insert', { id: 10 }]],
+        id: 10,
+    });
+    await this.createMessageComponent(message);
+    assert.containsOnce(
+        document.body,
+        '.o_Message_authorAvatar',
+        "message should have the author avatar"
+    );
+    assert.hasClass(
+        document.querySelector('.o_Message_authorAvatar'),
+        'o_redirect',
+        "author avatar should have the redirect style"
+    );
+
+    await afterNextRender(() =>
+        document.querySelector('.o_Message_authorAvatar').click()
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_ChatWindow_thread',
+        "chat window with thread should be opened after clicking on author avatar"
+    );
+    assert.strictEqual(
+        document.querySelector('.o_ChatWindow_thread').dataset.correspondentId,
+        message.author.id.toString(),
+        "chat with author should be opened after clicking on his avatar"
+    );
+});
+
+QUnit.test('chat with author should be opened after clicking on his im status icon', async function (assert) {
+    assert.expect(4);
+
+    this.data['res.partner'].records.push({ id: 10 });
+    this.data['res.users'].records.push({ partner_id: 10 });
+    await this.start({
+        hasChatWindow: true,
+    });
+    const message = this.env.models['mail.message'].create({
+        author: [['insert', { id: 10, im_status: 'online' }]],
+        id: 10,
+    });
+    await this.createMessageComponent(message);
+    assert.containsOnce(
+        document.body,
+        '.o_Message_partnerImStatusIcon',
+        "message should have the author im status icon"
+    );
+    assert.hasClass(
+        document.querySelector('.o_Message_partnerImStatusIcon'),
+        'o-has-open-chat',
+        "author im status icon should have the open chat style"
+    );
+
+    await afterNextRender(() =>
+        document.querySelector('.o_Message_partnerImStatusIcon').click()
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_ChatWindow_thread',
+        "chat window with thread should be opened after clicking on author im status icon"
+    );
+    assert.strictEqual(
+        document.querySelector('.o_ChatWindow_thread').dataset.correspondentId,
+        message.author.id.toString(),
+        "chat with author should be opened after clicking on his im status icon"
+    );
+});
+
+QUnit.test('open chat with author on avatar click should be disabled when currently chatting with the author', async function (assert) {
+    assert.expect(3);
+
+    this.data['mail.channel'].records.push({
+        channel_type: 'chat',
+        members: [this.data.currentPartnerId, 10],
+        public: 'private',
+    });
+    this.data['res.partner'].records.push({ id: 10 });
+    this.data['res.users'].records.push({ partner_id: 10 });
+    await this.start({
+        hasChatWindow: true,
+    });
+    const correspondent = this.env.models['mail.partner'].insert({ id: 10 });
+    const message = this.env.models['mail.message'].create({
+        author: [['link', correspondent]],
+        id: 10,
+    });
+    const thread = await correspondent.getChat();
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
+        thread: [['link', thread]],
+    });
+    await this.createMessageComponent(message, {
+        threadViewLocalId: threadViewer.threadView.localId,
+    });
+    assert.containsOnce(
+        document.body,
+        '.o_Message_authorAvatar',
+        "message should have the author avatar"
+    );
+    assert.doesNotHaveClass(
+        document.querySelector('.o_Message_authorAvatar'),
+        'o_redirect',
+        "author avatar should not have the redirect style"
+    );
+
+    document.querySelector('.o_Message_authorAvatar').click();
+    await nextAnimationFrame();
+    assert.containsNone(
+        document.body,
+        '.o_ChatWindow',
+        "should have no thread opened after clicking on author avatar when currently chatting with the author"
+    );
+});
+
+QUnit.test('basic rendering of tracking value (float type)', async function (assert) {
+    assert.expect(8);
+
+    await this.start();
+    const message = this.env.models['mail.message'].create({
+        id: 11,
+        tracking_value_ids: [{
+            changed_field: "Total",
+            field_type: "float",
+            id: 6,
+            new_value: 45.67,
+            old_value: 12.3,
+        }],
+    });
+    await this.createMessageComponent(message);
+    assert.containsOnce(
+        document.body,
+        '.o_Message_trackingValue',
+        "should display a tracking value"
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_Message_trackingValueFieldName',
+        "should display the name of the tracked field"
+    );
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValueFieldName').textContent,
+        "Total:",
+        "should display the correct tracked field name (Total)",
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_Message_trackingValueOldValue',
+        "should display the old value"
+    );
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValueOldValue').textContent,
+        "12.3",
+        "should display the correct old value (12.3)",
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_Message_trackingValueSeparator',
+        "should display the separator"
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_Message_trackingValueNewValue',
+        "should display the new value"
+    );
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValueNewValue').textContent,
+        "45.67",
+        "should display the correct new value (45.67)",
+    );
+});
+
+QUnit.test('rendering of tracked field with change of value from non-0 to 0', async function (assert) {
+    assert.expect(1);
+
+    await this.start();
+    const message = this.env.models['mail.message'].create({
+        id: 11,
+        tracking_value_ids: [{
+            changed_field: "Total",
+            field_type: "float",
+            id: 6,
+            new_value: 0,
+            old_value: 1,
+        }],
+    });
+    await this.createMessageComponent(message);
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValue').textContent,
+        "Total:10",
+        "should display the correct content of tracked field with change of value from non-0 to 0 (Total: 1 -> 0)"
+    );
+});
+
+QUnit.test('rendering of tracked field with change of value from 0 to non-0', async function (assert) {
+    assert.expect(1);
+
+    await this.start();
+    const message = this.env.models['mail.message'].create({
+        id: 11,
+        tracking_value_ids: [{
+            changed_field: "Total",
+            field_type: "float",
+            id: 6,
+            new_value: 1,
+            old_value: 0,
+        }],
+    });
+    await this.createMessageComponent(message);
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValue').textContent,
+        "Total:01",
+        "should display the correct content of tracked field with change of value from 0 to non-0 (Total: 0 -> 1)"
+    );
+});
+
+QUnit.test('rendering of tracked field with change of value from true to false', async function (assert) {
+    assert.expect(1);
+
+    await this.start();
+    const message = this.env.models['mail.message'].create({
+        id: 11,
+        tracking_value_ids: [{
+            changed_field: "Is Ready",
+            field_type: "boolean",
+            id: 6,
+            new_value: false,
+            old_value: true,
+        }],
+    });
+    await this.createMessageComponent(message);
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValue').textContent,
+        "Is Ready:truefalse",
+        "should display the correct content of tracked field with change of value from true to false (Is Ready: true -> false)"
+    );
+});
+
+QUnit.test('rendering of tracked field with change of value from false to true', async function (assert) {
+    assert.expect(1);
+
+    await this.start();
+    const message = this.env.models['mail.message'].create({
+        id: 11,
+        tracking_value_ids: [{
+            changed_field: "Is Ready",
+            field_type: "boolean",
+            id: 6,
+            new_value: true,
+            old_value: false,
+        }],
+    });
+    await this.createMessageComponent(message);
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValue').textContent,
+        "Is Ready:falsetrue",
+        "should display the correct content of tracked field with change of value from false to true (Is Ready: false -> true)"
+    );
+});
+
+QUnit.test('rendering of tracked field with change of value from string to empty', async function (assert) {
+    assert.expect(1);
+
+    await this.start();
+    const message = this.env.models['mail.message'].create({
+        id: 11,
+        tracking_value_ids: [{
+            changed_field: "Name",
+            field_type: "char",
+            id: 6,
+            new_value: "",
+            old_value: "Marc",
+        }],
+    });
+    await this.createMessageComponent(message);
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValue').textContent,
+        "Name:Marc",
+        "should display the correct content of tracked field with change of value from string to empty (Total: Marc ->)"
+    );
+});
+
+QUnit.test('rendering of tracked field with change of value from empty to string', async function (assert) {
+    assert.expect(1);
+
+    await this.start();
+    const message = this.env.models['mail.message'].create({
+        id: 11,
+        tracking_value_ids: [{
+            changed_field: "Name",
+            field_type: "char",
+            id: 6,
+            new_value: "Marc",
+            old_value: "",
+        }],
+    });
+    await this.createMessageComponent(message);
+    assert.strictEqual(
+        document.querySelector('.o_Message_trackingValue').textContent,
+        "Name:Marc",
+        "should display the correct content of tracked field with change of value from empty to string (Total: -> Marc)"
     );
 });
 

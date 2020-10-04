@@ -177,10 +177,8 @@ class Module(models.Model):
             if not module.name:
                 module.description_html = False
                 continue
-            module_path = modules.get_module_path(module.name, display_warning=False)  # avoid to log warning for fake community module
-            if module_path:
-                path = modules.check_resource_path(module_path, 'static/description/index.html')
-            if module_path and path:
+            path = modules.get_module_resource(module.name, 'static/description/index.html')
+            if path:
                 with tools.file_open(path, 'rb') as desc_file:
                     doc = desc_file.read()
                     html = lxml.html.document_fromstring(doc)
@@ -621,7 +619,7 @@ class Module(models.Model):
     def button_uninstall(self):
         if 'base' in self.mapped('name'):
             raise UserError(_("The `base` module cannot be uninstalled"))
-        if not all(state in ('installed', 'to upgrade') for state in self.mapped('state')):
+        if any(state not in ('installed', 'to upgrade') for state in self.mapped('state')):
             raise UserError(_(
                 "One or more of the selected modules have already been uninstalled, if you "
                 "believe this to be an error, you may try again later or contact support."

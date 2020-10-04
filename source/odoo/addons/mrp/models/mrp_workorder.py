@@ -239,7 +239,7 @@ class MrpWorkorder(models.Model):
     def _set_dates_planned(self):
         date_from = self[0].date_planned_start
         date_to = self[0].date_planned_finished
-        self.mapped('leave_id').write({
+        self.mapped('leave_id').sudo().write({
             'date_from': date_from,
             'date_to': date_to,
         })
@@ -614,7 +614,11 @@ class MrpWorkorder(models.Model):
 
     def action_cancel(self):
         self.leave_id.unlink()
-        return self.write({'state': 'cancel'})
+        return self.write({
+            'state': 'cancel',
+            'date_planned_start': False,
+            'date_planned_finished': False,
+        })
 
     def action_replan(self):
         """Replan a work order.

@@ -265,6 +265,11 @@ class Project(models.Model):
             if project.partner_id and project.partner_phone != project.partner_id.phone:
                 project.partner_id.phone = project.partner_phone
 
+    @api.onchange('alias_enabled')
+    def _onchange_alias_name(self):
+        if not self.alias_enabled:
+            self.alias_name = False
+
     def _compute_alias_enabled(self):
         for project in self:
             project.alias_enabled = project.alias_domain and project.alias_id.alias_name
@@ -586,7 +591,7 @@ class Task(models.Model):
         compute='_compute_project_id', store=True, readonly=False,
         index=True, tracking=True, check_company=True, change_default=True)
     planned_hours = fields.Float("Initially Planned Hours", help='Time planned to achieve this task (including its sub-tasks).', tracking=True)
-    subtask_planned_hours = fields.Float("Sub-tasks Planned Hours", compute='_compute_subtask_planned_hours', help="Sum of the planned hours of all the sub-tasks linked to this task. Usually less or equal to the initially planned hours of this task.")
+    subtask_planned_hours = fields.Float("Sub-tasks Planned Hours", compute='_compute_subtask_planned_hours', help="Sum of the time planned of all the sub-tasks linked to this task. Usually less or equal to the initially time planned of this task.")
     user_id = fields.Many2one('res.users',
         string='Assigned to',
         default=lambda self: self.env.uid,
@@ -1030,7 +1035,7 @@ class Task(models.Model):
         days = list(DAYS.keys())
         week_start = fields.Datetime.today().weekday()
 
-        if all([d in default_fields for d in days]):
+        if all(d in default_fields for d in days):
             vals[days[week_start]] = True
         if 'repeat_day' in default_fields:
             vals['repeat_day'] = str(fields.Datetime.today().day)

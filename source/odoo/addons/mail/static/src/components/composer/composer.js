@@ -3,6 +3,7 @@ odoo.define('mail/static/src/components/composer/composer.js', function (require
 
 const components = {
     AttachmentList: require('mail/static/src/components/attachment_list/attachment_list.js'),
+    ComposerSuggestedRecipientList: require('mail/static/src/components/composer_suggested_recipient_list/composer_suggested_recipient_list.js'),
     DropZone: require('mail/static/src/components/drop_zone/drop_zone.js'),
     EmojisPopover: require('mail/static/src/components/emojis_popover/emojis_popover.js'),
     FileUploader: require('mail/static/src/components/file_uploader/file_uploader.js'),
@@ -190,7 +191,6 @@ class Composer extends Component {
             }
             return;
         }
-        // TODO: take suggested recipients into account (task-2283356)
         await this.composer.postMessage();
         // TODO: we might need to remove trigger and use the store to wait for the post rpc to be done
         // task-2252858
@@ -262,6 +262,20 @@ class Composer extends Component {
     }
 
     /**
+     * @private
+     */
+    _onComposerSuggestionClicked() {
+        this.focus();
+    }
+
+    /**
+     * @private
+     */
+    _onComposerTextInputSendShortcut() {
+        this._postMessage();
+    }
+
+    /**
      * Called when some files have been dropped in the dropzone.
      *
      * @private
@@ -304,7 +318,7 @@ class Composer extends Component {
      */
     _onKeydown(ev) {
         if (ev.key === 'Escape') {
-            if (isEventHandled(ev, 'ComposerTextInput.closeMentionSuggestions')) {
+            if (isEventHandled(ev, 'ComposerTextInput.closeSuggestions')) {
                 return;
             }
             if (isEventHandled(ev, 'Composer.closeEmojisPopover')) {
@@ -340,13 +354,6 @@ class Composer extends Component {
         await this._fileUploaderRef.comp.uploadFiles(ev.clipboardData.files);
     }
 
-    /**
-     * @private
-     */
-    _onTextInputKeydownEnter() {
-        this._postMessage();
-    }
-
 }
 
 Object.assign(Composer, {
@@ -357,7 +364,6 @@ Object.assign(Composer, {
         hasDiscardButton: false,
         hasFollowers: false,
         hasSendButton: true,
-        hasTextInputSendOnEnterEnabled: true,
         hasThreadName: false,
         hasThreadTyping: false,
         isCompact: true,
@@ -381,7 +387,6 @@ Object.assign(Composer, {
             optional: true,
         },
         hasSendButton: Boolean,
-        hasTextInputSendOnEnterEnabled: Boolean,
         hasThreadName: Boolean,
         hasThreadTyping: Boolean,
         showAttachmentsExtensions: {
@@ -403,6 +408,15 @@ Object.assign(Composer, {
         },
         isCompact: Boolean,
         isExpandable: Boolean,
+        /**
+         * If set, keyboard shortcuts from text input to send message.
+         * If not set, will use default values from `ComposerTextInput`.
+         */
+        textInputSendShortcuts: {
+            type: Array,
+            element: String,
+            optional: true,
+        },
     },
     template: 'mail.Composer',
 });

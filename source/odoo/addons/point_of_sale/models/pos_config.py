@@ -348,7 +348,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'payment_method_ids')
     def _check_company_payment(self):
         if self.env['pos.payment.method'].search_count([('id', 'in', self.payment_method_ids.ids), ('company_id', '!=', self.company_id.id)]):
-            raise ValidationError(_("The method payments and the point of sale must belong to the same company."))
+            raise ValidationError(_("The payment methods and the point of sale must belong to the same company."))
 
     @api.constrains('pricelist_id', 'use_pricelist', 'available_pricelist_ids', 'journal_id', 'invoice_journal_id', 'payment_method_ids')
     def _check_currencies(self):
@@ -565,6 +565,12 @@ class PosConfig(models.Model):
              'params': {'wait': True}
          }
 
+    def _force_http(self):
+        return False
+
+    def _get_pos_base_url(self):
+        return '/pos/web' if self._force_http() else '/pos/ui'
+
     # Methods to open the POS
     def open_ui(self):
         """Open the pos interface with config_id as an extra argument.
@@ -579,7 +585,7 @@ class PosConfig(models.Model):
         self._validate_fields(set(self._fields) - {"cash_control"})
         return {
             'type': 'ir.actions.act_url',
-            'url':   '/pos/web?config_id=%d' % self.id,
+            'url': self._get_pos_base_url() + '?config_id=%d' % self.id,
             'target': 'self',
         }
 

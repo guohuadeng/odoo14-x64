@@ -6,29 +6,15 @@ from odoo import api, fields, models, tools, SUPERUSER_ID, _
 from odoo.exceptions import MissingError, UserError, ValidationError, AccessError
 from odoo.osv import expression
 from odoo.tools.safe_eval import safe_eval, test_python_expr
-from odoo.tools import wrap_module
-from odoo.http import request
 
 import base64
 from collections import defaultdict
-import datetime
 import functools
 import logging
-import time
 
 from pytz import timezone
 
 _logger = logging.getLogger(__name__)
-
-# build dateutil helper, starting with the relevant *lazy* imports
-import dateutil
-import dateutil.parser
-import dateutil.relativedelta
-import dateutil.rrule
-import dateutil.tz
-mods = {'parser', 'relativedelta', 'rrule', 'tz'}
-attribs = {atr for m in mods for atr in getattr(dateutil, m).__all__}
-dateutil = wrap_module(dateutil, mods | attribs)
 
 
 class IrActions(models.Model):
@@ -84,9 +70,9 @@ class IrActions(models.Model):
         return {
             'uid': self._uid,
             'user': self.env.user,
-            'time': time,
-            'datetime': datetime,
-            'dateutil': dateutil,
+            'time': tools.safe_eval.time,
+            'datetime': tools.safe_eval.datetime,
+            'dateutil': tools.safe_eval.dateutil,
             'timezone': timezone,
             'b64encode': base64.b64encode,
             'b64decode': base64.b64decode,
@@ -139,14 +125,12 @@ class IrActions(models.Model):
     def _for_xml_id(self, full_xml_id):
         """ Returns the action content for the provided xml_id
 
-        :param module: the module the act_window originates in
         :param xml_id: the namespace-less id of the action (the @id
                        attribute from the XML file)
         :return: A read() view of the ir.actions.action safe for web use
         """
         record = self.env.ref(full_xml_id)
         assert isinstance(self.env[record._name], type(self))
-        # TO CHECK MAT: check groups_id/res_model access?
         action = record.sudo().read()[0]
         return {
             field: value

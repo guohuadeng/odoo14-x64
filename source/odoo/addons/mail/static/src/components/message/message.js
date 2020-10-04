@@ -140,7 +140,7 @@ class Message extends Component {
             // TODO FIXME for public user this might not be accessible. task-2223236
             // we should probably use the correspondig attachment id + access token
             // or create a dedicated route to get message image, checking the access right of the message
-            return `/web/image/res.partner/${this.message.author.id}/image_128`;
+            return this.message.author.avatarUrl;
         } else if (this.message.message_type === 'email') {
             return '/mail/static/src/img/email_icon.png';
         }
@@ -166,8 +166,9 @@ class Message extends Component {
             return false;
         }
         if (
-            this.message.originThread &&
-            this.message.originThread.correspondent === this.message.author
+            this.threadView &&
+            this.threadView.thread &&
+            this.threadView.thread.correspondent === this.message.author
         ) {
             return false;
         }
@@ -435,22 +436,15 @@ class Message extends Component {
             ev.preventDefault();
             return;
         }
-        if (ev.target.closest('.o_mention')) {
-            this.env.messaging.openProfile({
-                id: Number(ev.target.dataset.oeId),
-                model: ev.target.dataset.oeModel,
-            });
-            // avoid following dummy href
-            ev.preventDefault();
-            return;
-        }
-        if (ev.target.closest('.o_mail_redirect')) {
-            this.env.messaging.openProfile({
-                id: Number(ev.target.dataset.oeId),
-                model: ev.target.dataset.oeModel,
-            });
-            // avoid following dummy href
-            ev.preventDefault();
+        if (ev.target.tagName === 'A') {
+            if (ev.target.dataset.oeId && ev.target.dataset.oeModel) {
+                this.env.messaging.openProfile({
+                    id: Number(ev.target.dataset.oeId),
+                    model: ev.target.dataset.oeModel,
+                });
+                // avoid following dummy href
+                ev.preventDefault();
+            }
             return;
         }
         this.state.isClicked = !this.state.isClicked;

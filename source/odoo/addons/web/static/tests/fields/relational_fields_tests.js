@@ -997,7 +997,7 @@ QUnit.module('relational_fields', {
     });
 
     QUnit.test('widget selection, edition and on many2one field', async function (assert) {
-        assert.expect(19);
+        assert.expect(21);
 
         this.data.partner.onchanges = {product_id: function () {}};
         this.data.partner.records[0].product_id = 37;
@@ -1024,10 +1024,14 @@ QUnit.module('relational_fields', {
         assert.containsNone(form.$('.o_form_view'), 'select');
         assert.strictEqual(form.$('.o_field_widget[name=product_id]').text(), 'xphone',
             "should have rendered the many2one field correctly");
+        assert.strictEqual(form.$('.o_field_widget[name=product_id]').attr('raw-value'), '37',
+            "should have set the raw-value attr for many2one field correctly");
         assert.strictEqual(form.$('.o_field_widget[name=trululu]').text(), '',
             "should have rendered the unset many2one field correctly");
         assert.strictEqual(form.$('.o_field_widget[name=color]').text(), 'Red',
             "should have rendered the selection field correctly");
+        assert.strictEqual(form.$('.o_field_widget[name=color]').attr('raw-value'), 'red',
+            "should have set the raw-value attr for selection field correctly");
 
         await testUtils.form.clickEdit(form);
 
@@ -2540,6 +2544,37 @@ QUnit.module('relational_fields', {
     });
 
     QUnit.module('FieldReference');
+
+    QUnit.test('Reference field can quick create models', async function (assert) {
+        assert.expect(8);
+
+        const form = await createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: `<form><field name="reference"/></form>`,
+            mockRPC(route, args) {
+                assert.step(args.method || route);
+                return this._super(...arguments);
+            },
+        });
+
+        await testUtils.fields.editSelect(form.$('select'), 'partner');
+        await testUtils.fields.many2one.searchAndClickItem('reference', {search: 'new partner'});
+        await testUtils.form.clickSave(form);
+
+        assert.verifySteps([
+            'onchange',
+            'name_search', // for the select
+            'name_search', // for the spawned many2one
+            'name_create',
+            'create',
+            'read',
+            'name_get'
+        ], "The name_create method should have been called");
+
+        form.destroy();
+    });
 
     QUnit.test('Reference field in modal readonly mode', async function (assert) {
         assert.expect(4);

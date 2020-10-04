@@ -880,7 +880,10 @@ class Website(models.Model):
             Returns a tuple (name, url, icon).
             Where icon can be a module name, or a path
         """
-        suggested_controllers = [(_('Homepage'), url_for('/'), 'website')]
+        suggested_controllers = [
+            (_('Homepage'), url_for('/'), 'website'),
+            (_('Contact Us'), url_for('/contactus'), 'website_crm'),
+        ]
         return suggested_controllers
 
     @api.model
@@ -908,11 +911,13 @@ class Website(models.Model):
             return self.env["ir.actions.actions"]._for_xml_id("website.backend_dashboard")
         return self.env["ir.actions.actions"]._for_xml_id("website.action_website")
 
-    def button_go_website(self):
+    def button_go_website(self, path='/', mode_edit=False):
         self._force()
+        if mode_edit:
+            path += '?enable_editor=1'
         return {
             'type': 'ir.actions.act_url',
-            'url': '/',
+            'url': path,
             'target': 'self',
         }
 

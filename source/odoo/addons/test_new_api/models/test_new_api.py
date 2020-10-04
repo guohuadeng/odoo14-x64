@@ -170,6 +170,7 @@ class Message(models.Model):
         if operator not in ('=', '!=', '<', '<=', '>', '>=', 'in', 'not in'):
             return []
         # retrieve all the messages that match with a specific SQL query
+        self.flush(['body'])
         query = """SELECT id FROM "%s" WHERE char_length("body") %s %%s""" % \
                 (self._table, operator)
         self.env.cr.execute(query, (value,))
@@ -592,6 +593,27 @@ class ComputeOnchangeLine(models.Model):
     foo = fields.Char()
     record_id = fields.Many2one('test_new_api.compute.onchange',
                                 required=True, ondelete='cascade')
+
+
+class ComputeDynamicDepends(models.Model):
+    _name = 'test_new_api.compute.dynamic.depends'
+    _description = "Computed field with dynamic dependencies"
+
+    name1 = fields.Char()
+    name2 = fields.Char()
+    name3 = fields.Char()
+    full_name = fields.Char(compute='_compute_full_name')
+
+    def _get_full_name_fields(self):
+        # the fields to use are stored in a config parameter
+        depends = self.env['ir.config_parameter'].get_param('test_new_api.full_name', '')
+        return depends.split(',') if depends else []
+
+    @api.depends(lambda self: self._get_full_name_fields())
+    def _compute_full_name(self):
+        fnames = self._get_full_name_fields()
+        for record in self:
+            record.full_name = ", ".join(filter(None, (record[fname] for fname in fnames)))
 
 
 class ComputeUnassigned(models.Model):
@@ -1105,3 +1127,23 @@ class ShareCacheComputeLine(models.Model):
     parent_id = fields.Many2one('test_new_api.model_shared_cache_compute_parent')
     amount = fields.Integer()
     user_id = fields.Many2one('res.users', default= lambda self: self.env.user)  # Note: There is an ir.rule about this.
+
+
+class ComputeContainer(models.Model):
+    _name = _description = 'test_new_api.compute.container'
+
+    name = fields.Char()
+    member_ids = fields.One2many('test_new_api.compute.member', 'container_id')
+
+
+class ComputeMember(models.Model):
+    _name = _description = 'test_new_api.compute.member'
+
+    name = fields.Char()
+    container_id = fields.Many2one('test_new_api.compute.container', compute='_compute_container', store=True)
+
+    @api.depends('name')
+    def _compute_container(self):
+        container = self.env['test_new_api.compute.container']
+        for member in self:
+            member.container_id = container.search([('name', '=', member.name)], limit=1)

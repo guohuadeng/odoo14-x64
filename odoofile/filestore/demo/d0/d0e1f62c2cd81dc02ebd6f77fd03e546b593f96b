@@ -1,0 +1,4 @@
+
+/* /web/static/src/js/main.js defined in bundle 'web.assets_backend_prod_only' */
+odoo.define('web.web_client',function(require){"use strict";const AbstractService=require('web.AbstractService');const env=require('web.env');const session=require("web.session");const WebClient=require('web.WebClient');owl.config.mode=env.isDebug()?"dev":"prod";owl.Component.env=env;AbstractService.prototype.deployServices(env);const webClient=new WebClient();async function startWebClient(){await session.is_bound;env.qweb.addTemplates(session.owlTemplates);await owl.utils.whenReady();webClient.setElement($(document.body));webClient.start();}
+startWebClient();return webClient;});

@@ -6,6 +6,7 @@ import hmac
 import json
 import logging
 import odoo
+import requests
 import werkzeug
 
 import odoo.addons.iap.tools.iap_tools
@@ -160,16 +161,28 @@ class MailClientExtensionController(http.Controller):
         if 'enrichment_info' in iap_data:
             return None, iap_data['enrichment_info']
 
+        phone_numbers = iap_data.get('phone_numbers')
+        emails = iap_data.get('email')
         new_company_info = {
             'is_company': True,
             'name': iap_data.get("name"),
             'street': iap_data.get("street_name"),
             'city': iap_data.get("city"),
             'zip': iap_data.get("postal_code"),
-            'phone': iap_data.get('phone_numbers', [''])[0],
+            'phone': phone_numbers[0] if phone_numbers else None,
             'website': iap_data.get("domain"),
-            'email': iap_data.get('email', [''])[0]
+            'email': emails[0] if emails else None
         }
+
+        logo_url = iap_data.get('logo')
+        if logo_url:
+            try:
+                response = requests.get(logo_url, timeout=2)
+                if response.ok:
+                    new_company_info['image_1920'] = base64.b64encode(response.content)
+            except Exception as e:
+                _logger.warning('Download of image for new company %r failed, error %r' % (new_company_info.name, e))
+
         if iap_data.get('country_code'):
             country = request.env['res.country'].search([('code', '=', iap_data['country_code'].upper())])
             if country:
@@ -184,7 +197,12 @@ class MailClientExtensionController(http.Controller):
 
         new_company_info['iap_enrich_info'] = json.dumps(iap_data)
         new_company = request.env['res.partner'].create(new_company_info)
-
+        new_company.message_post_with_view(
+            'iap_mail.enrich_company',
+            values=iap_data,
+            subtype_id=request.env.ref('mail.mt_note').id,
+        )
+        
         return new_company, {'type': 'company_created'}
 
     @http.route('/mail_client_extension/partner/get', type="json", auth="outlook", cors="*")
@@ -220,6 +238,7 @@ class MailClientExtensionController(http.Controller):
                 if not company: # create and enrich company
                     company, enrichment_info = self._create_company_from_iap(sender_domain)
                     response['enrichment_info'] = enrichment_info
+                partner.write({'parent_id': company})
                 response['partner']['company'] = self._get_company_dict(company)
         else: #no partner found
             response['partner'] = {

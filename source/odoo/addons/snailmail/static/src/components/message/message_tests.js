@@ -46,7 +46,8 @@ QUnit.test('Sent', async function (assert) {
     assert.expect(8);
 
     await this.start();
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -60,10 +61,10 @@ QUnit.test('Sent', async function (assert) {
             notification_status: 'sent',
             notification_type: 'snail',
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -73,7 +74,7 @@ QUnit.test('Sent', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -88,7 +89,7 @@ QUnit.test('Sent', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.containsOnce(
         document.body,
@@ -116,7 +117,8 @@ QUnit.test('Canceled', async function (assert) {
     assert.expect(8);
 
     await this.start();
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -130,10 +132,10 @@ QUnit.test('Canceled', async function (assert) {
             notification_status: 'canceled',
             notification_type: 'snail',
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -143,7 +145,7 @@ QUnit.test('Canceled', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -158,7 +160,7 @@ QUnit.test('Canceled', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.containsOnce(
         document.body,
@@ -186,7 +188,8 @@ QUnit.test('Pending', async function (assert) {
     assert.expect(8);
 
     await this.start();
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -200,10 +203,10 @@ QUnit.test('Pending', async function (assert) {
             notification_status: 'ready',
             notification_type: 'snail',
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -213,7 +216,7 @@ QUnit.test('Pending', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -228,7 +231,7 @@ QUnit.test('Pending', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.containsOnce(
         document.body,
@@ -263,7 +266,8 @@ QUnit.test('No Price Available', async function (assert) {
             return this._super(...arguments);
         },
     });
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -278,10 +282,10 @@ QUnit.test('No Price Available', async function (assert) {
             notification_status: 'exception',
             notification_type: 'snail',
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -291,7 +295,7 @@ QUnit.test('No Price Available', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -306,7 +310,7 @@ QUnit.test('No Price Available', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.containsOnce(
         document.body,
@@ -349,7 +353,8 @@ QUnit.test('Credit Error', async function (assert) {
             return this._super(...arguments);
         },
     });
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -364,10 +369,10 @@ QUnit.test('Credit Error', async function (assert) {
             notification_status: 'exception',
             notification_type: 'snail',
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -377,7 +382,7 @@ QUnit.test('Credit Error', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -392,7 +397,7 @@ QUnit.test('Credit Error', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.containsOnce(
         document.body,
@@ -440,7 +445,8 @@ QUnit.test('Trial Error', async function (assert) {
             return this._super(...arguments);
         },
     });
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -455,10 +461,10 @@ QUnit.test('Trial Error', async function (assert) {
             notification_status: 'exception',
             notification_type: 'snail',
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -468,7 +474,7 @@ QUnit.test('Trial Error', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -483,7 +489,7 @@ QUnit.test('Trial Error', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.containsOnce(
         document.body,
@@ -539,7 +545,8 @@ QUnit.test('Format Error', async function (assert) {
     });
 
     await this.start({ env: { bus } });
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['create', {
             id: 11,
             model: 'mail.channel',
@@ -554,10 +561,10 @@ QUnit.test('Format Error', async function (assert) {
             notification_status: 'exception',
             notification_type: 'snail',
         }]],
-        originThread: [['link', threadView.thread]],
+        originThread: [['link', threadViewer.thread]],
     });
     await this.createMessageComponent(message, {
-        threadViewLocalId: threadView.localId
+        threadViewLocalId: threadViewer.threadView.localId
     });
 
     assert.containsOnce(
@@ -567,7 +574,7 @@ QUnit.test('Format Error', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -582,7 +589,7 @@ QUnit.test('Format Error', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.verifySteps(
         ['do_action'],
@@ -627,11 +634,14 @@ QUnit.test('Missing Required Fields', async function (assert) {
     await this.start({
         env: { bus },
     });
-    const threadView = this.env.models['mail.thread_view'].create({
+    const threadViewer = this.env.models['mail.thread_viewer'].create({
+        hasThreadView: true,
         thread: [['insert', { id: 20, model: 'res.partner' }]],
     });
     const message = this.env.models['mail.message'].find(message => message.id === 10);
-    await this.createMessageComponent(message, { threadViewLocalId: threadView.localId });
+    await this.createMessageComponent(message, {
+        threadViewLocalId: threadViewer.threadView.localId,
+    });
 
     assert.containsOnce(
         document.body,
@@ -640,7 +650,7 @@ QUnit.test('Missing Required Fields', async function (assert) {
     );
     assert.containsOnce(
         document.body,
-        '.o_Message_notificationIconContainer',
+        '.o_Message_notificationIconClickable',
         "should display the notification icon container"
     );
     assert.containsOnce(
@@ -655,7 +665,7 @@ QUnit.test('Missing Required Fields', async function (assert) {
     );
 
     await afterNextRender(() => {
-        document.querySelector('.o_Message_notificationIconContainer').click();
+        document.querySelector('.o_Message_notificationIconClickable').click();
     });
     assert.verifySteps(
         ['do_action'],

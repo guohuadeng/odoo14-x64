@@ -20,11 +20,12 @@ class ResConfigSettings(models.TransientModel):
     module_google_calendar = fields.Boolean(
         string='Allow the users to synchronize their calendar  with Google Calendar')
     module_microsoft_calendar = fields.Boolean(
-        string='Allow the users to synchronize their calendar with Office 365 Calendar')
+        string='Allow the users to synchronize their calendar with Outlook Calendar')
     module_google_drive = fields.Boolean("Attach Google documents to any record")
     module_google_spreadsheet = fields.Boolean("Google Spreadsheet")
     module_auth_oauth = fields.Boolean("Use external authentication providers (OAuth)")
     module_auth_ldap = fields.Boolean("LDAP Authentication")
+    # TODO: remove in master
     module_base_gengo = fields.Boolean("Translate Your Website with Gengo")
     module_account_inter_company_rules = fields.Boolean("Manage Inter Company")
     module_pad = fields.Boolean("Collaborative Pads")

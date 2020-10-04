@@ -41,6 +41,7 @@
                                     <group string="Taxes" attrs="{'invisible': [('tax_line_id','=',False), ('tax_ids','=',[])]}">
                                         <field name="tax_line_id" readonly="1" attrs="{'invisible': [('tax_line_id','=',False)]}"/>
                                         <field name="tax_ids" widget="many2many_tags" readonly="1" attrs="{'invisible': [('tax_ids','=',[])]}"/>
+                                        <field name="tax_exigible" attrs="{'readonly':[('parent_state','=','posted')]}"/>
                                         <field name="tax_audit"/>
                                     </group>
                                     <group string="Matching" attrs="{'invisible':[('matched_debit_ids', '=', []),('matched_credit_ids', '=', [])]}">
@@ -286,7 +287,8 @@
             <field name="mode">primary</field>
             <field name="inherit_id" ref="account.view_move_line_tree"/>
             <field name="arch" type="xml">
-                <field name="matching_number" position="after">
+                <field name="move_id" position="replace"/>
+                <field name="matching_number" position="replace">
                     <field name="tax_line_id" string="Tax"/>
                     <field name="tax_base_amount" sum="Total Base Amount"/>
                     <field name="tax_audit"/>
@@ -294,7 +296,6 @@
                 </field>
                 <field name="date_maturity" position="replace"/>
                 <field name="analytic_account_id" position="replace"/>
-                <field name="matching_number" position="replace"/>
                 <field name="debit" position="replace"/>
                 <field name="credit" position="replace"/>
             </field>
@@ -399,7 +400,6 @@
             <field name="model">account.move</field>
             <field name="arch" type="xml">
                 <tree string="Invoices"
-                      banner_route="/account/account_invoice_onboarding"
                       js_class="account_tree"
                       sample="1">
                     <header>
@@ -428,9 +428,37 @@
                     <field name="currency_id" invisible="1"/>
                     <field name="company_currency_id" invisible="1"/>
                     <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" optional="show"/>
-                    <field name="payment_state" widget="badge" decoration-danger="payment_state in ('not_paid')"  decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')" attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"/>
+                    <field name="payment_state" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')" attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"/>
                     <field name="move_type" invisible="context.get('default_move_type', True)"/>
                   </tree>
+            </field>
+        </record>
+
+        <record id="view_out_invoice_tree" model="ir.ui.view">
+            <field name="name">account.out.invoice.tree</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="banner_route">/account/account_invoice_onboarding</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_in_invoice_tree" model="ir.ui.view">
+            <field name="name">account.out.invoice.tree</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='ref']" position="attributes">
+                    <attribute name="optional">show</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='payment_state']" position="attributes">
+                    <attribute name="optional">hide</attribute>
+                </xpath>
             </field>
         </record>
 
@@ -487,7 +515,7 @@
                         <button name="action_post" string="Post" class="oe_highlight"
                                 type="object" groups="account.group_account_invoice"
                                 attrs="{'invisible': ['|', '|', ('state', '!=', 'draft'), ('auto_post', '=', True), ('move_type', '!=', 'entry')]}"/>
-                        <button name="action_post" string="Validate" class="oe_highlight"
+                        <button name="action_post" string="Confirm" class="oe_highlight"
                                 type="object" groups="account.group_account_invoice"
                                 attrs="{'invisible': ['|', '|', ('state', '!=', 'draft'), ('auto_post', '=', True), ('move_type', '=', 'entry')]}"/>
                         <!-- Send (only invoices) -->
@@ -540,7 +568,7 @@
                     <div groups="account.group_account_invoice,account.group_account_readonly"
                          class="alert alert-info" role="alert" style="margin-bottom:0px;"
                          attrs="{'invisible': ['|', '|', ('move_type', 'not in', ('in_invoice', 'in_refund')), ('invoice_has_outstanding', '=', False), ('payment_state', 'not in', ('not_paid', 'partial'))]}">
-                        You have <bold><a class="alert-link" href="#outstanding" role="button">outstanding debits</a></bold> for this supplier. You can allocate them to mark this bill as paid.
+                        You have <bold><a class="alert-link" href="#outstanding" role="button">outstanding debits</a></bold> for this vendor. You can allocate them to mark this bill as paid.
                     </div>
                     <div class="alert alert-info" role="alert" style="margin-bottom:0px;"
                          attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('auto_post', '=', False)]}">
@@ -678,12 +706,12 @@
                                         options="{'no_create': True}"
                                         attrs="{'readonly': [('posted_before', '=', True)]}"/>
                                     <span class="oe_inline o_form_label mx-3 oe_read_only"
-                                        groups="account.group_account_readonly,base.group_multi_currency"> in </span>
+                                        groups="base.group_multi_currency"> in </span>
                                     <!-- Bigger margin on the left because in edit mode the external link button covers the text -->
                                     <span class="oe_inline o_form_label mr-3 ml-5 oe_edit_only"
-                                        groups="account.group_account_readonly,base.group_multi_currency"> in </span>
+                                        groups="base.group_multi_currency"> in </span>
                                     <field name="currency_id"
-                                        groups="account.group_account_readonly,base.group_multi_currency"
+                                        groups="base.group_multi_currency"
                                         attrs="{'readonly': [('posted_before', '=', True)]}"/>
                                 </div>
                             </group>
@@ -778,7 +806,6 @@
                                         <field name="product_uom_category_id" invisible="1"/>
                                         <field name="product_uom_id" groups="uom.group_uom"/>
                                         <field name="price_unit"/>
-                                        <field name="display_type"/>
                                         <templates>
                                             <t t-name="kanban-box">
                                                 <div t-attf-class="oe_kanban_card oe_kanban_global_click {{ record.display_type.raw_value ? 'o_is_' + record.display_type.raw_value : '' }}">
@@ -859,7 +886,7 @@
                                                 <field name="quantity"/>
                                                 <field name="product_uom_id" groups="uom.group_uom"/>
                                                 <field name="price_unit"/>
-                                                <field name="discount" groups="base.group_no_one"/>
+                                                <field name="discount" groups="product.group_discount_per_so_line"/>
                                                 <field name="currency_id" invisible="1"/>
                                             </group>
                                             <group>
@@ -1296,7 +1323,7 @@
             <field name="name">Invoices</field>
             <field name="res_model">account.move</field>
             <field name="view_mode">tree,kanban,form</field>
-            <field name="view_id" ref="view_invoice_tree"/>
+            <field name="view_id" ref="view_out_invoice_tree"/>
             <field name="search_view_id" ref="view_account_invoice_filter"/>
             <field name="domain">[('move_type', '=', 'out_invoice')]</field>
             <field name="context">{'default_move_type': 'out_invoice'}</field>
@@ -1331,7 +1358,7 @@
             <field name="name">Bills</field>
             <field name="res_model">account.move</field>
             <field name="view_mode">tree,kanban,form</field>
-            <field name="view_id" ref="view_invoice_tree"/>
+            <field name="view_id" ref="view_in_invoice_tree"/>
             <field name="search_view_id" ref="view_account_invoice_filter"/>
             <field name="domain">[('move_type', '=', 'in_invoice')]</field>
             <field name="context">{'default_move_type': 'in_invoice'}</field>
@@ -1348,7 +1375,7 @@
             <field name="name">Refunds</field>
             <field name="res_model">account.move</field>
             <field name="view_mode">tree,kanban,form</field>
-            <field name="view_id" ref="view_invoice_tree"/>
+            <field name="view_id" ref="view_in_invoice_tree"/>
             <field name="search_view_id" ref="view_account_invoice_filter"/>
             <field name="domain">[('move_type', '=', 'in_refund')]</field>
             <field name="context">{'default_move_type': 'in_refund'}</field>
@@ -1383,7 +1410,7 @@
             <field name="name">Receipts</field>
             <field name="res_model">account.move</field>
             <field name="view_mode">tree,kanban,form</field>
-            <field name="view_id" ref="view_invoice_tree"/>
+            <field name="view_id" ref="view_in_invoice_tree"/>
             <field name="search_view_id" ref="view_account_invoice_filter"/>
             <field name="domain">[('move_type', '=', 'in_receipt')]</field>
             <field name="context">{'default_move_type': 'in_receipt'}</field>

@@ -7,6 +7,7 @@ var time = require('web.time');
 var core = require('web.core');
 var Dialog = require('web.Dialog');
 var dom = require('web.dom');
+var utils = require('web.utils');
 
 var _t = core._t;
 
@@ -35,6 +36,12 @@ publicWidget.registry.SurveyFormWidget = publicWidget.Widget.extend({
             self.options = self.$target.find('form').data();
             self.readonly = self.options.readonly;
             self.selectedAnswers = self.options.selectedAnswers;
+
+            // Add Survey cookie to retrieve the survey if you quit the page and restart the survey.
+            if (!utils.get_cookie('survey_' + self.options.surveyToken)) {
+                utils.set_cookie('survey_' + self.options.surveyToken, self.options.answerToken, 60*60*24);
+            }
+
             // Init fields
             if (!self.options.isStartScreen && !self.readonly) {
                 self._initTimer();
@@ -110,11 +117,7 @@ publicWidget.registry.SurveyFormWidget = publicWidget.Widget.extend({
                    && letter.match(/[a-z]/i)) {
             var $choiceInput = this.$(`input[data-selection-key=${letter}]`);
             if ($choiceInput.length === 1) {
-                if ($choiceInput.attr('type') === 'radio') {
-                    $choiceInput.prop("checked", true).trigger('change');
-                } else {
-                    $choiceInput.prop("checked", !$choiceInput.prop("checked")).trigger('change');
-                }
+                $choiceInput.prop("checked", !$choiceInput.prop("checked")).trigger('change');
 
                 // Avoid selection key to be typed into the textbox if 'other' is selected by key
                 event.preventDefault();
@@ -422,6 +425,7 @@ publicWidget.registry.SurveyFormWidget = publicWidget.Widget.extend({
         var selectorsToFadeout = ['.o_survey_form_content'];
         if (options.isFinish) {
             selectorsToFadeout.push('.breadcrumb', '.o_survey_timer');
+            utils.set_cookie('survey_' + self.options.surveyToken, '', -1);  // delete cookie
         }
         self.$(selectorsToFadeout.join(',')).fadeOut(this.fadeInOutDelay, function () {
             resolveFadeOut();
@@ -848,9 +852,19 @@ publicWidget.registry.SurveyFormWidget = publicWidget.Widget.extend({
      * @private
      */
     _initSessionManagement: function () {
+        var self = this;
         if (this.options.surveyToken && this.options.sessionInProgress) {
             this.call('bus_service', 'addChannel', this.options.surveyToken);
             this.call('bus_service', 'startPolling');
+
+            if (!this._checkIsMasterTab()) {
+                this.shouldReloadMasterTab = true;
+                this.masterTabCheckInterval = setInterval(function() {
+                     if (self._checkIsMasterTab()) {
+                        clearInterval(self.masterTabCheckInterval);
+                     }
+                }, 2000);
+            }
 
             this.call('bus_service', 'onNotification', this, this._onNotification);
         }
@@ -971,6 +985,29 @@ publicWidget.registry.SurveyFormWidget = publicWidget.Widget.extend({
         if ($firstTextInput.length > 0) {
             $firstTextInput.focus();
         }
+    },
+
+    /**
+    * This method check if the current tab is the master tab at the bus level.
+    * If not, the survey could not receive next question notification anymore from session manager.
+    * We then ask the participant to close all other tabs on the same hostname before letting them continue.
+    *
+    * @private
+    */
+    _checkIsMasterTab: function () {
+        var isMasterTab = this.call('bus_service', 'isMasterTab');
+        var $errorModal = this.$('#MasterTabErrorModal');
+        if (isMasterTab) {
+            // Force reload the page when survey is ready to be followed, to force restart long polling
+            if (this.shouldReloadMasterTab) {
+                window.location.reload();
+            }
+           return true;
+        } else if (!$errorModal.modal._isShown){
+            $errorModal.find('.text-danger').text(window.location.hostname);
+            $errorModal.modal('show');
+        }
+        return false;
     },
 
     // CONDITIONAL QUESTIONS MANAGEMENT TOOLS

@@ -8,8 +8,6 @@ const utils = require('web.utils');
 
 function factory(dependencies) {
 
-    let nextPublicId = -1;
-
     class Partner extends dependencies['mail.model'] {
 
         //----------------------------------------------------------------------
@@ -58,19 +56,13 @@ function factory(dependencies) {
                     data2.user = [
                         ['insert', {
                             id: data.user_id[0],
-                            partnerDisplayName: data.user_id[1],
+                            display_name: data.user_id[1],
                         }],
                     ];
                 }
             }
 
             return data2;
-        }
-
-        static getNextPublicId() {
-            const id = nextPublicId;
-            nextPublicId -= 1;
-            return id;
         }
 
         /**
@@ -199,6 +191,14 @@ function factory(dependencies) {
         //----------------------------------------------------------------------
 
         /**
+         * @private
+         * @returns {string}
+         */
+        _computeAvatarUrl() {
+            return `/web/image/res.partner/${this.id}/image_128`;
+        }
+
+        /**
          * @override
          */
         static _createRecordLocalId(data) {
@@ -254,7 +254,15 @@ function factory(dependencies) {
 
         /**
          * @private
-         * @returns {string}
+         * @returns {string|undefined}
+         */
+        _computeDisplayName() {
+            return this.display_name || this.user && this.user.display_name;
+        }
+
+        /**
+         * @private
+         * @returns {string|undefined}
          */
         _computeNameOrDisplayName() {
             return this.name || this.display_name;
@@ -266,12 +274,23 @@ function factory(dependencies) {
         active: attr({
             default: true,
         }),
+        avatarUrl: attr({
+            compute: '_computeAvatarUrl',
+            dependencies: [
+                'id',
+            ],
+        }),
         correspondentThreads: one2many('mail.thread', {
             inverse: 'correspondent',
         }),
         country: many2one('mail.country'),
         display_name: attr({
+            compute: '_computeDisplayName',
             default: "",
+            dependencies: [
+                'display_name',
+                'userDisplayName',
+            ],
         }),
         email: attr(),
         failureNotifications: one2many('mail.notification', {
@@ -311,6 +330,12 @@ function factory(dependencies) {
         }),
         user: one2one('mail.user', {
             inverse: 'partner',
+        }),
+        /**
+         * Serves as compute dependency.
+         */
+        userDisplayName: attr({
+            related: 'user.display_name',
         }),
     };
 

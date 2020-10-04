@@ -14,7 +14,7 @@ http://nightly.odoo.com/13.0/nightly/src/odoo_13.0.latest.zip
 1. python 3.7.5, 64位
 2. postgresql 10.10 ,64位
 3. Nginx 1.15.5， 64位
-4. Odoo 13社区版，20200525版
+4. Odoo 14社区版，20201004版
 5. 增加 sphinx 及 tx_client，用于文档及翻译
 6. 本地执行 gi.bat，会将原始odoo的最新版clone到本地 .\source_git，执行 gu.bat 更新
 7. 对断点调试的处理， 如果更新了新版odoo，将 .\fixed 目录内容覆盖 .\source 内容
@@ -39,9 +39,9 @@ http://demo.erpapp.cn
 - 系统已有默认数据库 demo，登录用户/密码:  admin/admin
 - 重新初始化数据库：执行 init.bat
 - 如多版本并存，请自行调整nginx的映射端口
-- odoo13下载地址 https://codeload.github.com/odoo/odoo/zip/13.0
-- 高速odoo13下载地址 http://nightly.odoocdn.com/master/nightly/src/odoo_13.0alpha1.latest.zip
-- odoo13 deb http://nightly.odoocdn.com/master/nightly/deb/odoo_13.0alpha1.latest_all.deb
+- odoo14下载地址 https://codeload.github.com/odoo/odoo/zip/14.0
+- 高速odoo14下载地址 http://nightly.odoo.com/14.0/nightly/src/odoo_14.0.latest.zip
+- odoo14 deb http://nightly.odoo.com/14.0/nightly/deb/odoo_14.0.latest_all.deb
 - pycharm配置说明： http://www.sunpop.cn/odoo_12_11_10_dev_with_pycharm_setup/
 - 数据库：demo，底层密码 odoo
 - 数据库用户： admin admin

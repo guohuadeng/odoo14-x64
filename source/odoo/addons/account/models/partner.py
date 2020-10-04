@@ -32,9 +32,9 @@ class AccountFiscalPosition(models.Model):
     auto_apply = fields.Boolean(string='Detect Automatically', help="Apply automatically this fiscal position.")
     vat_required = fields.Boolean(string='VAT required', help="Apply only if partner has a VAT number.")
     country_id = fields.Many2one('res.country', string='Country',
-        help="Apply only if delivery or invoicing country match.")
+        help="Apply only if delivery country matches.")
     country_group_id = fields.Many2one('res.country.group', string='Country Group',
-        help="Apply only if delivery or invoicing country match the group.")
+        help="Apply only if delivery country matches the group.")
     state_ids = fields.Many2many('res.country.state', string='Federal States')
     zip_from = fields.Char(string='Zip Range From')
     zip_to = fields.Char(string='Zip Range To')
@@ -492,16 +492,16 @@ class ResPartner(models.Model):
                     vals['supplier_rank'] = 1
         return super().create(vals_list)
 
-    def _increase_rank(self, field):
+    def _increase_rank(self, field, n=1):
         if self.ids and field in ['customer_rank', 'supplier_rank']:
             try:
                 with self.env.cr.savepoint(flush=False):
                     query = sql.SQL("""
                         SELECT {field} FROM res_partner WHERE ID IN %(partner_ids)s FOR UPDATE NOWAIT;
-                        UPDATE res_partner SET {field} = {field} + 1
+                        UPDATE res_partner SET {field} = {field} + %(n)s
                         WHERE id IN %(partner_ids)s
                     """).format(field=sql.Identifier(field))
-                    self.env.cr.execute(query, {'partner_ids': tuple(self.ids)})
+                    self.env.cr.execute(query, {'partner_ids': tuple(self.ids), 'n': n})
                     for partner in self:
                         self.env.cache.remove(partner, partner._fields[field])
             except DatabaseError as e:

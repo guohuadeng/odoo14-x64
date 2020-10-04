@@ -543,3 +543,25 @@
 2020-08-29 14:04:18.653 HKT [18576] LOG:  worker process: logical replication launcher (PID 20340) exited with exit code 1
 2020-08-29 14:04:18.660 HKT [852] LOG:  shutting down
 2020-08-29 14:04:18.835 HKT [18576] LOG:  database system is shut down
+2020-10-04 19:23:43.400 HKT [11428] LOG:  listening on IPv6 address "::1", port 5432
+2020-10-04 19:23:43.400 HKT [11428] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-10-04 19:23:43.489 HKT [13736] LOG:  database system was shut down at 2020-10-04 19:23:40 HKT
+2020-10-04 19:23:43.568 HKT [11428] LOG:  database system is ready to accept connections
+2020-10-04 19:24:39.923 HKT [11428] LOG:  received fast shutdown request
+2020-10-04 19:24:39.926 HKT [11428] LOG:  aborting any active transactions
+2020-10-04 19:24:39.926 HKT [5000] ERROR:  canceling statement due to user request
+2020-10-04 19:24:39.941 HKT [11428] LOG:  worker process: logical replication launcher (PID 5000) exited with exit code 1
+2020-10-04 19:24:39.942 HKT [6308] LOG:  shutting down
+2020-10-04 19:24:39.989 HKT [11428] LOG:  database system is shut down
+2020-10-04 19:24:53.682 HKT [9320] LOG:  listening on IPv6 address "::1", port 5432
+2020-10-04 19:24:53.682 HKT [9320] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-10-04 19:24:53.771 HKT [2220] LOG:  database system was shut down at 2020-10-04 19:24:39 HKT
+2020-10-04 19:24:53.845 HKT [9320] LOG:  database system is ready to accept connections
+2020-10-04 19:26:32.695 HKT [9320] LOG:  received fast shutdown request
+2020-10-04 19:26:32.698 HKT [9320] LOG:  aborting any active transactions
+2020-10-04 19:26:32.698 HKT [7916] FATAL:  terminating connection due to administrator command
+2020-10-04 19:26:32.699 HKT [2060] FATAL:  terminating connection due to administrator command
+2020-10-04 19:26:32.699 HKT [16288] FATAL:  terminating connection due to administrator command
+2020-10-04 19:26:32.721 HKT [9320] LOG:  worker process: logical replication launcher (PID 12684) exited with exit code 1
+2020-10-04 19:26:32.727 HKT [11272] LOG:  shutting down
+2020-10-04 19:26:33.316 HKT [9320] LOG:  database system is shut down

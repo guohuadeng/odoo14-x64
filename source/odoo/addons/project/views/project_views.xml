@@ -328,15 +328,7 @@
                                     <field name="privacy_visibility" widget="radio"/>
                                     <field name="allowed_internal_user_ids" widget="many2many_tags" attrs="{'invisible': [('privacy_visibility', '!=', 'followers')]}"/>
                                     <field name="allowed_portal_user_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('privacy_visibility', '!=', 'portal')]}"/>
-                                    <span colspan="2" class="oe_edit_only text-muted"
-                                          attrs="{'invisible': [('privacy_visibility', '!=', 'portal')]}">
-                                        <dl class="o_project_portal_warning_dl">
-                                            <dt class="o_project_portal_warning_dt" aria-hidden="True">
-                                                <i class="fa fa-exclamation-triangle fa-sm"/>&amp;nbsp;</dt>
-                                            <dd class="o_project_portal_warning_dd">Allowed Portal Users will see all the tasks of this project without distinction.<br/>
-                                                Leave empty to restrict the access to the portal users' own tasks.</dd>
-                                        </dl>
-                                    </span>
+
                                     <field name="company_id" groups="base.group_multi_company"/>
                                 </group>
                                 <group name="extra_settings">
@@ -666,8 +658,8 @@
                         <group>
                             <field name="active" invisible="1"/>
                             <field name="partner_id" class="o_task_customer_field"/>
-                            <field name="partner_phone" widget="phone" attrs="{'invisible': [('partner_id', '=', False)]}"/>
                             <field name="partner_email" widget="email" attrs="{'invisible': [('partner_id', '=', False)]}"/>
+                            <field name="partner_phone" widget="phone" attrs="{'invisible': [('partner_id', '=', False)]}"/>
                             <field name="legend_blocked" invisible="1"/>
                             <field name="legend_normal" invisible="1"/>
                             <field name="legend_done" invisible="1"/>

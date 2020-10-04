@@ -81,7 +81,11 @@ QUnit.test('sidebar: pinned channel 3: open pinned channel and unpin it', async 
 
     // channel that is expected to be found in the sidebar
     // with a random unique id that will be referenced in the test
-    this.data['mail.channel'].records.push({ id: 20 });
+    this.data['mail.channel'].records.push({
+        id: 20,
+        is_minimized: true,
+        state: 'open',
+    });
     await this.start({
         async mockRPC(route, args) {
             if (args.method === 'execute_command') {
@@ -126,8 +130,8 @@ QUnit.test('sidebar: pinned channel 3: open pinned channel and unpin it', async 
     );
     assert.containsOnce(
         document.body,
-        `.o_Discuss_thread[data-thread-local-id="${this.env.messaging.inbox.localId}"]`,
-        "The Inbox is opened in discuss"
+        '.o_Discuss_noThread',
+        "should have no thread opened in discuss"
     );
 });
 
@@ -182,8 +186,8 @@ QUnit.test('sidebar: unpin channel from bus', async function (assert) {
     });
     assert.containsOnce(
         document.body,
-        `.o_Discuss_thread[data-thread-local-id="${this.env.messaging.inbox.localId}"]`,
-        "The Inbox is opened in discuss"
+        '.o_Discuss_noThread',
+        "should have no thread opened in discuss"
     );
     assert.containsNone(
         document.body,

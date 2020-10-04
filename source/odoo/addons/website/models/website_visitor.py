@@ -38,7 +38,7 @@ class WebsiteVisitor(models.Model):
 
     # localisation and info
     country_id = fields.Many2one('res.country', 'Country', readonly=True)
-    country_flag = fields.Binary(related="country_id.image", string="Country Flag")
+    country_flag = fields.Char(related="country_id.image_url", string="Country Flag")
     lang_id = fields.Many2one('res.lang', string='Language', help="Language from the website when visitor has been created")
     timezone = fields.Selection(_tz_get, string='Timezone')
     email = fields.Char(string='Email', compute='_compute_email_phone')
@@ -137,7 +137,7 @@ class WebsiteVisitor(models.Model):
     def action_send_mail(self):
         self.ensure_one()
         if not self._check_for_message_composer():
-            raise UserError(_("There is no contact and/or no email linked this visitor."))
+            raise UserError(_("There are no contact and/or no email linked to this visitor."))
         visitor_composer_ctx = self._prepare_message_composer_context()
         compose_form = self.env.ref('mail.email_compose_message_wizard_form', False)
         compose_ctx = dict(

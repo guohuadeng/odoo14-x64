@@ -6,7 +6,7 @@
     <t t-call="website_event.layout">
         <div class="o_wevent_online o_weagenda_index">
             <!-- Options -->
-            <t t-set="option_track_wishlist" t-value="not event.is_done and request.website.viewref('website_event_track.agenda_topbar_wishlist').active"/>
+            <t t-set="option_track_wishlist" t-value="not event.is_done and is_view_active('website_event_track.agenda_topbar_wishlist')"/>
             <!-- Topbar -->
             <t t-call="website_event_track.agenda_topbar"/>
             <!-- Drag/Drop Area -->
@@ -89,7 +89,7 @@
 
         <!-- Day Agenda -->
         <div class="o_we_online_agenda">
-        <table id="table_search" class="table table-sm border-0">
+        <table id="table_search" class="table table-sm border-0 h-100">
             <!--Header-->
             <tr>
                 <th class="border-0 bg-white position-sticky"/>
@@ -115,16 +115,22 @@
                         <t t-set="tracks" t-value="time_slots[day][time_slot].get(location, {})"/>
                         <t t-if="tracks">
                             <t t-foreach="tracks" t-as="track">
+                                <t t-set="_classes"
+                                    t-value="'text-center %s %s %s' % (
+                                        'event_color_%s' % (track.color) if track.color else 'bg-100',
+                                        'event_track h-100' if track else '',
+                                        'o_location_size_%d' % len(locations),
+                                    )"/>
                                 <t t-if="track.location_id and track.location_id == location">
                                     <td t-att-rowspan="tracks[track]['rowspan']"
-                                        t-attf-class="text-center event_color_#{track.color} #{track and 'event_track' or ''} o_location_size_#{len(locations)}">
+                                        t-att-class="_classes">
                                         <t t-call="website_event_track.agenda_main_track"/>
                                     </td>
                                 </t>
                                 <t t-else="">
                                     <td t-att-colspan="len(locations)-1"
                                         t-att-rowspan="tracks[track]['rowspan']"
-                                        t-attf-class="text-center event_color_#{track.color} #{track and 'event_track' or ''} o_location_size_#{len(locations)}">
+                                        t-att-class="_classes">
                                         <t t-call="website_event_track.agenda_main_track"/>
                                     </td>
                                 </t>
@@ -149,7 +155,7 @@
 
 <template id="agenda_main_track" name="Track Agenda: Track">
     <div class="d-flex flex-column h-100">
-        <div class="d-flex justify-content-end flex-wrap-reverse o_weagenda_track_badges">
+        <div class="d-flex justify-content-end flex-wrap-reverse align-items-center o_weagenda_track_badges">
             <small t-if="track.is_track_live and not track.is_track_done and track.website_published"
                 class="mx-1 badge badge-danger">Live
             </small>

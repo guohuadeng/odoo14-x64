@@ -2,14 +2,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
 from odoo.exceptions import UserError, AccessError
-from odoo.tools.safe_eval import safe_eval
+from odoo.tools.safe_eval import safe_eval, time
 from odoo.tools.misc import find_in_path
 from odoo.tools import config
 from odoo.sql_db import TestCursor
 from odoo.http import request
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS, FALSE_DOMAIN
 
-import time
 import base64
 import io
 import logging
@@ -145,7 +144,11 @@ class IrActionsReport(models.Model):
 
     def _get_readable_fields(self):
         return super()._get_readable_fields() | {
-            "params", "report_name", "report_type", "target",
+            "report_name", "report_type", "target",
+            # these two are not real fields of ir.actions.report but are
+            # expected in the route /report/<converter>/<reportname> and must
+            # not be removed by clean_action
+            "context", "data",
         }
 
     def associated_view(self):
@@ -694,13 +697,13 @@ class IrActionsReport(models.Model):
             data = {}
         data.setdefault('report_type', 'pdf')
 
-        # access the report details with sudo() but evaluation context as sudo(False)
+        # access the report details with sudo() but evaluation context as current user
         self_sudo = self.sudo()
 
         # In case of test environment without enough workers to perform calls to wkhtmltopdf,
         # fallback to render_html.
         if (tools.config['test_enable'] or tools.config['test_file']) and not self.env.context.get('force_report_rendering'):
-            return self_sudo._render_qweb_html(res_ids, data=data)
+            return self._render_qweb_html(res_ids, data=data)
 
         # As the assets are generated during the same transaction as the rendering of the
         # templates calling them, there is a scenario where the assets are unreachable: when
@@ -791,7 +794,7 @@ class IrActionsReport(models.Model):
             data = {}
         data.setdefault('report_type', 'text')
         data = self._get_rendering_context(docids, data)
-        return self._render_template(self.report_name, data), 'text'
+        return self._render_template(self.sudo().report_name, data), 'text'
 
     @api.model
     def _render_qweb_html(self, docids, data=None):
@@ -801,7 +804,7 @@ class IrActionsReport(models.Model):
             data = {}
         data.setdefault('report_type', 'html')
         data = self._get_rendering_context(docids, data)
-        return self._render_template(self.report_name, data), 'html'
+        return self._render_template(self.sudo().report_name, data), 'html'
 
     @api.model
     def _get_rendering_context_model(self):
@@ -810,23 +813,22 @@ class IrActionsReport(models.Model):
 
     @api.model
     def _get_rendering_context(self, docids, data):
+        # access the report details with sudo() but evaluation context as current user
+        self_sudo = self.sudo()
+
         # If the report is using a custom model to render its html, we must use it.
         # Otherwise, fallback on the generic html rendering.
-        report_model = self._get_rendering_context_model()
+        report_model = self_sudo._get_rendering_context_model()
 
         data = data and dict(data) or {}
 
-
         if report_model is not None:
-            # _render_ may be executed in sudo but evaluation context as real user
-            report_model = report_model.sudo(False)
             data.update(report_model._get_report_values(docids, data=data))
         else:
-            # _render_ may be executed in sudo but evaluation context as real user
-            docs = self.env[self.model].sudo(False).browse(docids)
+            docs = self.env[self_sudo.model].browse(docids)
             data.update({
                 'doc_ids': docids,
-                'doc_model': self.model,
+                'doc_model': self_sudo.model,
                 'docs': docs,
             })
         return data
@@ -866,7 +868,7 @@ class IrActionsReport(models.Model):
 
         discard_logo_check = self.env.context.get('discard_logo_check')
         if self.env.is_admin() and not self.env.company.external_report_layout_id and config and not discard_logo_check:
-            action = self.env["ir.actions.actions"]._for_xml_id("base.action_base_document_layout_configurator")
+            action = self.env["ir.actions.actions"]._for_xml_id("web.action_base_document_layout_configurator")
             ctx = action.get('context')
             py_ctx = json.loads(ctx) if ctx else {}
             report_action['close_on_report_download'] = True

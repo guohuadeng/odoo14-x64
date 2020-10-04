@@ -9,7 +9,7 @@ from datetime import datetime
 
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError, AccessError
-from odoo.tools import misc
+from odoo.tools import misc, sql
 from odoo.tools.translate import html_translate
 from odoo.addons.http_routing.models.ir_http import slug
 
@@ -145,7 +145,13 @@ class Forum(models.Model):
 
     @api.depends('post_ids.state', 'post_ids.views', 'post_ids.child_count', 'post_ids.favourite_count')
     def _compute_forum_statistics(self):
-        result = dict((cid, dict(total_posts=0, total_views=0, total_answers=0, total_favorites=0)) for cid in self.ids)
+        default_stats = {'total_posts': 0, 'total_views': 0, 'total_answers': 0, 'total_favorites': 0}
+
+        if not self.ids:
+            self.update(default_stats)
+            return
+
+        result = dict.fromkeys(self.ids, default_stats)
         read_group_res = self.env['forum.post'].read_group(
             [('forum_id', 'in', self.ids), ('state', 'in', ('active', 'close')), ('parent_id', '=', False)],
             ['forum_id', 'views', 'child_count', 'favourite_count'],
@@ -850,10 +856,9 @@ class Post(models.Model):
             result.append(comment.unlink())
         return result
 
-    def set_viewed(self):
+    def _set_viewed(self):
         self.ensure_one()
-        self._cr.execute("""UPDATE forum_post SET views = views+1 WHERE views = %s and id = %s""", (self.views, self.id,))
-        return True
+        return sql.increment_field_skiplock(self, 'views')
 
     def get_access_action(self, access_uid=None):
         """ Instead of the classic form view, redirect to the post on the website directly """

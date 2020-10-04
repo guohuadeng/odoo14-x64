@@ -99,7 +99,7 @@ class Website(Home):
         """ Redirect regular users (employees) to the backend) and others to
         the frontend
         """
-        if not redirect and request.params['login_success']:
+        if not redirect and request.params.get('login_success'):
             if request.env['res.users'].browse(uid).has_group('base.group_user'):
                 redirect = b'/web?' + request.httprequest.query_string
             else:
@@ -386,8 +386,9 @@ class Website(Home):
         values = {}
         if 'website_published' in Model._fields:
             values['website_published'] = not record.website_published
-        record.write(values)
-        return bool(record.website_published)
+            record.write(values)
+            return bool(record.website_published)
+        return False
 
     @http.route(['/website/seo_suggest'], type='json', auth="user", website=True)
     def seo_suggest(self, keywords=None, lang=None):

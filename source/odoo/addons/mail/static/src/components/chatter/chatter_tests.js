@@ -9,6 +9,7 @@ const {
     afterNextRender,
     beforeEach,
     createRootComponent,
+    nextAnimationFrame,
     start,
 } = require('mail/static/src/utils/test_utils.js');
 
@@ -92,7 +93,7 @@ QUnit.test('base rendering when chatter has no attachment', async function (asse
 });
 
 QUnit.test('base rendering when chatter has no record', async function (assert) {
-    assert.expect(7);
+    assert.expect(8);
 
     await this.start();
     const chatter = this.env.models['mail.chatter'].create({
@@ -132,6 +133,11 @@ QUnit.test('base rendering when chatter has no record', async function (assert) 
         document.querySelector(`.o_Message_content`).textContent,
         "Creating a new record...",
         "should have the 'Creating a new record ...' message"
+    );
+    assert.containsNone(
+        document.body,
+        '.o_MessageList_loadMore',
+        "should not have the 'load more' button"
     );
 });
 
@@ -322,12 +328,12 @@ QUnit.test('should not display user notification messages in chatter', async fun
     assert.expect(1);
 
     this.data['res.partner'].records.push({ id: 100 });
-    this.data['mail.message'].records = [{
+    this.data['mail.message'].records.push({
         id: 102,
         message_type: 'user_notification',
         model: 'res.partner',
         res_id: 100,
-    }];
+    });
     await this.start();
     const chatter = this.env.models['mail.chatter'].create({
         threadId: 100,
@@ -339,6 +345,110 @@ QUnit.test('should not display user notification messages in chatter', async fun
         document.body,
         '.o_Message',
         "should display no messages"
+    );
+});
+
+QUnit.test('post message with "CTRL-Enter" keyboard shortcut', async function (assert) {
+    assert.expect(2);
+
+    this.data['res.partner'].records.push({ id: 100 });
+    await this.start();
+    const chatter = this.env.models['mail.chatter'].create({
+        threadId: 100,
+        threadModel: 'res.partner',
+    });
+    await this.createChatterComponent({ chatter });
+    assert.containsNone(
+        document.body,
+        '.o_Message',
+        "should not have any message initially in chatter"
+    );
+
+    await afterNextRender(() =>
+        document.querySelector('.o_ChatterTopbar_buttonSendMessage').click()
+    );
+    await afterNextRender(() => {
+        document.querySelector(`.o_ComposerTextInput_textarea`).focus();
+        document.execCommand('insertText', false, "Test");
+    });
+    await afterNextRender(() => {
+        const kevt = new window.KeyboardEvent('keydown', { ctrlKey: true, key: "Enter" });
+        document.querySelector('.o_ComposerTextInput_textarea').dispatchEvent(kevt);
+    });
+    assert.containsOnce(
+        document.body,
+        '.o_Message',
+        "should now have single message in chatter after posting message from pressing 'CTRL-Enter' in text input of composer"
+    );
+});
+
+QUnit.test('post message with "META-Enter" keyboard shortcut', async function (assert) {
+    assert.expect(2);
+
+    this.data['res.partner'].records.push({ id: 100 });
+    await this.start();
+    const chatter = this.env.models['mail.chatter'].create({
+        threadId: 100,
+        threadModel: 'res.partner',
+    });
+    await this.createChatterComponent({ chatter });
+    assert.containsNone(
+        document.body,
+        '.o_Message',
+        "should not have any message initially in chatter"
+    );
+
+    await afterNextRender(() =>
+        document.querySelector('.o_ChatterTopbar_buttonSendMessage').click()
+    );
+    await afterNextRender(() => {
+        document.querySelector(`.o_ComposerTextInput_textarea`).focus();
+        document.execCommand('insertText', false, "Test");
+    });
+    await afterNextRender(() => {
+        const kevt = new window.KeyboardEvent('keydown', { key: "Enter", metaKey: true });
+        document.querySelector('.o_ComposerTextInput_textarea').dispatchEvent(kevt);
+    });
+    assert.containsOnce(
+        document.body,
+        '.o_Message',
+        "should now have single message in channel after posting message from pressing 'META-Enter' in text input of composer"
+    );
+});
+
+QUnit.test('do not post message with "Enter" keyboard shortcut', async function (assert) {
+    // Note that test doesn't assert Enter makes a newline, because this
+    // default browser cannot be simulated with just dispatching
+    // programmatically crafted events...
+    assert.expect(2);
+
+    this.data['res.partner'].records.push({ id: 100 });
+    await this.start();
+    const chatter = this.env.models['mail.chatter'].create({
+        threadId: 100,
+        threadModel: 'res.partner',
+    });
+    await this.createChatterComponent({ chatter });
+    assert.containsNone(
+        document.body,
+        '.o_Message',
+        "should not have any message initially in chatter"
+    );
+
+    await afterNextRender(() =>
+        document.querySelector('.o_ChatterTopbar_buttonSendMessage').click()
+    );
+    await afterNextRender(() => {
+        document.querySelector(`.o_ComposerTextInput_textarea`).focus();
+        document.execCommand('insertText', false, "Test");
+    });
+    const kevt = new window.KeyboardEvent('keydown', { key: "Enter" });
+    document.querySelector('.o_ComposerTextInput_textarea').dispatchEvent(kevt);
+    await nextAnimationFrame();
+    assert.containsNone(
+        document.body,
+        '.o_Message',
+        "should still not have any message in mailing channel after pressing 'Enter' in text input of composer"
     );
 });
 

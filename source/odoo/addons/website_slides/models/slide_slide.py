@@ -18,6 +18,7 @@ from odoo.addons.http_routing.models.ir_http import slug
 from odoo.exceptions import Warning, UserError, AccessError
 from odoo.http import request
 from odoo.addons.http_routing.models.ir_http import url_for
+from odoo.tools import sql
 
 
 class SlidePartnerRelation(models.Model):
@@ -251,7 +252,13 @@ class Slide(models.Model):
     @api.depends('slide_partner_ids.vote')
     @api.depends_context('uid')
     def _compute_user_info(self):
-        slide_data = dict.fromkeys(self.ids, dict({'likes': 0, 'dislikes': 0, 'user_vote': False}))
+        default_stats = {'likes': 0, 'dislikes': 0, 'user_vote': False}
+
+        if not self.ids:
+            self.update(default_stats)
+            return
+
+        slide_data = dict.fromkeys(self.ids, default_stats)
         slide_partners = self.env['slide.slide.partner'].sudo().search([
             ('slide_id', 'in', self.ids)
         ])
@@ -611,7 +618,7 @@ class Slide(models.Model):
             self.env.user.add_karma(karma_to_add)
 
     def action_set_viewed(self, quiz_attempts_inc=False):
-        if not all(slide.channel_id.is_member for slide in self):
+        if any(not slide.channel_id.is_member for slide in self):
             raise UserError(_('You cannot mark a slide as viewed if you are not among its members.'))
 
         return bool(self._action_set_viewed(self.env.user.partner_id, quiz_attempts_inc=quiz_attempts_inc))
@@ -623,11 +630,8 @@ class Slide(models.Model):
             ('slide_id', 'in', self.ids),
             ('partner_id', '=', target_partner.id)
         ])
-        if quiz_attempts_inc:
-            for exsting_slide in existing_sudo:
-                exsting_slide.write({
-                    'quiz_attempts_count': exsting_slide.quiz_attempts_count + 1
-                })
+        if quiz_attempts_inc and existing_sudo:
+            sql.increment_field_skiplock(existing_sudo, 'quiz_attempts_count')
 
         new_slides = self_sudo - existing_sudo.mapped('slide_id')
         return SlidePartnerSudo.create([{
@@ -638,7 +642,7 @@ class Slide(models.Model):
             'vote': 0} for new_slide in new_slides])
 
     def action_set_completed(self):
-        if not all(slide.channel_id.is_member for slide in self):
+        if any(not slide.channel_id.is_member for slide in self):
             raise UserError(_('You cannot mark a slide as completed if you are not among its members.'))
 
         return self._action_set_completed(self.env.user.partner_id)
@@ -663,7 +667,7 @@ class Slide(models.Model):
         return True
 
     def _action_set_quiz_done(self):
-        if not all(slide.channel_id.is_member for slide in self):
+        if any(not slide.channel_id.is_member for slide in self):
             raise UserError(_('You cannot mark a slide quiz as completed if you are not among its members.'))
 
         points = 0

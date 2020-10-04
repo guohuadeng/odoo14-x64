@@ -234,12 +234,12 @@ const UserValueWidget = Widget.extend({
             const buildImgExtensionSwitcher = (from, to) => {
                 const regex = new RegExp(`${from}$`, 'i');
                 return ev => {
-                    const img = ev.currentTarget;
+                    const img = ev.currentTarget.getElementsByTagName("img")[0];
                     img.src = img.src.replace(regex, to);
                 };
             };
-            this.$el.on('mouseenter.img_animate', 'img', buildImgExtensionSwitcher('png', 'gif'));
-            this.$el.on('mouseleave.img_animate', 'img', buildImgExtensionSwitcher('gif', 'png'));
+            this.$el.on('mouseenter.img_animate', buildImgExtensionSwitcher('png', 'gif'));
+            this.$el.on('mouseleave.img_animate', buildImgExtensionSwitcher('gif', 'png'));
         }
     },
     /**
@@ -861,7 +861,8 @@ const SelectUserValueWidget = BaseSelectionUserValueWidget.extend({
         let textContent = '';
         const activeWidget = this._userValueWidgets.find(widget => !widget.isPreviewed() && widget.isActive());
         if (activeWidget) {
-            const value = (activeWidget.el.dataset.selectLabel || activeWidget.el.textContent.trim());
+            const svgTag = activeWidget.el.querySelector('svg'); // useful to avoid searching text content in svg element
+            const value = (activeWidget.el.dataset.selectLabel || (!svgTag && activeWidget.el.textContent.trim()));
             const imgSrc = activeWidget.el.dataset.img;
             if (value) {
                 textContent = value;
@@ -1043,6 +1044,9 @@ const InputUserValueWidget = UnitUserValueWidget.extend({
         var unitEl = document.createElement('span');
         unitEl.textContent = unit;
         this.containerEl.appendChild(unitEl);
+        if (unit.length > 3) {
+            this.el.classList.add('o_we_large_input');
+        }
     },
 
     //--------------------------------------------------------------------------
@@ -1680,7 +1684,6 @@ const SelectPagerUserValueWidget = SelectUserValueWidget.extend({
 
         this.pageNum = document.createElement('span');
         this.currentPage = 0;
-        this._updatePageNum();
 
         const next = document.createElement('i');
         next.classList.add('o_we_pager_next', 'fa', 'fa-chevron-right');
@@ -1691,9 +1694,16 @@ const SelectPagerUserValueWidget = SelectUserValueWidget.extend({
         pagerControls.appendChild(this.pageNum);
         pagerControls.appendChild(next);
 
+        this.pageName = document.createElement('b');
+        const pagerHeader = document.createElement('div');
+        pagerHeader.classList.add('o_we_pager_header');
+        pagerHeader.appendChild(this.pageName);
+        pagerHeader.appendChild(pagerControls);
+
         await _super(...arguments);
         this.menuEl.classList.add('o_we_has_pager');
-        $(this.menuEl).prepend(pagerControls);
+        $(this.menuEl).prepend(pagerHeader);
+        this._updatePage();
     },
 
     //--------------------------------------------------------------------------
@@ -1705,9 +1715,11 @@ const SelectPagerUserValueWidget = SelectUserValueWidget.extend({
      *
      * @private
      */
-    _updatePageNum() {
+    _updatePage() {
         this.pages.forEach((page, i) => page.classList.toggle('active', i === this.currentPage));
         this.pageNum.textContent = `${this.currentPage + 1}/${this.numPages}`;
+        const activePage = this.pages.find((page, i) => i === this.currentPage);
+        this.pageName.textContent = activePage.getAttribute('string');
     },
 
     //--------------------------------------------------------------------------
@@ -1724,7 +1736,7 @@ const SelectPagerUserValueWidget = SelectUserValueWidget.extend({
         ev.stopPropagation();
         const delta = ev.target.matches('.o_we_pager_next') ? 1 : -1;
         this.currentPage = (this.currentPage + this.numPages + delta) % this.numPages;
-        this._updatePageNum();
+        this._updatePage();
     },
     /**
      * @override
@@ -1735,7 +1747,7 @@ const SelectPagerUserValueWidget = SelectUserValueWidget.extend({
             const currentPage = this.pages.indexOf(activeButton.el.closest('we-select-page'));
             if (currentPage !== -1) {
                 this.currentPage = currentPage;
-                this._updatePageNum();
+                this._updatePage();
             }
         }
         return this._super(...arguments);
@@ -1808,6 +1820,7 @@ const SnippetOptionWidget = Widget.extend({
         this.ownerDocument = this.$target[0].ownerDocument;
 
         this._userValueWidgets = [];
+        this._actionQueues = new Map();
     },
     /**
      * @override
@@ -2676,9 +2689,34 @@ const SnippetOptionWidget = Widget.extend({
             }
         }
 
+        // Queue action so that we can later skip useless actions.
+        if (!this._actionQueues.get(widget)) {
+            this._actionQueues.set(widget, []);
+        }
+        const currentAction = {previewMode};
+        this._actionQueues.get(widget).push(currentAction);
+
         // Ask a mutexed snippet update according to the widget value change
         const shouldRecordUndo = (!previewMode && !ev.data.isSimulatedEvent);
         this.trigger_up('snippet_edition_request', {exec: async () => {
+            // Filter actions that are counterbalanced by earlier/later actions
+            const actionQueue = this._actionQueues.get(widget).filter(({previewMode}, i, actions) => {
+                const prev = actions[i - 1];
+                const next = actions[i + 1];
+                if (previewMode === true && next && next.previewMode) {
+                    return false;
+                } else if (previewMode === 'reset' && prev && prev.previewMode) {
+                    return false;
+                }
+                return true;
+            });
+            // Skip action if it's been counterbalanced
+            if (!actionQueue.includes(currentAction)) {
+                this._actionQueues.set(widget, actionQueue);
+                return;
+            }
+            this._actionQueues.set(widget, actionQueue.filter(action => action !== currentAction));
+
             if (ev.data.prepare) {
                 ev.data.prepare();
             }
@@ -3101,7 +3139,11 @@ const ImageHandlerOption = SnippetOptionWidget.extend({
      * @override
      */
     _computeVisibility() {
-        const src = this._getImg().getAttribute('src');
+        const img = this._getImg();
+        if (!['image/jpeg', 'image/png'].includes(img.dataset.mimetype)) {
+            return false;
+        }
+        const src = img.getAttribute('src');
         return src && src !== '/';
     },
     /**
@@ -3296,6 +3338,7 @@ registry.ImageOptimize = ImageHandlerOption.extend({
             this._getImg().dataset.resizeWidth = this.optimizedWidth;
             await this._applyOptions();
             await this.updateUI();
+            this.trigger_up('cover_update');
         }});
     },
     /**
@@ -3566,6 +3609,30 @@ registry.BackgroundImage = SnippetOptionWidget.extend({
             this.$target.trigger('background_changed', [previewMode]);
         }
     },
+    /**
+     * Changes the main color of dynamic SVGs.
+     *
+     * @see this.selectClass for parameters
+     */
+    async dynamicColor(previewMode, widgetValue, params) {
+        const currentSrc = getBgImageURL(this.$target[0]);
+        switch (previewMode) {
+            case true:
+                this.previousSrc = currentSrc;
+                break;
+            case 'reset':
+                this.$target.css('background-image', `url('${this.previousSrc}')`);
+                return;
+        }
+        const newURL = new URL(currentSrc, window.location.origin);
+        newURL.searchParams.set('c1', normalizeColor(widgetValue));
+        const src = newURL.pathname + newURL.search;
+        await loadImage(src);
+        this.$target.css('background-image', `url('${src}')`);
+        if (!previewMode) {
+            this.previousSrc = src;
+        }
+    },
 
     //--------------------------------------------------------------------------
     // Public
@@ -3596,8 +3663,21 @@ registry.BackgroundImage = SnippetOptionWidget.extend({
      * @override
      */
     _computeWidgetState: function (methodName) {
-        if (methodName === 'background') {
-            return getBgImageURL(this.$target[0]);
+        switch (methodName) {
+            case 'background':
+                return getBgImageURL(this.$target[0]);
+            case 'dynamicColor':
+                return new URL(getBgImageURL(this.$target[0]), window.location.origin).searchParams.get('c1');
+        }
+        return this._super(...arguments);
+    },
+    /**
+     * @override
+     */
+    _computeWidgetVisibility(widgetName, params) {
+        if (widgetName === 'dynamic_color_opt') {
+            const src = new URL(getBgImageURL(this.$target[0]), window.location.origin);
+            return src.origin === window.location.origin && src.pathname.startsWith('/web_editor/shape/');
         }
         return this._super(...arguments);
     },
@@ -3654,7 +3734,7 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
         this._handlePreviewState(previewMode, () => {
             const {colorName} = params;
             const {colors: previousColors} = this._getShapeData();
-            const newColor = widgetValue || this._getDefaultColors()[colorName];
+            const newColor = normalizeColor(widgetValue) || this._getDefaultColors()[colorName];
             const newColors = Object.assign(previousColors, {[colorName]: newColor});
             return {colors: newColors};
         });
@@ -3692,7 +3772,7 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
                 const {shape, colors: customColors} = this._getShapeData();
                 const colors = Object.assign(this._getDefaultColors(), customColors);
                 const color = shape && colors[params.colorName];
-                return color ? normalizeColor(color) : '';
+                return color || '';
             }
             case 'flipX': {
                 return this.$target.find('> .o_we_shape.o_we_flip_x').length !== 0;
@@ -3820,7 +3900,7 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
         const defaultColors = this._getDefaultColors();
         const shapeData = Object.assign(this._getShapeData(), newData);
         const areColorsDefault = Object.entries(shapeData.colors).every(([colorName, colorValue]) => {
-            return colorValue === defaultColors[colorName];
+            return colorValue.toLowerCase() === defaultColors[colorName].toLowerCase();
         });
         if (areColorsDefault) {
             delete shapeData.colors;
@@ -3853,7 +3933,7 @@ registry.BackgroundShape = SnippetOptionWidget.extend({
         }
         const queryString = Object.entries(colors)
             .map(([colorName, colorValue]) => {
-                const encodedCol = encodeURIComponent(normalizeColor(colorValue));
+                const encodedCol = encodeURIComponent(colorValue);
                 return `${colorName}=${encodedCol}`;
             }).join('&');
         return `/web_editor/shape/${shape}.svg?${queryString}`;
@@ -4077,7 +4157,7 @@ registry.BackgroundPosition = SnippetOptionWidget.extend({
      * @param {boolean} activate toggle the overlay on (true) or off (false)
      */
     _toggleBgOverlay: function (activate) {
-        if (this.$backgroundOverlay.is('.oe_active') === activate) {
+        if (!this.$backgroundOverlay || this.$backgroundOverlay.is('.oe_active') === activate) {
             return;
         }
 
@@ -4493,6 +4573,86 @@ registry.SnippetSave = SnippetOptionWidget.extend({
     },
 });
 
+/**
+ * Handles the dynamic colors for dynamic SVGs.
+ */
+registry.DynamicSvg = SnippetOptionWidget.extend({
+    /**
+     * @override
+     */
+    start() {
+        this.$target.on('image_changed.DynamicSvg', this._onImageChanged.bind(this));
+        return this._super(...arguments);
+    },
+    /**
+     * @override
+     */
+    destroy() {
+        this.$target.off('.DynamicSvg');
+        return this._super(...arguments);
+    },
+
+    //--------------------------------------------------------------------------
+    // Options
+    //--------------------------------------------------------------------------
+
+    /**
+     * Sets the dynamic SVG's dynamic color.
+     *
+     * @see this.selectClass for params
+     */
+    async color(previewMode, widgetValue, params) {
+        const target = this.$target[0];
+        switch (previewMode) {
+            case true:
+                this.previousSrc = target.getAttribute('src');
+                break;
+            case 'reset':
+                target.src = this.previousSrc;
+                return;
+        }
+        const newURL = new URL(target.src, window.location.origin);
+        newURL.searchParams.set('c1', normalizeColor(widgetValue));
+        const src = newURL.pathname + newURL.search;
+        await loadImage(src);
+        target.src = src;
+        if (!previewMode) {
+            this.previousSrc = src;
+        }
+    },
+
+    //--------------------------------------------------------------------------
+    // Private
+    //--------------------------------------------------------------------------
+
+    /**
+     * @override
+     */
+    _computeWidgetState(methodName, params) {
+        switch (methodName) {
+            case 'color':
+                return new URL(this.$target[0].src, window.location.origin).searchParams.get('c1');
+        }
+        return this._super(...arguments);
+    },
+    /**
+     * @override
+     */
+    _computeVisibility(methodName, params) {
+        return this.$target.is("img[src^='/web_editor/shape/']");
+    },
+
+    //--------------------------------------------------------------------------
+    // Handlers
+    //--------------------------------------------------------------------------
+
+    /**
+     * @override
+     */
+    _onImageChanged(methodName, params) {
+        return this.updateUI();
+    },
+});
 
 return {
     SnippetOptionWidget: SnippetOptionWidget,

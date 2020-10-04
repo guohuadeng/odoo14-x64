@@ -17,8 +17,7 @@ var fieldsToGather = [
     "date_delay",
     "date_stop",
     "all_day",
-    "recurrence_update",
-    "create_name_field",
+    "recurrence_update"
 ];
 
 const scalesInfo = {

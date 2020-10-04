@@ -120,3 +120,11 @@ class AliasMixin(models.AbstractModel):
             else:
                 record_values[fname] = values.get(fname)
         return alias_values, record_values
+
+    # --------------------------------------------------
+    # GATEWAY
+    # --------------------------------------------------
+
+    def _alias_check_contact_on_record(self, record, message, message_dict, alias):
+        """ Move to ``BaseModel._alias_get_error_message() """
+        return record._alias_get_error_message(message, message_dict, alias)

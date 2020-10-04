@@ -468,9 +468,17 @@ QUnit.test('chatter updating', async function (assert) {
         { display_name: "first partner", id: 11 },
         { display_name: "second partner", id: 12 }
     );
+    const messageFetchChannelDef = makeDeferred();
     await this.createView({
         data: this.data,
         hasView: true,
+        async mockRPC(route, args) {
+            const res = await this._super(...arguments);
+            if (route.includes('message_fetch')) {
+                messageFetchChannelDef.resolve();
+            }
+            return res;
+        },
         // View params
         View: FormView,
         model: 'res.partner',
@@ -501,8 +509,10 @@ QUnit.test('chatter updating', async function (assert) {
         "there should be no message"
     );
 
-    await afterNextRender(() => {
+    await afterNextRender(async () => {
         document.querySelector('.o_pager_next').click();
+        // wait until messages are fetched, ignore other renders that are too early
+        await messageFetchChannelDef;
     });
     assert.containsOnce(
         document.body,
@@ -739,9 +749,7 @@ QUnit.test('read more links becomes read less after being clicked', async functi
         "read more/less link should contain 'read more' as text"
     );
 
-    await afterNextRender(() => {
-        document.querySelector('.o_Message_readMoreLess').click();
-    });
+    document.querySelector('.o_Message_readMoreLess').click();
     assert.strictEqual(
         document.querySelector('.o_Message_readMoreLess').textContent,
         'read less',
@@ -813,7 +821,7 @@ QUnit.test('Form view not scrolled when switching record', async function (asser
     );
 
     await afterNextRender(async () => {
-        controllerContentEl.scrollTop = controllerContentEl.scrollHeight - controllerContentEl.offsetHeight;
+        controllerContentEl.scrollTop = controllerContentEl.scrollHeight - controllerContentEl.clientHeight;
         await triggerEvent(
             document.querySelector('.o_ThreadView_messageList'),
             'scroll'
@@ -821,7 +829,7 @@ QUnit.test('Form view not scrolled when switching record', async function (asser
     });
     assert.strictEqual(
         controllerContentEl.scrollTop,
-        controllerContentEl.scrollHeight - controllerContentEl.offsetHeight,
+        controllerContentEl.scrollHeight - controllerContentEl.clientHeight,
         "The controller container should be scrolled to its bottom"
     );
 
@@ -842,6 +850,75 @@ QUnit.test('Form view not scrolled when switching record', async function (asser
     );
     assert.strictEqual(controllerContentEl.scrollTop, 0,
         "Form view's scroll position should have been reset when switching back to first record"
+    );
+});
+
+QUnit.test('Attachments that have been unlinked from server should be visually unlinked from record', async function (assert) {
+    // Attachments that have been fetched from a record at certain time and then
+    // removed from the server should be reflected on the UI when the current
+    // partner accesses this record again.
+    assert.expect(2);
+
+    this.data['res.partner'].records.push(
+        { display_name: "Partner1", id: 11 },
+        { display_name: "Partner2", id: 12 }
+    );
+    this.data['ir.attachment'].records.push(
+        {
+           id: 11,
+           mimetype: 'text.txt',
+           res_id: 11,
+           res_model: 'res.partner',
+        },
+        {
+           id: 12,
+           mimetype: 'text.txt',
+           res_id: 11,
+           res_model: 'res.partner',
+        }
+    );
+    await this.createView({
+        data: this.data,
+        hasView: true,
+        // View params
+        View: FormView,
+        model: 'res.partner',
+        res_id: 11,
+        viewOptions: {
+            ids: [11, 12],
+            index: 0,
+        },
+        arch: `
+            <form string="Partners">
+                <sheet>
+                    <field name="name"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        `,
+    });
+    assert.strictEqual(
+        document.querySelector('.o_ChatterTopbar_buttonCount').textContent,
+        '2',
+        "Partner1 should have 2 attachments initially"
+    );
+
+    // The attachment links are updated on (re)load,
+    // so using pager is a way to reload the record "Partner1".
+    await afterNextRender(() =>
+        document.querySelector('.o_pager_next').click()
+    );
+    // Simulate unlinking attachment 12 from Partner 1.
+    this.data['ir.attachment'].records.find(a => a.id === 11).res_id = 0;
+    await afterNextRender(() =>
+        document.querySelector('.o_pager_previous').click()
+    );
+    assert.strictEqual(
+        document.querySelector('.o_ChatterTopbar_buttonCount').textContent,
+        '1',
+        "Partner1 should now have 1 attachment after it has been unlinked from server"
     );
 });
 

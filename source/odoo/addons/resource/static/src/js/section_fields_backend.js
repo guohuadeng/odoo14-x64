@@ -23,7 +23,7 @@ var SectionListRenderer = ListRenderer.extend({
         if (isSection) {
             if (node.attrs.widget === "handle") {
                 return $cell;
-            } else if (node.attrs.name === "display_name") {
+            } else if (node.attrs.name === "name") {
                 var nbrColumns = this._getNumberOfCols();
                 if (this.handleField) {
                     nbrColumns--;
@@ -63,8 +63,6 @@ var SectionListRenderer = ListRenderer.extend({
         var self = this;
         return this._super.apply(this, arguments).then(function () {
             self.$('.o_list_table').addClass('o_section_list_view');
-            // Discard the possibility to remove the sections
-            self.$('.o_is_line_section .o_list_record_remove').remove()
         });
     },
 });

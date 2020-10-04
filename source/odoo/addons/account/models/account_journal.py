@@ -3,6 +3,11 @@ from odoo import api, fields, models, _
 from odoo.osv import expression
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons.base.models.res_bank import sanitize_account_number
+from odoo.tools import remove_accents
+import logging
+import re
+
+_logger = logging.getLogger(__name__)
 
 
 class AccountJournalGroup(models.Model):
@@ -357,6 +362,17 @@ class AccountJournal(models.Model):
             alias_name = self.name
             if self.company_id != self.env.ref('base.main_company'):
                 alias_name += '-' + str(self.company_id.name)
+        try:
+            remove_accents(alias_name).encode('ascii')
+        except UnicodeEncodeError:
+            try:
+                remove_accents(self.code).encode('ascii')
+                safe_alias_name = self.code
+            except UnicodeEncodeError:
+                safe_alias_name = self.type
+            _logger.warning("Cannot use '%s' as email alias, fallback to '%s'",
+                alias_name, safe_alias_name)
+            alias_name = safe_alias_name
         return {
             'alias_defaults': {'move_type': type == 'purchase' and 'in_invoice' or 'out_invoice', 'company_id': self.company_id.id, 'journal_id': self.id},
             'alias_parent_thread_id': self.id,
@@ -529,7 +545,7 @@ class AccountJournal(models.Model):
 
         # === Fill missing alias name ===
         if journal_type in ('sale', 'purchase') and 'alias_name' not in vals:
-            vals['alias_name'] = '%s.%s' % (company.name, vals.get('code'))
+            vals['alias_name'] = '%s-%s' % (company.name, vals.get('code'))
 
     @api.model
     def create(self, vals):
@@ -690,11 +706,11 @@ class AccountJournal(models.Model):
             FROM ''' + tables + '''
             WHERE ''' + where_clause + '''
         '''
-        self._cr.execute(query, where_params)
 
         company_currency = self.company_id.currency_id
         journal_currency = self.currency_id if self.currency_id and self.currency_id != company_currency else False
 
+        self._cr.execute(query, where_params)
         nb_lines, balance, amount_currency = self._cr.fetchone()
         return amount_currency if journal_currency else balance, nb_lines
 

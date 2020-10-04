@@ -30,6 +30,11 @@ function factory(dependencies) {
                     model: 'mail.box',
                     name: this.env._t("Inbox"),
                 }]],
+                moderation: [['create', {
+                    id: 'moderation',
+                    model: 'mail.box',
+                    name: this.env._t("Moderation"),
+                }]],
                 starred: [['create', {
                     id: 'starred',
                     isServerPinned: true,
@@ -37,7 +42,6 @@ function factory(dependencies) {
                     name: this.env._t("Starred"),
                 }]],
             });
-
             const device = this.messaging.device;
             device.start();
             const context = Object.assign({
@@ -124,20 +128,12 @@ function factory(dependencies) {
 
         /**
          * @private
-         * @param {Object[]} shortcodes
+         * @param {Object[]} cannedResponsesData
          */
-        _initCannedResponses(shortcodes) {
-            const messaging = this.messaging;
-            const cannedResponses = shortcodes
-                .map(s => {
-                    const { id, source, substitution } = s;
-                    return { id, source, substitution };
-                })
-                .reduce((obj, cr) => {
-                    obj[cr.id] = cr;
-                    return obj;
-                }, {});
-            messaging.update({ cannedResponses });
+        _initCannedResponses(cannedResponsesData) {
+            this.messaging.update({
+                cannedResponses: [['insert', cannedResponsesData]],
+            });
         }
 
         /**
@@ -157,9 +153,14 @@ function factory(dependencies) {
                 // there might be a lot of channels, insert each of them one by
                 // one asynchronously to avoid blocking the UI
                 await this.async(() => new Promise(resolve => setTimeout(resolve)));
-                this.env.models['mail.thread'].insert(
+                const channel = this.env.models['mail.thread'].insert(
                     this.env.models['mail.thread'].convertData(channelData)
                 );
+                // flux specific: channels received at init have to be
+                // considered pinned. task-2284357
+                if (!channel.isPinned) {
+                    channel.update({ isPendingPinned: true });
+                }
             }
         }
 
@@ -168,18 +169,9 @@ function factory(dependencies) {
          * @param {Object[]} commandsData
          */
         _initCommands(commandsData) {
-            const messaging = this.messaging;
-            const commands = commandsData
-                .map(command => {
-                    return Object.assign({
-                        id: command.name,
-                    }, command);
-                })
-                .reduce((obj, command) => {
-                    obj[command.id] = command;
-                    return obj;
-                }, {});
-            messaging.update({ commands });
+            this.messaging.update({
+                commands: [['insert', commandsData]],
+            });
         }
 
         /**
@@ -199,14 +191,9 @@ function factory(dependencies) {
             this.env.messaging.inbox.update({ counter: needaction_inbox_counter });
             this.env.messaging.starred.update({ counter: starred_counter });
             if (moderation_channel_ids.length > 0) {
-                this.messaging.update({
-                    moderation: [['create', {
-                        counter: moderation_counter,
-                        id: 'moderation',
-                        isServerPinned: true,
-                        model: 'mail.box',
-                        name: this.env._t("Moderation"),
-                    }]],
+                this.messaging.moderation.update({
+                    counter: moderation_counter,
+                    isServerPinned: true,
                 });
             }
         }

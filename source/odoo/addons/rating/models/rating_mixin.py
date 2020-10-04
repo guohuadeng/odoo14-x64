@@ -35,9 +35,9 @@ class RatingParentMixin(models.AbstractModel):
         for item in data:
             parent_id = item['parent_res_id']
             rating = item['rating']
-            if rating >= RATING_LIMIT_SATISFIED:
+            if rating > RATING_LIMIT_OK:
                 grades_per_parent[parent_id]['great'] += item['__count']
-            elif rating > RATING_LIMIT_OK:
+            elif rating > RATING_LIMIT_MIN:
                 grades_per_parent[parent_id]['okay'] += item['__count']
             else:
                 grades_per_parent[parent_id]['bad'] += item['__count']
@@ -258,7 +258,7 @@ class RatingMixin(models.AbstractModel):
         """ get the statistics of the rating repatition
             :param domain : optional domain of the rating to include/exclude in statistic computation
             :return dictionnary where
-                - key is the the name of the information (stat name)
+                - key is the name of the information (stat name)
                 - value is statistic value : 'percent' contains the repartition in percentage, 'avg' is the average rate
                   and 'total' is the number of rating
         """

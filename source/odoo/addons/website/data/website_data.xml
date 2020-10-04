@@ -129,7 +129,7 @@
                                         <td>Interaction History</td>
                                         <td>
                                             <p>
-                                                Users to collect information about your interactions with the website, the pages you've seen,
+                                                Used to collect information about your interactions with the website, the pages you've seen,
                                                 and any specific marketing campaign that brought you to the website.
                                             </p>
                                             <p>We may not be able to provide the best service to you if you reject those cookies, but the website will work.</p>
@@ -250,8 +250,8 @@
             <field name="public" eval="True"/>
             <field name="name">business_conference.jpg</field>
             <field name="res_model">ir.ui.view</field>
-            <field name="type">binary</field>
-            <field name="datas" type="base64" file="website/static/src/img/library/business_conference.jpg"/>
+            <field name="type">url</field>
+            <field name="url">/website/static/src/img/library/business_conference.jpg</field>
         </record>
         <record id="website.library_image_01" model="ir.attachment">
             <field name="public" eval="True"/>
@@ -763,7 +763,7 @@
         </template>
         <!-- Dynamic Snippet Data Source -->
         <record id="dynamic_snippet_data_source_country" model="website.snippet.filter">
-            <field name="field_names">name,code,image,phone_code</field>
+            <field name="field_names">name,code,image_url:image,phone_code:char</field>
             <field name="filter_id" ref="website.dynamic_snippet_country_filter"/>
             <field name="limit" eval="16"/>
             <field name="name">Countries</field>

@@ -90,7 +90,7 @@ class PurchaseRequisition(models.Model):
         ])
         if any(requisitions):
             title = _("Warning for %s", self.vendor_id.name)
-            message = _("There is already an open blanket order for this supplier. We suggest you to use to complete this open blanket order instead of creating a new one.")
+            message = _("There is already an open blanket order for this supplier. We suggest you complete this open blanket order, instead of creating a new one.")
             warning = {
                 'title': title,
                 'message': message
@@ -114,7 +114,7 @@ class PurchaseRequisition(models.Model):
 
     def action_in_progress(self):
         self.ensure_one()
-        if not all(obj.line_ids for obj in self):
+        if not self.line_ids:
             raise UserError(_("You cannot confirm agreement '%s' because there is no product line.", self.name))
         if self.type_id.quantity_copy == 'none' and self.vendor_id:
             for requisition_line in self.line_ids:

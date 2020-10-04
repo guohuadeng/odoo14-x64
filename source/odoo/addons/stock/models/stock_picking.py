@@ -15,6 +15,7 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, format_datetime
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round
+from odoo.tools.misc import format_date
 
 
 class PickingType(models.Model):
@@ -346,13 +347,13 @@ class Picking(models.Model):
         help='Check the existence of destination packages on move lines')
     show_check_availability = fields.Boolean(
         compute='_compute_show_check_availability',
-        help='Technical field used to compute whether the check availability button should be shown.')
+        help='Technical field used to compute whether the button "Check Availability" should be displayed.')
     show_mark_as_todo = fields.Boolean(
         compute='_compute_show_mark_as_todo',
-        help='Technical field used to compute whether the mark as todo button should be shown.')
+        help='Technical field used to compute whether the button "Mark as Todo" should be displayed.')
     show_validate = fields.Boolean(
         compute='_compute_show_validate',
-        help='Technical field used to compute whether the validate should be shown.')
+        help='Technical field used to decide whether the button "Validate" should be displayed.')
     use_create_lots = fields.Boolean(related='picking_type_id.use_create_lots')
     owner_id = fields.Many2one(
         'res.partner', 'Assign Owner',
@@ -400,24 +401,20 @@ class Picking(models.Model):
         for picking in self:
             picking.delay_alert_date = delay_alert_date_data.get(picking.id, False)
 
-    @api.depends('move_lines', 'state')
+    @api.depends('move_lines', 'state', 'picking_type_code', 'move_lines.forecast_availability', 'move_lines.forecast_expected_date')
     def _compute_products_availability(self):
         self.products_availability = False
         self.products_availability_state = 'available'
         pickings = self.filtered(lambda picking: picking.state not in ['cancel', 'draft', 'done'] and picking.picking_type_code == 'outgoing')
+        pickings.products_availability = _('Available')
         for picking in pickings:
-            forecast_data = []
-            for move in picking.move_lines:
-                if move.json_forecast:
-                    forecast_data.append(json.loads(move.json_forecast))
-            picking.products_availability = 'Available'
-            forecast_data.sort(key=lambda line: line.get('sortingDate', ''), reverse=True)
-            if len(forecast_data) > 0 and forecast_data[0].get('sortingDate', False):
-                picking.products_availability = _('Exp %s', forecast_data[0]['expectedDate'])
-                picking.products_availability_state = 'late' if forecast_data[0]['isLate'] else 'expected'
-            elif any(not data.get('reservedAvailability', False) for data in forecast_data):
-                picking.products_availability = 'Not Available'
+            forecast_date = max(picking.move_lines.filtered('forecast_expected_date').mapped('forecast_expected_date'), default=False)
+            if any(float_compare(move.forecast_availability, move.product_qty, move.product_id.uom_id.rounding) == -1 for move in picking.move_lines):
+                picking.products_availability = _('Not Available')
                 picking.products_availability_state = 'late'
+            elif forecast_date:
+                picking.products_availability = _('Exp %s', format_date(self.env, forecast_date))
+                picking.products_availability_state = 'late' if picking.date_deadline < forecast_date else 'expected'
 
     @api.depends('picking_type_id.show_operations')
     def _compute_show_operations(self):
@@ -694,6 +691,9 @@ class Picking(models.Model):
         self.mapped('move_lines')\
             .filtered(lambda move: move.state == 'draft')\
             ._action_confirm()
+
+        # run scheduler for moves forecasted to not have enough in stock
+        self.mapped('move_lines').filtered(lambda move: move.state not in ('draft', 'cancel', 'done'))._trigger_scheduler()
         return True
 
     def action_assign(self):
@@ -712,19 +712,6 @@ class Picking(models.Model):
         package_level_done.write({'is_done': False})
         moves._action_assign()
         package_level_done.write({'is_done': True})
-
-        # run scheduler for moves are not fully reserved
-        orderpoints_by_company = defaultdict(lambda: self.env['stock.warehouse.orderpoint'])
-        for move in moves:
-            orderpoint = self.env['stock.warehouse.orderpoint'].search([
-                ('product_id', '=', move.product_id.id),
-                ('trigger', '=', 'auto'),
-                ('location_id', 'parent_of', move.location_id.id),
-            ], limit=1)
-            if orderpoint:
-                orderpoints_by_company[move.company_id] |= orderpoint
-        for company, orderpoints in orderpoints_by_company.items():
-            orderpoints._procure_orderpoint_confirm(company_id=company, raise_user_error=False)
 
         return True
 
@@ -777,12 +764,7 @@ class Picking(models.Model):
 
         # if incoming moves make other confirmed/partially_available moves available, assign them
         done_incoming_moves = self.filtered(lambda p: p.picking_type_id.code == 'incoming').move_lines.filtered(lambda m: m.state == 'done')
-        domains = []
-        for move in done_incoming_moves:
-            domains.append([('product_id', '=', move.product_id.id), ('location_id', '=', move.location_dest_id.id)])
-        static_domain = [('state', 'in', ['confirmed', 'partially_available']), ('procure_method', '=', 'make_to_stock')]
-        moves_to_reserve = self.env['stock.move'].search(expression.AND([static_domain, expression.OR(domains)]))
-        moves_to_reserve._action_assign()
+        done_incoming_moves._trigger_assign()
 
         self._send_confirmation_email()
         return True
