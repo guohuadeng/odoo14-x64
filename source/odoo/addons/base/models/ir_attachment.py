@@ -201,7 +201,7 @@ class IrAttachment(models.Model):
     def _compute_raw(self):
         for attach in self:
             if attach.store_fname:
-                attach.raw = self._file_read(attach.store_fname)
+                attach.raw = attach._file_read(attach.store_fname)
             else:
                 attach.raw = attach.db_datas
 
@@ -282,7 +282,9 @@ class IrAttachment(models.Model):
 
     def _check_contents(self, values):
         mimetype = values['mimetype'] = self._compute_mimetype(values)
-        xml_like = 'ht' in mimetype or 'xml' in mimetype # hta, html, xhtml, etc.
+        xml_like = 'ht' in mimetype or ( # hta, html, xhtml, etc.
+                'xml' in mimetype and    # other xml (svg, text/xml, etc)
+                not 'openxmlformats' in mimetype)  # exception for Office formats
         user = self.env.context.get('binary_field_real_user', self.env.user)
         force_text = (xml_like and (not user._is_system() or
             self.env.context.get('attachments_mime_plainxml')))
@@ -333,7 +335,7 @@ class IrAttachment(models.Model):
     access_token = fields.Char('Access Token', groups="base.group_user")
 
     # the field 'datas' is computed and may use the other fields below
-    raw = fields.Binary(string="File Content (raw)", compute='_compute_raw', inverse='_inverse_raw', context_dependent=False)
+    raw = fields.Binary(string="File Content (raw)", compute='_compute_raw', inverse='_inverse_raw')
     datas = fields.Binary(string='File Content (base64)', compute='_compute_datas', inverse='_inverse_datas')
     db_datas = fields.Binary('Database Data', attachment=False)
     store_fname = fields.Char('Stored Filename')

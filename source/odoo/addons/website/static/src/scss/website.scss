@@ -177,17 +177,31 @@ $-seen-urls: ();
 }
 
 .navbar {
-    @if ($o-theme-navbar-font != $o-theme-font) {
-        font-family: $o-theme-navbar-font;
-    }
 
+    .navbar-collapse {
+        min-width: 0; // Allows it to shrink during loading
+    }
     .nav-item {
         transition: opacity 1000ms ease 0s;
     }
-    .o_menu_loading .nav-item {
-        height: 0 !important;
+    .btn {
+        // This was a default bootstrap style before but it was removed from
+        // the library at some point. It seems important in the header so that
+        // the header does not flicker during loading.
+        white-space: nowrap;
+    }
+    .o_menu_loading {
+        flex-wrap: nowrap !important;
         overflow: hidden !important;
-        opacity: 0 !important;
+
+        .nav-item {
+            opacity: 0 !important;
+        }
+    }
+}
+.navbar-brand, .navbar-text, .navbar .nav-link {
+    @if $o-theme-navbar-font != $o-theme-font {
+        font-family: $o-theme-navbar-font;
     }
 }
 
@@ -460,6 +474,12 @@ table.table_desc tr td {
         width: 8%;
         opacity: 1;
     }
+    @include media-breakpoint-down(sm) {
+        .carousel-control-prev,
+        .carousel-control-next {
+            display: none; // remove arrows on mobile
+        }
+    }
     .carousel-control-prev { justify-content: flex-start; }
     .carousel-control-next { justify-content: flex-end; }
     .carousel-control-prev-icon,
@@ -515,6 +535,9 @@ table.table_desc tr td {
     // Border
     &.s_carousel_bordered {
         border: 2rem solid rgba(0,0,0,0);
+        @include media-breakpoint-down(sm) {
+            border: 0.5rem solid rgba(0,0,0,0);
+        }
         // Controls - caret
         .carousel-control-prev-icon:before { content: "\f0d9"; }
         .carousel-control-next-icon:before { content: "\f0da"; }
@@ -679,6 +702,10 @@ table.table_desc tr td {
         }
     }
 }
+// Keeps parallax snippet element selectable when Height = auto.
+.s_parallax {
+    min-height: 10px;
+}
 
 //
 // Layout
@@ -790,6 +817,23 @@ header {
                 transition: height $-transition-duration;
             }
         }
+    }
+
+    // Dropdown menus
+
+    // In mobile there is no need to limit the height...
+    @include media-breakpoint-up(lg) {
+        .navbar .dropdown-menu {
+            max-height: 60vh;
+            overflow-y: auto;
+            overflow-x: hidden; // Needed because of container in container having 0px padding... TODO improve
+        }
+    }
+    // ... but we limit the navbar-collapse height
+    .navbar-collapse.show {
+        max-height: 80vh;
+        overflow-y: auto;
+        overflow-x: hidden; // Needed because of container in container having 0px padding... TODO improve
     }
 
     &:not(.o_header_is_scrolled) {
@@ -1059,31 +1103,7 @@ header {
                             position: absolute;
                         }
                     }
-                    &:not(.o_header_affixed) {
-                        position: sticky;
-                        top: 0;
-                        right: 0;
-                        bottom: auto;
-                        left: 0;
-                        z-index: $zindex-fixed;
-                    }
-                    &.o_header_affixed {
-                        transform: none !important;
-                    }
                 }
-                > main {
-                    > :first-child:not(#wrap), #wrap > :first-child {
-                        &::before {
-                            content: "";
-                            display: block;
-                            width: 100%;
-                            margin-top: $o-hamburger-full-navbar-height;
-                        }
-                    }
-                }
-            }
-            #oe_main_menu_navbar ~ #wrapwrap > header {
-                top: $o-navbar-height;
             }
         }
     }
@@ -1120,7 +1140,7 @@ header {
 }
 
 #wrapwrap.o_header_overlay {
-    > header:not(.o_header_affixed) {
+    > header:not(.o_header_affixed):not(.o_top_menu_collapse_shown) {
         @include o-position-absolute(0, 0, auto, 0);
         z-index: 1000;
 
@@ -1202,8 +1222,7 @@ header {
                 }
             }
             > footer {
-                @include o-position-absolute(0, 0, 0, 0);
-                position: sticky;
+                @include o-position-sticky(auto, 0, 0, 0);
                 z-index: -1;
             }
         }
@@ -1211,15 +1230,26 @@ header {
 }
 
 // Language selector
-.js_language_selector .dropdown-menu {
-    min-width: 0;
+.js_language_selector {
+    .dropdown-menu {
+        min-width: 0;
+    }
+    a.list-inline-item {
+        padding: 3px 0;
+
+        > * {
+            vertical-align: middle;
+        }
+    }
 }
 .o_lang_flag {
     width: 1.5em;
     height: 1.5em;
     margin-right: 0.2em;
     border-radius: $rounded-pill;
-    vertical-align: top;
+}
+span.list-inline-item.o_add_language:last-child {
+    display: none !important; // Hide the separator if it is the last list item
 }
 
 // Footer scrolltop button

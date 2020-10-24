@@ -23,12 +23,13 @@ QUnit.module('chat_window_manager_tests.js', {
         beforeEach(this);
 
         this.start = async params => {
-            const { env, widget } = await start(Object.assign(
+            const { afterEvent, env, widget } = await start(Object.assign(
                 { hasChatWindow: true, hasMessagingMenu: true },
                 params,
                 { data: this.data }
             ));
             this.debug = params && params.debug;
+            this.afterEvent = afterEvent;
             this.env = env;
             this.widget = widget;
         };
@@ -802,9 +803,8 @@ QUnit.test('[technical] chat window: scroll conservation on toggle home menu', a
     this.data['mail.channel'].records.push({ id: 20 });
     for (let i = 0; i < 10; i++) {
         this.data['mail.message'].records.push({
+            body: "not empty",
             channel_ids: [20],
-            model: 'mail.channel',
-            res_id: 20,
         });
     }
     await this.start();
@@ -813,7 +813,20 @@ QUnit.test('[technical] chat window: scroll conservation on toggle home menu', a
         document.querySelector(`.o_MessagingMenu_dropdownMenu .o_NotificationList_preview`).click()
     );
     // Set a scroll position to chat window
-    document.querySelector(`.o_ThreadView_messageList`).scrollTop = 142;
+    await this.afterEvent({
+        eventName: 'o-component-message-list-scrolled',
+        func: () => {
+            document.querySelector(`.o_ThreadView_messageList`).scrollTop = 142;
+        },
+        message: "should wait until channel 20 scrolled to 142 after setting this value manually",
+        predicate: ({ scrollTop, threadViewer }) => {
+            return (
+                threadViewer.thread.model === 'mail.channel' &&
+                threadViewer.thread.id === 20 &&
+                scrollTop === 142
+            );
+        },
+    });
     assert.strictEqual(
         document.querySelector(`.o_ThreadView_messageList`).scrollTop,
         142,
@@ -827,7 +840,18 @@ QUnit.test('[technical] chat window: scroll conservation on toggle home menu', a
         "chat window scrollTop should still be the same after home menu is hidden"
     );
 
-    await afterNextRender(() => this.showHomeMenu());
+    await this.afterEvent({
+        eventName: 'o-component-message-list-scrolled',
+        func: () => this.showHomeMenu(),
+        message: "should wait until channel 20 restored its scroll to 142 after hiding the home menu",
+        predicate: ({ scrollTop, threadViewer }) => {
+            return (
+                threadViewer.thread.model === 'mail.channel' &&
+                threadViewer.thread.id === 20 &&
+                scrollTop === 142
+            );
+        },
+    });
     assert.strictEqual(
         document.querySelector(`.o_ThreadView_messageList`).scrollTop,
         142,
@@ -1543,9 +1567,8 @@ QUnit.test('chat window with a thread: keep scroll position in message list on f
     this.data['mail.channel'].records.push({ id: 20 });
     for (let i = 0; i < 10; i++) {
         this.data['mail.message'].records.push({
+            body: "not empty",
             channel_ids: [20],
-            model: 'mail.channel',
-            res_id: 20,
         });
     }
     await this.start();
@@ -1554,7 +1577,20 @@ QUnit.test('chat window with a thread: keep scroll position in message list on f
         document.querySelector(`.o_NotificationList_preview`).click()
     );
     // Set a scroll position to chat window
-    document.querySelector(`.o_ThreadView_messageList`).scrollTop = 142;
+    await this.afterEvent({
+        eventName: 'o-component-message-list-scrolled',
+        func: () => {
+            document.querySelector(`.o_ThreadView_messageList`).scrollTop = 142;
+        },
+        message: "should wait until channel 20 scrolled to 142 after setting this value manually",
+        predicate: ({ scrollTop, threadViewer }) => {
+            return (
+                threadViewer.thread.model === 'mail.channel' &&
+                threadViewer.thread.id === 20 &&
+                scrollTop === 142
+            );
+        },
+    });
     assert.strictEqual(
         document.querySelector(`.o_ThreadView_messageList`).scrollTop,
         142,
@@ -1570,7 +1606,19 @@ QUnit.test('chat window with a thread: keep scroll position in message list on f
     );
 
     // unfold chat window
-    await afterNextRender(() => document.querySelector('.o_ChatWindow_header').click());
+    await afterNextRender(() => this.afterEvent({
+        eventName: 'o-component-message-list-scrolled',
+        func: () => document.querySelector('.o_ChatWindow_header').click(),
+        message: "should wait until channel 20 restored its scroll position to 142",
+        predicate: ({ scrollTop, threadViewer }) => {
+            return (
+                threadViewer.thread.model === 'mail.channel' &&
+                threadViewer.thread.id === 20 &&
+                scrollTop === 142
+
+            );
+        },
+    }));
     assert.strictEqual(
         document.querySelector(`.o_ThreadView_messageList`).scrollTop,
         142,
@@ -1588,9 +1636,8 @@ QUnit.test('chat window should scroll to the newly posted message just after pos
     });
     for (let i = 0; i < 10; i++) {
         this.data['mail.message'].records.push({
+            body: "not empty",
             channel_ids: [20],
-            model: 'mail.channel',
-            res_id: 20,
         });
     }
     await this.start();
@@ -1710,9 +1757,8 @@ QUnit.test('[technical] chat window with a thread: keep scroll position in messa
     this.data['mail.channel'].records.push({ id: 20 });
     for (let i = 0; i < 10; i++) {
         this.data['mail.message'].records.push({
+            body: "not empty",
             channel_ids: [20],
-            model: 'mail.channel',
-            res_id: 20,
         });
     }
     await this.start();
@@ -1865,6 +1911,116 @@ QUnit.test('chat window does not fetch messages if hidden', async function (asse
     assert.verifySteps(
         ['rpc:message_fetch:12'],
         "messages should now be fetched for Channel #12"
+    );
+});
+
+QUnit.test('new message separator is shown in a chat window of a chat on receiving new message', async function (assert) {
+    assert.expect(6);
+
+    this.data['res.partner'].records.push({ id: 10, name: "Demo" });
+    this.data['res.users'].records.push({
+        id: 42,
+        name: "Foreigner user",
+        partner_id: 10,
+    });
+    this.data['mail.channel'].records = [
+        {
+            id: 10,
+            channel_type: "chat",
+            is_minimized: true,
+            is_pinned: false,
+            members: [this.data.currentPartnerId, 10],
+            message_unread_counter: 0,
+            uuid: 'channel-10-uuid',
+        },
+    ];
+    await this.start({
+        mockRPC(route, args) {
+            if (args.method === 'channel_fold') {
+                const channel_uuid = args.kwargs.uuid;
+                assert.strictEqual(channel_uuid, 'channel-10-uuid', "chat window fold state should have been sent to server");
+                assert.step(`rpc:channel_fold:${channel_uuid}`);
+            }
+            return this._super(...arguments);
+        },
+    });
+
+    // simulate receiving a message
+    await afterNextRender(async () => this.env.services.rpc({
+        route: '/mail/chat_post',
+        params: {
+            context: {
+                mockedUserId: 42,
+            },
+            uuid: 'channel-10-uuid',
+            message_content: "hu",
+        },
+    }));
+    assert.containsOnce(
+        document.body,
+        '.o_ChatWindow',
+        "a chat window should be visible after receiving a new message from a chat"
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_Message',
+        "chat window should have a single message (the newly received one)"
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_MessageList_separatorNewMessages',
+        "should display 'new messages' separator in the conversation, from reception of new messages"
+    );
+    assert.verifySteps(
+        ['rpc:channel_fold:channel-10-uuid'],
+        "fold state of chat window of chat should have been updated to server"
+    );
+});
+
+QUnit.test('focusing a chat window of a chat should make new message separator disappear [REQUIRE FOCUS]', async function (assert) {
+    assert.expect(2);
+
+    this.data['res.partner'].records.push({ id: 10, name: "Demo" });
+    this.data['res.users'].records.push({
+        id: 42,
+        name: "Foreigner user",
+        partner_id: 10,
+    });
+    this.data['mail.channel'].records = [
+        {
+            id: 10,
+            channel_type: "chat",
+            is_minimized: true,
+            is_pinned: false,
+            members: [this.data.currentPartnerId, 10],
+            message_unread_counter: 0,
+            uuid: 'channel-10-uuid',
+        },
+    ];
+    await this.start();
+
+    // simulate receiving a message
+    await afterNextRender(async () => this.env.services.rpc({
+        route: '/mail/chat_post',
+        params: {
+            context: {
+                mockedUserId: 42,
+            },
+            uuid: 'channel-10-uuid',
+            message_content: "hu",
+        },
+    }));
+    assert.containsOnce(
+        document.body,
+        '.o_MessageList_separatorNewMessages',
+        "should display 'new messages' separator in the conversation, from reception of new messages"
+    );
+
+    await afterNextRender(() => document.querySelector('.o_ComposerTextInput_textarea').focus());
+    assert.containsNone(
+        document.body,
+        '.o_MessageList_separatorNewMessages',
+        "new message separator should no longer be shown, after focus on composer text input of chat window"
     );
 });
 

@@ -66,13 +66,18 @@ def flush_env(cr, *, clear=True):
     """ Retrieve and flush an environment corresponding to the given cursor.
         Also clear the environment if ``clear`` is true.
     """
+    env_to_flush = None
     for env in list(Environment.envs):
         # don't flush() on another cursor or with a RequestUID
         if env.cr is cr and (isinstance(env.uid, int) or env.uid is None):
-            env['base'].flush()
-            if clear:
-                env.clear()         # clear remaining new records to compute
-            break
+            env_to_flush = env
+            if env.uid is not None:
+                break               # prefer an environment with a real uid
+
+    if env_to_flush is not None:
+        env_to_flush['base'].flush()
+        if clear:
+            env_to_flush.clear()    # clear remaining new records to compute
 
 def clear_env(cr):
     """ Retrieve and clear an environment corresponding to the given cursor """
@@ -102,6 +107,8 @@ class BaseCursor:
     def __init__(self):
         self.precommit = tools.Callbacks()
         self.postcommit = tools.Callbacks()
+        self.prerollback = tools.Callbacks()
+        self.postrollback = tools.Callbacks()
 
     @contextmanager
     @check
@@ -373,10 +380,11 @@ class Cursor(BaseCursor):
         # collected as fast as they should). The problem is probably due in
         # part because browse records keep a reference to the cursor.
         del self._obj
-        self._closed = True
 
-        # Clean the underlying connection.
-        self._cnx.rollback()
+        # Clean the underlying connection, and run rollback hooks.
+        self.rollback()
+
+        self._closed = True
 
         if leak:
             self._cnx.leaked = True
@@ -428,7 +436,7 @@ class Cursor(BaseCursor):
         if event == 'commit':
             self.postcommit.add(func)
         elif event == 'rollback':
-            raise NotImplementedError()
+            self.postrollback.add(func)
 
     @check
     def commit(self):
@@ -436,6 +444,8 @@ class Cursor(BaseCursor):
         flush_env(self)
         self.precommit.run()
         result = self._cnx.commit()
+        self.prerollback.clear()
+        self.postrollback.clear()
         self.postcommit.run()
         return result
 
@@ -445,7 +455,9 @@ class Cursor(BaseCursor):
         clear_env(self)
         self.precommit.clear()
         self.postcommit.clear()
+        self.prerollback.run()
         result = self._cnx.rollback()
+        self.postrollback.run()
         return result
 
     @check
@@ -491,8 +503,8 @@ class TestCursor(BaseCursor):
 
     def close(self):
         if not self._closed:
+            self.rollback()
             self._closed = True
-            self._cursor.execute('ROLLBACK TO SAVEPOINT "%s"' % self._savepoint)
             self._lock.release()
 
     def autocommit(self, on):
@@ -504,16 +516,19 @@ class TestCursor(BaseCursor):
         flush_env(self)
         self.precommit.run()
         self._cursor.execute('SAVEPOINT "%s"' % self._savepoint)
-        # ignore post-commit hooks
-        self.postcommit.clear()
+        self.prerollback.clear()
+        self.postrollback.clear()
+        self.postcommit.clear()         # TestCursor ignores post-commit hooks
 
     @check
     def rollback(self):
         """ Perform an SQL `ROLLBACK` """
         clear_env(self)
         self.precommit.clear()
-        self._cursor.execute('ROLLBACK TO SAVEPOINT "%s"' % self._savepoint)
         self.postcommit.clear()
+        self.prerollback.run()
+        self._cursor.execute('ROLLBACK TO SAVEPOINT "%s"' % self._savepoint)
+        self.postrollback.run()
 
     def __getattr__(self, name):
         value = getattr(self._cursor, name)

@@ -2,12 +2,19 @@
 # This file contains the translation of the following modules:
 # 	* website_event_track_quiz
 # 
+# Translators:
+# Aleksander, 2020
+# Martin Trigaux, 2020
+# Jorunn D. Newth, 2020
+# Marius Stedjan <marius@stedjan.com>, 2020
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server saas~13.5\n"
+"Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-01 07:29+0000\n"
+"POT-Creation-Date: 2020-09-29 13:46+0000\n"
 "PO-Revision-Date: 2020-09-07 08:21+0000\n"
+"Last-Translator: Marius Stedjan <marius@stedjan.com>, 2020\n"
 "Language-Team: Norwegian Bokmål (https://www.transifex.com/odoo/teams/41243/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +30,7 @@ msgstr ""
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_leaderboard
 msgid ". Try another search."
-msgstr ""
+msgstr ". Prøv et annet søk."
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.all_visitor_card
@@ -46,7 +53,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__text_value
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_question__answer_ids
 msgid "Answer"
-msgstr ""
+msgstr "Svar"
 
 #. module: website_event_track_quiz
 #. openerp-web
@@ -66,16 +73,44 @@ msgstr ""
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__comment
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_track_visitor__quiz_completed
 msgid "Completed"
+msgstr "Fullført"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_13_question_0_0
+msgid "Concrete Blocks Wall"
 msgstr ""
 
 #. module: website_event_track_quiz
 #: model:ir.model,name:website_event_track_quiz.model_event_quiz_question
 msgid "Content Quiz Question"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_1_question_1_0
+msgid "Correct !"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_1_question_0_0
+msgid "Correct ! You're really smart !"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_13_question_0_0
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_5_question_1_1
+msgid "Correct!"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_5_question_0_1
+msgid ""
+"Correct! Even if you have a big trunk, some long products need to be "
+"secured."
 msgstr ""
 
 #. module: website_event_track_quiz
@@ -93,14 +128,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__create_uid
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_question__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Opprettet av"
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz__create_date
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__create_date
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_question__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Opprettet"
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_event__display_name
@@ -110,7 +145,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_track__display_name
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_track_visitor__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Visningsnavn"
 
 #. module: website_event_track_quiz
 #. openerp-web
@@ -124,7 +159,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz__event_id
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_quiz_view_search
 msgid "Event"
-msgstr ""
+msgstr "Arrangement"
 
 #. module: website_event_track_quiz
 #: model:ir.actions.act_window,name:website_event_track_quiz.event_quiz_question_action
@@ -140,12 +175,17 @@ msgstr ""
 #: model:ir.model,name:website_event_track_quiz.model_event_track
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz__event_track_id
 msgid "Event Track"
-msgstr ""
+msgstr "Arrangementsspor"
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_quiz_question_view_search
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_quiz_view_search
 msgid "Group By"
+msgstr "Grupper etter"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_5_question_1_0
+msgid "Hammer"
 msgstr ""
 
 #. module: website_event_track_quiz
@@ -156,6 +196,44 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_track__id
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_track_visitor__id
 msgid "ID"
+msgstr "ID"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_1_question_0_1
+msgid "Incorrect ! Even if there will be some."
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_1_question_1_1
+msgid "Incorrect ! Lumbers need first to be cut from trees!"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_1_question_0_2
+msgid "Incorrect ! OpenWood is not an Open Source congres about Apps."
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_13_question_0_1
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_13_question_0_2
+msgid "Incorrect!"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_5_question_1_0
+msgid "Incorrect! Hammer won't be of any help here!"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_5_question_0_0
+msgid ""
+"Incorrect! In order to avoid accident, you need to secure any product of "
+"this kind during transportation!"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,comment:website_event_track_quiz.event_7_track_5_question_1_2
+msgid "Incorrect! Well, it could work but you will need a lot of tape!"
 msgstr ""
 
 #. module: website_event_track_quiz
@@ -176,36 +254,51 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_track____last_update
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_track_visitor____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Sist endret"
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz__write_uid
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__write_uid
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_question__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Sist oppdatert av"
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz__write_date
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__write_date
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_question__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Sist oppdatert"
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.leaderboard_search_bar
 msgid "Mobile sub-nav"
+msgstr "Mobile sub-nav"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_13_question_0_2
+msgid "Mud Wall"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_1_question_0_1
+msgid "Music"
 msgstr ""
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz__name
 msgid "Name"
-msgstr ""
+msgstr "Navn"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_5_question_0_1
+msgid "No"
+msgstr "Nei"
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_leaderboard
 msgid "No user found for"
-msgstr ""
+msgstr "Ingen bruker funnet for"
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__awarded_points
@@ -214,17 +307,27 @@ msgid "Number of Points"
 msgstr ""
 
 #. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_1_question_0_2
+msgid "Open Source Apps"
+msgstr ""
+
+#. module: website_event_track_quiz
 #. openerp-web
 #: code:addons/website_event_track_quiz/static/src/xml/quiz_templates.xml:0
 #, python-format
 msgid "Points"
+msgstr "Poeng"
+
+#. module: website_event_track_quiz
+#: model:event.quiz,name:website_event_track_quiz.event_7_track_13_quiz
+msgid "Pretty. Ugly. Lovely."
 msgstr ""
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__question_id
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_question__name
 msgid "Question"
-msgstr ""
+msgstr "Spørsmål"
 
 #. module: website_event_track_quiz
 #: code:addons/website_event_track_quiz/models/event_quiz.py:0
@@ -247,7 +350,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz__question_ids
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_quiz_view_form
 msgid "Questions"
-msgstr ""
+msgstr "Spørsmål"
 
 #. module: website_event_track_quiz
 #: model:ir.model,name:website_event_track_quiz.model_event_quiz
@@ -296,12 +399,17 @@ msgstr ""
 #: code:addons/website_event_track_quiz/static/src/xml/quiz_templates.xml:0
 #, python-format
 msgid "Reset"
+msgstr "Tilbakestill"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_5_question_1_2
+msgid "Scotch tape"
 msgstr ""
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.leaderboard_search_bar
 msgid "Search"
-msgstr ""
+msgstr "Søk"
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.leaderboard_search_bar
@@ -311,12 +419,27 @@ msgstr ""
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.leaderboard_search_bar
 msgid "Search courses"
+msgstr "Søk etter kurs"
+
+#. module: website_event_track_quiz
+#: model:event.quiz,name:website_event_track_quiz.event_7_track_5_quiz
+msgid "Securing your Lumber during transport"
 msgstr ""
 
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_answer__sequence
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz_question__sequence
 msgid "Sequence"
+msgstr "Sekvens"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_13_question_0_1
+msgid "Steel Wall"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_1_question_1_1
+msgid "Stores !"
 msgstr ""
 
 #. module: website_event_track_quiz
@@ -359,9 +482,14 @@ msgid "This quiz is already done. Retaking it is not possible."
 msgstr ""
 
 #. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_5_question_1_1
+msgid "Tie-down straps and other wooden blocks"
+msgstr ""
+
+#. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.event_quiz_view_search
 msgid "Track"
-msgstr ""
+msgstr "Spor"
 
 #. module: website_event_track_quiz
 #: model:ir.model,name:website_event_track_quiz.model_event_track_visitor
@@ -371,12 +499,57 @@ msgstr ""
 #. module: website_event_track_quiz
 #: model:ir.model.fields,field_description:website_event_track_quiz.field_event_quiz__event_track_ids
 msgid "Tracks"
+msgstr "Spor"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.question,name:website_event_track_quiz.event_7_track_5_question_0
+msgid "Transporting lumber from stores to your house is safe."
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_1_question_1_0
+msgid "Trees !"
 msgstr ""
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.top3_visitor_card
 msgid "User rank"
+msgstr "Brukergrad"
+
+#. module: website_event_track_quiz
+#: model:event.quiz,name:website_event_track_quiz.event_7_track_1_quiz
+msgid "What This Event Is All About"
 msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.question,name:website_event_track_quiz.event_7_track_5_question_1
+msgid "What kind of tool are needed to secure your lumber ?"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.question,name:website_event_track_quiz.event_7_track_13_question_0
+msgid "What kind of wall is transformed here ?"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.question,name:website_event_track_quiz.event_7_track_1_question_0
+msgid "What will we talk about during this event ?"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.question,name:website_event_track_quiz.event_7_track_1_question_1
+msgid "Where does lumber comes from ?"
+msgstr ""
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_1_question_0_0
+msgid "Wood"
+msgstr "Tre"
+
+#. module: website_event_track_quiz
+#: model:event.quiz.answer,text_value:website_event_track_quiz.event_7_track_5_question_0_0
+msgid "Yes"
+msgstr "a"
 
 #. module: website_event_track_quiz
 #: model_terms:ir.ui.view,arch_db:website_event_track_quiz.all_visitor_card

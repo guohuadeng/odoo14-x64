@@ -3483,6 +3483,54 @@ QUnit.module('basic_fields', {
         form.destroy();
     });
 
+    QUnit.test('Datetime field manually input value should send utc value to server', async function (assert) {
+        assert.expect(4);
+
+        this.data.partner.fields.datetime_end = { string: 'Datetime End', type: 'datetime' };
+        this.data.partner.records[0].datetime_end = '2017-03-13 00:00:00';
+
+        const form = await createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: `
+                <form>
+                    <field name="datetime" widget="daterange" options="{'related_end_date': 'datetime_end'}"/>
+                    <field name="datetime_end" widget="daterange" options="{'related_start_date': 'datetime'}"/>
+                </form>`,
+            res_id: 1,
+            session: {
+                getTZOffset: function () {
+                    return 330;
+                },
+            },
+            mockRPC: function (route, args) {
+                if (args.method === 'write') {
+                    assert.deepEqual(args.args[1], { datetime: '2017-02-08 06:00:00' });
+                }
+                return this._super(...arguments);
+            },
+        });
+
+        // check date display correctly in readonly
+        assert.strictEqual(form.$('.o_field_date_range:first').text(), '02/08/2017 15:30:00',
+            "the start date should be correctly displayed in readonly");
+        assert.strictEqual(form.$('.o_field_date_range:last').text(), '03/13/2017 05:30:00',
+            "the end date should be correctly displayed in readonly");
+
+        // edit form
+        await testUtils.form.clickEdit(form);
+        // update input for Datetime
+        await testUtils.fields.editInput(form.$('.o_field_date_range:first'), '02/08/2017 11:30:00');
+        // save form
+        await testUtils.form.clickSave(form);
+
+        assert.strictEqual(form.$('.o_field_date_range:first').text(), '02/08/2017 11:30:00',
+            "the start date should be correctly displayed in readonly after manual update");
+
+        form.destroy();
+    });
+
     QUnit.module('FieldDate');
 
     QUnit.test('date field: toggle datepicker [REQUIRE FOCUS]', async function (assert) {
@@ -4529,20 +4577,20 @@ QUnit.module('basic_fields', {
 
         assert.strictEqual(list.$('.o_data_cell:nth(0) .o_field_widget').attr('title'), '10/08/2017');
 
-        assert.hasClass(list.$('.o_data_cell:nth(0) span'), 'text-bf text-warning');
-        assert.doesNotHaveClass(list.$('.o_data_cell:nth(1) span'), 'text-bf text-warning text-danger');
-        assert.hasClass(list.$('.o_data_cell:nth(2) span'), 'text-bf text-danger');
-        assert.doesNotHaveClass(list.$('.o_data_cell:nth(3) span'), 'text-bf text-warning text-danger');
-        assert.hasClass(list.$('.o_data_cell:nth(4) span'), 'text-bf text-danger');
-        assert.doesNotHaveClass(list.$('.o_data_cell:nth(5) span'), 'text-bf text-warning text-danger');
-        assert.hasClass(list.$('.o_data_cell:nth(6) span'), 'text-bf text-danger');
+        assert.hasClass(list.$('.o_data_cell:nth(0) div'), 'text-bf text-warning');
+        assert.doesNotHaveClass(list.$('.o_data_cell:nth(1) div'), 'text-bf text-warning text-danger');
+        assert.hasClass(list.$('.o_data_cell:nth(2) div'), 'text-bf text-danger');
+        assert.doesNotHaveClass(list.$('.o_data_cell:nth(3) div'), 'text-bf text-warning text-danger');
+        assert.hasClass(list.$('.o_data_cell:nth(4) div'), 'text-bf text-danger');
+        assert.doesNotHaveClass(list.$('.o_data_cell:nth(5) div'), 'text-bf text-warning text-danger');
+        assert.hasClass(list.$('.o_data_cell:nth(6) div'), 'text-bf text-danger');
 
         list.destroy();
         unpatchDate();
     });
 
     QUnit.test('remaining_days widget on a date field in form view', async function (assert) {
-        assert.expect(6);
+        assert.expect(4);
 
         const unpatchDate = patchDate(2017, 9, 8, 15, 35, 11); // October 8 2017, 15:35:11
         this.data.partner.records = [
@@ -4560,16 +4608,11 @@ QUnit.module('basic_fields', {
         assert.strictEqual(form.$('.o_field_widget').text(), 'Today');
         assert.hasClass(form.$('.o_field_widget'), 'text-bf text-warning');
 
-        // in edit mode, this widget should behave like a regular date(time) widget
+        // in edit mode, this widget should not be editable.
         await testUtils.form.clickEdit(form);
 
         assert.hasClass(form.$('.o_form_view'), 'o_form_editable');
-        assert.containsOnce(form, '.o_datepicker');
-        assert.strictEqual(form.$('.o_datepicker_input').val(), '10/08/2017');
-
-        await testUtils.dom.openDatepicker(form.$('.o_datepicker'));
-
-        assert.containsOnce(document.body, '.bootstrap-datetimepicker-widget:visible');
+        assert.containsOnce(form, 'div.o_field_widget[name=date]');
 
         form.destroy();
         unpatchDate();
@@ -4611,13 +4654,13 @@ QUnit.module('basic_fields', {
 
         assert.strictEqual(list.$('.o_data_cell:nth(0) .o_field_widget').attr('title'), '10/08/2017');
 
-        assert.hasClass(list.$('.o_data_cell:nth(0) span'), 'text-bf text-warning');
-        assert.doesNotHaveClass(list.$('.o_data_cell:nth(1) span'), 'text-bf text-warning text-danger');
-        assert.hasClass(list.$('.o_data_cell:nth(2) span'), 'text-bf text-danger');
-        assert.doesNotHaveClass(list.$('.o_data_cell:nth(3) span'), 'text-bf text-warning text-danger');
-        assert.hasClass(list.$('.o_data_cell:nth(4) span'), 'text-bf text-danger');
-        assert.doesNotHaveClass(list.$('.o_data_cell:nth(5) span'), 'text-bf text-warning text-danger');
-        assert.hasClass(list.$('.o_data_cell:nth(6) span'), 'text-bf text-danger');
+        assert.hasClass(list.$('.o_data_cell:nth(0) div'), 'text-bf text-warning');
+        assert.doesNotHaveClass(list.$('.o_data_cell:nth(1) div'), 'text-bf text-warning text-danger');
+        assert.hasClass(list.$('.o_data_cell:nth(2) div'), 'text-bf text-danger');
+        assert.doesNotHaveClass(list.$('.o_data_cell:nth(3) div'), 'text-bf text-warning text-danger');
+        assert.hasClass(list.$('.o_data_cell:nth(4) div'), 'text-bf text-danger');
+        assert.doesNotHaveClass(list.$('.o_data_cell:nth(5) div'), 'text-bf text-warning text-danger');
+        assert.hasClass(list.$('.o_data_cell:nth(6) div'), 'text-bf text-danger');
 
         list.destroy();
         unpatchDate();
@@ -5830,6 +5873,25 @@ QUnit.module('basic_fields', {
         list.destroy();
     });
 
+    QUnit.test('priority widget with readonly attribute', async function (assert) {
+        assert.expect(1);
+
+        const form = await createView({
+            View: FormView,
+            model: 'partner',
+            data: this.data,
+            arch: `
+                <form>
+                    <field name="selection" widget="priority" readonly="1"/>
+                </form>`,
+            res_id: 2,
+        });
+
+        assert.containsN(form, '.o_field_widget.o_priority span', 2,
+            "stars of priority widget should rendered with span tag if readonly");
+
+        form.destroy();
+    });
 
     QUnit.module('StateSelection Widget');
 

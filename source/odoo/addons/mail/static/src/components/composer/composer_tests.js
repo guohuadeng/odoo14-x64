@@ -673,9 +673,20 @@ QUnit.test('add an emoji after a channel mention', async function (assert) {
 QUnit.test('display command suggestions on typing "/"', async function (assert) {
     assert.expect(2);
 
+    this.data['mail.channel'].records.push({ channel_type: 'channel', id: 20 });
+    this.data['mail.channel_command'].records.push(
+        {
+            channel_types: ['channel'],
+            help: "List users in the current channel",
+            name: "who",
+        },
+    );
     await this.start();
-    const composer = this.env.models['mail.composer'].create();
-    await this.createComposerComponent(composer);
+    const thread = this.env.models['mail.thread'].findFromIdentifyingData({
+        id: 20,
+        model: 'mail.channel',
+    });
+    await this.createComposerComponent(thread.composer);
 
     assert.containsNone(
         document.body,
@@ -697,12 +708,23 @@ QUnit.test('display command suggestions on typing "/"', async function (assert) 
     );
 });
 
-QUnit.test('use a command', async function (assert) {
+QUnit.test('use a command for a specific channel type', async function (assert) {
     assert.expect(4);
 
+    this.data['mail.channel'].records.push({ channel_type: 'channel', id: 20 });
+    this.data['mail.channel_command'].records.push(
+        {
+            channel_types: ['channel'],
+            help: "List users in the current channel",
+            name: "who",
+        },
+    );
     await this.start();
-    const composer = this.env.models['mail.composer'].create();
-    await this.createComposerComponent(composer);
+    const thread = this.env.models['mail.thread'].findFromIdentifyingData({
+        id: 20,
+        model: 'mail.channel',
+    });
+    await this.createComposerComponent(thread.composer);
 
     assert.containsNone(
         document.body,
@@ -739,13 +761,56 @@ QUnit.test('use a command', async function (assert) {
     );
 });
 
+QUnit.test("channel with no commands should not prompt any command suggestions on typing /", async function (assert) {
+    assert.expect(1);
+
+    this.data['mail.channel'].records.push({ channel_type: 'chat', id: 20 });
+    this.data['mail.channel_command'].records.push(
+        {
+            channel_types: ['channel'],
+            help: "bla bla bla",
+            name: "who",
+        },
+    );
+    await this.start();
+    const thread = this.env.models['mail.thread'].findFromIdentifyingData({
+        id: 20,
+        model: 'mail.channel',
+    });
+    await this.createComposerComponent(thread.composer);
+    await afterNextRender(() => {
+        document.querySelector('.o_ComposerTextInput_textarea').focus();
+        document.execCommand('insertText', false, "/");
+    });
+    await afterNextRender(() => {
+        const composer_text_input = document.querySelector('.o_ComposerTextInput_textarea');
+        composer_text_input.dispatchEvent(new window.KeyboardEvent('keydown'));
+        composer_text_input.dispatchEvent(new window.KeyboardEvent('keyup'));
+    });
+    assert.containsNone(
+        document.body,
+        '.o_ComposerSuggestion',
+        "should not prompt (command) suggestion after typing / (reason: no channel commands in chat channels)"
+    );
+});
+
 QUnit.test('use a command after some text', async function (assert) {
     assert.expect(5);
 
+    this.data['mail.channel'].records.push({ channel_type: 'channel', id: 20 });
+    this.data['mail.channel_command'].records.push(
+        {
+            channel_types: ['channel'],
+            help: "List users in the current channel",
+            name: "who",
+        },
+    );
     await this.start();
-    const composer = this.env.models['mail.composer'].create();
-    await this.createComposerComponent(composer);
-
+    const thread = this.env.models['mail.thread'].findFromIdentifyingData({
+        id: 20,
+        model: 'mail.channel',
+    });
+    await this.createComposerComponent(thread.composer);
     assert.containsNone(
         document.body,
         '.o_ComposerSuggestion',
@@ -792,9 +857,20 @@ QUnit.test('use a command after some text', async function (assert) {
 QUnit.test('add an emoji after a command', async function (assert) {
     assert.expect(5);
 
+    this.data['mail.channel'].records.push({ channel_type: 'channel', id: 20 });
+    this.data['mail.channel_command'].records.push(
+        {
+            channel_types: ['channel'],
+            help: "List users in the current channel",
+            name: "who",
+        },
+    );
     await this.start();
-    const composer = this.env.models['mail.composer'].create();
-    await this.createComposerComponent(composer);
+    const thread = this.env.models['mail.thread'].findFromIdentifyingData({
+        id: 20,
+        model: 'mail.channel',
+    });
+    await this.createComposerComponent(thread.composer);
 
     assert.containsNone(
         document.body,
@@ -1743,6 +1819,44 @@ QUnit.test('warning on send with shortcut when attempting to post message with s
     assert.verifySteps(
         ['notification'],
         "should have triggered a notification for inability to post message at the moment (some attachments are still being uploaded)"
+    );
+});
+
+QUnit.test('remove an attachment from composer does not need any confirmation', async function (assert) {
+    assert.expect(3);
+
+    await this.start();
+    const composer = this.env.models['mail.composer'].create();
+    await this.createComposerComponent(composer);
+    const file = await createFile({
+        content: 'hello, world',
+        contentType: 'text/plain',
+        name: 'text.txt',
+    });
+    await afterNextRender(() =>
+        inputFiles(
+            document.querySelector('.o_FileUploader_input'),
+            [file]
+        )
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_Composer_attachmentList',
+        "should have an attachment list"
+    );
+    assert.containsOnce(
+        document.body,
+        '.o_Composer .o_Attachment',
+        "should have only one attachment"
+    );
+
+    await afterNextRender(() =>
+        document.querySelector('.o_Attachment_asideItemUnlink').click()
+    );
+    assert.containsNone(
+        document.body,
+        '.o_Composer .o_Attachment',
+        "should not have any attachment left after unlinking the only one"
     );
 });
 

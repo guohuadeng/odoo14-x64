@@ -61,12 +61,6 @@ function factory(dependencies) {
             if ('note' in data) {
                 data2.note = data.note;
             }
-            if ('res_id' in data) {
-                data2.res_id = data.res_id;
-            }
-            if ('res_model' in data) {
-                data2.res_model = data.res_model;
-            }
             if ('state' in data) {
                 data2.state = data.state;
             }
@@ -102,6 +96,12 @@ function factory(dependencies) {
             if ('mail_template_ids' in data) {
                 data2.mailTemplates = [['insert', data.mail_template_ids]];
             }
+            if ('res_id' in data && 'res_model' in data) {
+                data2.thread = [['insert', {
+                    id: data.res_id,
+                    model: data.res_model,
+                }]];
+            }
             if ('user_id' in data) {
                 if (!data.user_id) {
                     data2.assignee = [['unlink-all']];
@@ -110,6 +110,18 @@ function factory(dependencies) {
                         ['insert', {
                             id: data.user_id[0],
                             display_name: data.user_id[1],
+                        }],
+                    ];
+                }
+            }
+            if ('request_partner_id' in data) {
+                if (!data.request_partner_id) {
+                    data2.requestingPartner = [['unlink']];
+                } else {
+                    data2.requestingPartner = [
+                        ['insert', {
+                            id: data.request_partner_id[0],
+                            display_name: data.request_partner_id[1],
                         }],
                     ];
                 }
@@ -131,8 +143,8 @@ function factory(dependencies) {
                 views: [[false, 'form']],
                 target: 'new',
                 context: {
-                    default_res_id: this.res_id,
-                    default_res_model: this.res_model,
+                    default_res_id: this.thread.id,
+                    default_res_model: this.thread.model,
                 },
                 res_id: this.id,
             };
@@ -147,10 +159,13 @@ function factory(dependencies) {
                 model: 'mail.activity',
                 method: 'activity_format',
                 args: [this.id],
-            }));
-            this.update(this.constructor.convertData(data));
-            if (this.chatter) {
-                this.chatter.refresh();
+            }, { shadow: true }));
+            if (data) {
+                this.update(this.constructor.convertData(data));
+                this.thread.refresh();
+            } else {
+                this.thread.refresh();
+                this.delete();
             }
         }
 
@@ -169,11 +184,8 @@ function factory(dependencies) {
                     attachment_ids: attachmentIds,
                     feedback,
                 },
-                context: this.chatter ? this.chatter.context : {},
             }));
-            if (this.chatter) {
-                this.chatter.refresh();
-            }
+            this.thread.refresh();
             this.delete();
         }
 
@@ -189,18 +201,14 @@ function factory(dependencies) {
                 args: [[this.id]],
                 kwargs: { feedback },
             }));
-            const chatter = this.chatter;
-            if (chatter) {
-                this.chatter.refresh();
-            }
+            this.thread.refresh();
+            const thread = this.thread;
             this.delete();
             this.env.bus.trigger('do-action', {
                 action,
                 options: {
                     on_close: () => {
-                        if (chatter) {
-                            chatter.refreshActivities();
-                        }
+                        thread.refreshActivities();
                     },
                 },
             });
@@ -264,9 +272,6 @@ function factory(dependencies) {
             default: false,
         }),
         category: attr(),
-        chatter: many2one('mail.chatter', {
-            inverse: 'activities',
-        }),
         creator: many2one('mail.user'),
         dateCreate: attr(),
         dateDeadline: attr(),
@@ -304,10 +309,23 @@ function factory(dependencies) {
                 'note',
             ],
         }),
-        res_id: attr(),
-        res_model: attr(),
+        /**
+         * Determines that an activity is linked to a requesting partner or not.
+         * It will be used notably in website slides to know who triggered the
+         * "request access" activity.
+         * Also, be useful when the assigned user is different from the
+         * "source" or "requesting" partner.
+         */
+        requestingPartner: many2one('mail.partner'),
         state: attr(),
         summary: attr(),
+        /**
+         * Determines to which "thread" (using `mail.activity.mixin` on the
+         * server) `this` belongs to.
+         */
+        thread: many2one('mail.thread', {
+            inverse: 'activities',
+        }),
         type: many2one('mail.activity_type', {
             inverse: 'activities',
         }),

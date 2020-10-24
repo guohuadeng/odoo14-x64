@@ -3,6 +3,7 @@ odoo.define('mail/static/src/components/chatter/chatter_tests', function (requir
 
 const components = {
     Chatter: require('mail/static/src/components/chatter/chatter.js'),
+    Composer: require('mail/static/src/components/composer/composer.js'),
 };
 const {
     afterEach,
@@ -28,6 +29,14 @@ QUnit.module('chatter_tests.js', {
             });
         };
 
+        this.createComposerComponent = async (composer, otherProps) => {
+            const props = Object.assign({ composerLocalId: composer.localId }, otherProps);
+            await createRootComponent(this, components.Composer, {
+                props,
+                target: this.widget.el,
+            });
+        };
+
         this.start = async params => {
             const { env, widget } = await start(Object.assign({}, params, {
                 data: this.data,
@@ -47,6 +56,7 @@ QUnit.test('base rendering when chatter has no attachment', async function (asse
     this.data['res.partner'].records.push({ id: 100 });
     for (let i = 0; i < 60; i++) {
         this.data['mail.message'].records.push({
+            body: "not empty",
             model: 'res.partner',
             res_id: 100,
         });

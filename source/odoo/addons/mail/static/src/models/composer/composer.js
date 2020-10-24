@@ -176,7 +176,7 @@ function factory(dependencies) {
             const recipients = [...this.mentionedPartners];
             if (this.thread) {
                 for (const recipient of this.thread.suggestedRecipientInfoList) {
-                    if (recipient.isSelected) {
+                    if (recipient.partner && recipient.isSelected) {
                         recipients.push(recipient.partner);
                     }
                 }
@@ -254,7 +254,7 @@ function factory(dependencies) {
             if (thread.model === 'mail.channel') {
                 const command = this._getCommandFromText(body);
                 Object.assign(postData, {
-                    command,
+                    command: command ? command.name : undefined,
                     subtype_xmlid: 'mail.mt_comment'
                 });
                 messageId = await this.async(() => this.env.services.rpc({
@@ -277,7 +277,7 @@ function factory(dependencies) {
                     model: 'mail.message',
                     method: 'message_format',
                     args: [[messageId]],
-                }));
+                }, { shadow: true }));
                 this.env.models['mail.message'].insert(Object.assign(
                     {},
                     this.env.models['mail.message'].convertData(messageData),
@@ -486,7 +486,7 @@ function factory(dependencies) {
          * @returns {mail.partner[]}
          */
         _computeMentionedPartners() {
-            const inputMentions = this.textInputContent.match(
+            const inputMentions = this.textInputContent.replace('\n', "\n ").match(
                 new RegExp("@[^ ]+(?= |&nbsp;|$)", 'g')
             ) || [];
             const unmentionedPartners = [];
@@ -556,7 +556,9 @@ function factory(dependencies) {
             if (this.mentionedPartners.length === 0 && this.mentionedChannels.length === 0) {
                 return body;
             }
-            const inputMentions = body.match(new RegExp("(@|#)" + '[^ ]+(?= |&nbsp;|$)', 'g'));
+            const inputMentions = body.replace("<br/>", "<br/> ")
+                .match(new RegExp("(@|#)" + '[^ ]+(?= |&nbsp;|$)', 'g'))
+                .filter(match => !match.endsWith("<br/>"));
             const substrings = [];
             let startIndex = 0;
             for (const match of inputMentions) {
@@ -595,11 +597,20 @@ function factory(dependencies) {
         /**
          * @private
          * @param {string} content html content
-         * @returns {string|undefined} command, if any in the content
+         * @returns {mail.channel_command|undefined} command, if any in the content
          */
         _getCommandFromText(content) {
             if (content.startsWith('/')) {
-                return content.substring(1).split(/\s/)[0];
+                const firstWord = content.substring(1).split(/\s/)[0];
+                return this.env.messaging.commands.find(command => {
+                    if (command.name !== firstWord) {
+                        return false;
+                    }
+                    if (command.channel_types) {
+                        return command.channel_types.includes(this.thread.channel_type);
+                    }
+                    return true;
+                });
             }
             return undefined;
         }
@@ -662,9 +673,11 @@ function factory(dependencies) {
             this.update({
                 suggestedChannels: [[
                     'insert-and-replace',
-                    mentions.map(data =>
-                        this.env.models['mail.thread'].convertData(data))
-                    ]],
+                    mentions.map(data => {
+                        const threadData = this.env.models['mail.thread'].convertData(data);
+                        return Object.assign({ model: 'mail.channel' }, threadData);
+                    })
+                ]],
             });
 
             if (this.suggestedChannels[0]) {
@@ -682,15 +695,16 @@ function factory(dependencies) {
          * @param {string} mentionKeyword
          */
         _updateSuggestedChannelCommands(mentionKeyword) {
-            this.update({
-                suggestedChannelCommands: [[
-                    'replace',
-                    this.env.messaging.commands.filter(
-                        command => command.name.includes(mentionKeyword)
-                    )
-                ]],
+            const commands = this.env.messaging.commands.filter(command => {
+                if (!command.name.includes(mentionKeyword)) {
+                    return false;
+                }
+                if (command.channel_types) {
+                    return command.channel_types.includes(this.thread.channel_type);
+                }
+                return true;
             });
-
+            this.update({ suggestedChannelCommands: [['replace', commands]] });
             if (this.suggestedChannelCommands[0]) {
                 this.update({
                     activeSuggestedChannelCommand: [['link', this.suggestedChannelCommands[0]]],

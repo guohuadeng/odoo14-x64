@@ -396,7 +396,7 @@ var FileWidget = SearchableMediaWidget.extend({
         }
         const selected = this.selectedAttachments.concat(mediaAttachments).map(attachment => {
             // Color-customize dynamic SVGs with the primary theme color
-            if (attachment.image_src.startsWith('/web_editor/shape/')) {
+            if (attachment.image_src && attachment.image_src.startsWith('/web_editor/shape/')) {
                 const colorCustomizedURL = new URL(attachment.image_src, window.location.origin);
                 colorCustomizedURL.searchParams.set('c1', getCSSVariableValue('o-color-1'));
                 attachment.image_src = colorCustomizedURL.pathname + colorCustomizedURL.search;
@@ -904,7 +904,25 @@ var ImageWidget = FileWidget.extend({
                 console.error('CORS is misconfigured on the API server, image will be treated as non-dynamic.');
             }
         }
-        const aspectRatio = img.naturalWidth / img.naturalHeight;
+        let aspectRatio = img.naturalWidth / img.naturalHeight;
+        // Special case for SVGs with no instrinsic sizes on firefox
+        // See https://github.com/whatwg/html/issues/3510#issuecomment-369982529
+        if (img.naturalHeight === 0) {
+            img.width = 1000;
+            // Position fixed so that the image doesn't affect layout while rendering
+            img.style.position = 'fixed';
+            // Make invisible so the image doesn't briefly appear on the screen
+            img.style.opacity = '0';
+            // Image needs to be in the DOM for dimensions to be correct after render
+            const originalParent = img.parentElement;
+            document.body.appendChild(img);
+
+            aspectRatio = img.width / img.height;
+            originalParent.appendChild(img);
+            img.removeAttribute('width');
+            img.style.removeProperty('position');
+            img.style.removeProperty('opacity');
+        }
         const width = aspectRatio * this.MIN_ROW_HEIGHT;
         cell.style.flexGrow = width;
         cell.style.flexBasis = `${width}px`;
@@ -1031,7 +1049,7 @@ var IconWidget = SearchableMediaWidget.extend({
         var style = this.$media.attr('style') || '';
         var iconFont = this._getFont(this.selectedIcon) || {base: 'fa', font: ''};
         var finalClasses = _.uniq(this.nonIconClasses.concat([iconFont.base, iconFont.font]));
-        if (!this.$media.is('span')) {
+        if (!this.$media.is('span, i')) {
             var $span = $('<span/>');
             $span.data(this.$media.data());
             this.$media = $span;

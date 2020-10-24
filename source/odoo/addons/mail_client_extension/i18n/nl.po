@@ -3,28 +3,22 @@
 # 	* mail_client_extension
 # 
 # Translators:
-# Martin Trigaux, 2020
-# Erwin van der Ploeg <erwin@odooexperts.nl>, 2020
 # Yenthe Van Ginneken <yenthespam@gmail.com>, 2020
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2020
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server saas~13.5\n"
+"Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-01 07:28+0000\n"
+"POT-Creation-Date: 2020-09-29 13:45+0000\n"
 "PO-Revision-Date: 2020-09-07 08:14+0000\n"
-"Last-Translator: Yenthe Van Ginneken <yenthespam@gmail.com>, 2020\n"
+"Last-Translator: Erwin van der Ploeg <erwin@odooexperts.nl>, 2020\n"
 "Language-Team: Dutch (https://www.transifex.com/odoo/teams/41243/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#. module: mail_client_extension
-#: model_terms:ir.ui.view,arch_db:mail_client_extension.app_auth
-msgid "Additional information"
-msgstr "Aanvullende informatie"
 
 #. module: mail_client_extension
 #: model_terms:ir.ui.view,arch_db:mail_client_extension.app_auth
@@ -57,7 +51,7 @@ msgstr "HTTP routing"
 #: model:ir.model.fields,field_description:mail_client_extension.field_res_partner__iap_enrich_info
 #: model:ir.model.fields,field_description:mail_client_extension.field_res_users__iap_enrich_info
 msgid "IAP Enrich Info"
-msgstr ""
+msgstr "IAP verrijk info"
 
 #. module: mail_client_extension
 #: model:ir.model.fields,field_description:mail_client_extension.field_crm_lead__id
@@ -65,14 +59,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mail_client_extension.field_res_partner__id
 msgid "ID"
 msgstr "ID"
-
-#. module: mail_client_extension
-#: model_terms:ir.ui.view,arch_db:mail_client_extension.app_auth
-msgid ""
-"If you allow it, an access-key will be created in your profile. You can "
-"manage your keys in your Preferences. You can give more information related "
-"to this key here, to recognize it easier later."
-msgstr ""
 
 #. module: mail_client_extension
 #: model:ir.model.fields,field_description:mail_client_extension.field_crm_lead____last_update
@@ -87,17 +73,24 @@ msgid "Lead/Opportunity"
 msgstr "Lead/Verkoopkans"
 
 #. module: mail_client_extension
+#: model_terms:ir.ui.view,arch_db:mail_client_extension.app_auth
+msgid "Let"
+msgstr "Laat"
+
+#. module: mail_client_extension
 #: model:ir.actions.server,name:mail_client_extension.lead_creation_prefilled_action
 msgid "Redirection to the lead creation form with prefilled info"
 msgstr ""
+"Omleiding naar het formulier voor het maken van leads met vooraf ingevulde "
+"informatie"
 
 #. module: mail_client_extension
 #: model:ir.model.fields,help:mail_client_extension.field_res_partner__iap_enrich_info
 #: model:ir.model.fields,help:mail_client_extension.field_res_users__iap_enrich_info
 msgid "Stores additional info retrieved from IAP in JSON"
-msgstr ""
+msgstr "Slaat aanvullende informatie op die is opgehaald uit IAP in JSON"
 
 #. module: mail_client_extension
 #: model_terms:ir.ui.view,arch_db:mail_client_extension.app_auth
-msgid "wants to access Odoo."
-msgstr ""
+msgid "access your Odoo database?"
+msgstr "toegang tot uw Odoo-database?"

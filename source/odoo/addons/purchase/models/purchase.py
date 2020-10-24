@@ -659,18 +659,18 @@ class PurchaseOrder(models.Model):
                     order.with_context(is_reminder=True).message_post_with_template(template.id, email_layout_xmlid="mail.mail_notification_paynow", composition_mode='comment')
 
     def send_reminder_preview(self):
-        if not self.user_has_groups('purchase.group_send_reminder') and not self.receipt_reminder_email:
+        self.ensure_one()
+        if not self.user_has_groups('purchase.group_send_reminder'):
             return
 
         template = self.env.ref('purchase.email_template_edi_purchase_reminder', raise_if_not_found=False)
-        if template and self.env.user.email:
-            for order in self:
-                template.with_context(is_reminder=True).send_mail(
-                    order.id,
-                    force_send=True,
-                    raise_exception=False,
-                    email_values={'email_to': self.env.user.email, 'recipient_ids': []},
-                    notif_layout="mail.mail_notification_paynow")
+        if template and self.env.user.email and self.id:
+            template.with_context(is_reminder=True).send_mail(
+                self.id,
+                force_send=True,
+                raise_exception=False,
+                email_values={'email_to': self.env.user.email, 'recipient_ids': []},
+                notif_layout="mail.mail_notification_paynow")
             return {'toast_message': _("A sample email has been sent to %s.") % self.env.user.email}
 
     @api.model
@@ -924,10 +924,7 @@ class PurchaseOrderLine(models.Model):
                                                          subtype_id=self.env.ref('mail.mt_note').id)
         if 'qty_received' in values:
             for line in self:
-                if values['qty_received'] != line.qty_received and line.order_id.state == 'purchase':
-                    line.order_id.message_post_with_view('purchase.track_po_line_qty_received_template',
-                                                         values={'line': line, 'qty_received': values['qty_received']},
-                                                         subtype_id=self.env.ref('mail.mt_note').id)
+                line._track_qty_received(values['qty_received'])
         return super(PurchaseOrderLine, self).write(values)
 
     def unlink(self):
@@ -1166,10 +1163,19 @@ class PurchaseOrderLine(models.Model):
         }
 
     def _convert_to_middle_of_day(self, date):
-        """Return a datetime which is the last minute of the input date(time)
-        according to order user's time zone, convert to UTC time.
+        """Return a datetime which is the noon of the input date(time) according
+        to order user's time zone, convert to UTC time.
         """
         return timezone(self.order_id.user_id.tz or self.company_id.partner_id.tz or 'UTC').localize(datetime.combine(date, time(12))).astimezone(UTC).replace(tzinfo=None)
 
     def _update_date_planned(self, updated_date):
         self.date_planned = updated_date
+
+    def _track_qty_received(self, new_qty):
+        self.ensure_one()
+        if new_qty != self.qty_received and self.order_id.state == 'purchase':
+            self.order_id.message_post_with_view(
+                'purchase.track_po_line_qty_received_template',
+                values={'line': self, 'qty_received': new_qty},
+                subtype_id=self.env.ref('mail.mt_note').id
+            )

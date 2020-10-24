@@ -1953,10 +1953,21 @@ class TestFields(TransactionCaseWithUserDemo):
         self.assertEqual(image_data_uri(record.image_256)[:30], 'data:image/png;base64,iVBORw0K')
 
         # ensure invalid image raises
-        with self.assertRaises(UserError):
+        with self.assertRaises(UserError), self.cr.savepoint():
             record.write({
                 'image': 'invalid image',
             })
+
+        # assignment of invalid image on new record does nothing, the value is
+        # taken from origin instead (use-case: onchange)
+        new_record = record.new(origin=record)
+        new_record.image = '31.54 Kb'
+        self.assertEqual(record.image, image_h)
+        self.assertEqual(new_record.image, image_h)
+
+        # assignment to new record with origin should not do any query
+        with self.assertQueryCount(0):
+            new_record.image = image_w
 
     def test_95_binary_bin_size(self):
         binary_value = base64.b64encode(b'content')
@@ -2893,6 +2904,28 @@ class TestSelectionOndeleteAdvanced(common.TransactionCase):
 
         with self.assertRaises(ValueError):
             self.registry.setup_models(self.env.cr)
+
+
+class TestFieldParametersValidation(common.TransactionCase):
+    def test_invalid_parameter(self):
+        self.addCleanup(self.registry.model_cache.clear)
+
+        class Foo(models.Model):
+            _module = None
+            _name = _description = 'test_new_api.field_parameter_validation'
+
+            name = fields.Char(invalid_parameter=42)
+
+        Foo._build_model(self.registry, self.env.cr)
+        self.addCleanup(self.registry.__delitem__, Foo._name)
+
+        with self.assertLogs('odoo.fields', level='WARNING') as cm:
+            self.registry.setup_models(self.env.cr)
+
+        self.assertTrue(cm.output[0].startswith(
+            "WARNING:odoo.fields:Field test_new_api.field_parameter_validation.name: "
+            "unknown parameter 'invalid_parameter'"
+        ))
 
 
 def insert(model, *fnames):

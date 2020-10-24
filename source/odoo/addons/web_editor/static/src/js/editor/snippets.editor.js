@@ -28,6 +28,7 @@ var SnippetEditor = Widget.extend({
     xmlDependencies: ['/web_editor/static/src/xml/snippets.xml'],
     events: {
         'click .oe_snippet_remove': '_onRemoveClick',
+        'wheel': '_onMouseWheel',
     },
     custom_events: {
         'option_update': '_onOptionUpdate',
@@ -205,11 +206,38 @@ var SnippetEditor = Widget.extend({
      * Makes the editor overlay cover the associated snippet.
      */
     cover: function () {
-        if (!this.isShown() || !this.$target.length || !this.$target.is(':visible')) {
+        if (!this.isShown() || !this.$target.length) {
             return;
         }
+
         const $modal = this.$target.find('.modal');
         const $target = $modal.length ? $modal : this.$target;
+        const targetEl = $target[0];
+
+        // Check first if the target is still visible, otherwise we have to
+        // hide it. When covering all element after scroll for instance it may
+        // have been hidden (part of an affixed header for example) or it may
+        // be outside of the viewport (the whole header during an effect for
+        // example).
+        const rect = targetEl.getBoundingClientRect();
+        const vpWidth = window.innerWidth || document.documentElement.clientWidth;
+        const vpHeight = window.innerHeight || document.documentElement.clientHeight;
+        const isInViewport = (
+            rect.bottom > -0.1 &&
+            rect.right > -0.1 &&
+            (vpHeight - rect.top) > -0.1 &&
+            (vpWidth - rect.left) > -0.1
+        );
+        const hasSize = ( // :visible not enough for images
+            Math.abs(rect.bottom - rect.top) > 0.01 &&
+            Math.abs(rect.right - rect.left) > 0.01
+        );
+        if (!isInViewport || !hasSize || !this.$target.is(`:visible`)) {
+            this.toggleOverlayVisibility(false);
+            return;
+        }
+
+        // Now cover the element
         const offset = $target.offset();
         var manipulatorOffset = this.$el.parent().offset();
         offset.top -= manipulatorOffset.top;
@@ -220,7 +248,9 @@ var SnippetEditor = Widget.extend({
             top: offset.top,
         });
         this.$('.o_handles').css('height', $target.outerHeight());
-        this.$el.toggleClass('o_top_cover', offset.top < this.$editable.offset().top);
+
+        const editableOffsetTop = this.$editable.offset().top - manipulatorOffset.top;
+        this.$el.toggleClass('o_top_cover', offset.top - editableOffsetTop < 25);
     },
     /**
      * DOMElements have a default name which appears in the overlay when they
@@ -805,6 +835,21 @@ var SnippetEditor = Widget.extend({
             }
         }
     },
+    /**
+     * Called when the 'mouse wheel' is used when hovering over the overlay.
+     * Disable the pointer events to prevent page scrolling from stopping.
+     *
+     * @private
+     * @param {Event} ev
+     */
+    _onMouseWheel: function (ev) {
+        ev.stopPropagation();
+        this.$el.css('pointer-events', 'none');
+        clearTimeout(this.wheelTimeout);
+        this.wheelTimeout = setTimeout(() => {
+            this.$el.css('pointer-events', '');
+        }, 250);
+    },
 });
 
 /**
@@ -991,13 +1036,19 @@ var SnippetsMenu = Widget.extend({
         // On keydown add a class on the active overlay to hide it and show it
         // again when the mouse moves
         this.$document.on('keydown.snippets_menu', () => {
+            this.__overlayKeyWasDown = true;
             this.snippetEditors.forEach(editor => {
                 editor.toggleOverlayVisibility(false);
             });
         });
         this.$document.on('mousemove.snippets_menu, mousedown.snippets_menu', _.throttle(() => {
+            if (!this.__overlayKeyWasDown) {
+                return;
+            }
+            this.__overlayKeyWasDown = false;
             this.snippetEditors.forEach(editor => {
                 editor.toggleOverlayVisibility(true);
+                editor.cover();
             });
         }, 250));
 
@@ -1032,7 +1083,6 @@ var SnippetsMenu = Widget.extend({
 
         const $autoFocusEls = $('.o_we_snippet_autofocus');
         this._activateSnippet($autoFocusEls.length ? $autoFocusEls.first() : false);
-        this._textToolsSwitchingEnabled = true;
 
         // Add tooltips on we-title elements whose text overflows
         this.$el.tooltip({
@@ -1064,6 +1114,12 @@ var SnippetsMenu = Widget.extend({
             // animation). (TODO wait for real animation end)
             setTimeout(() => {
                 this.$window.trigger('resize');
+
+                // Hacky way to prevent to switch to text tools on editor
+                // start. Only allow switching after some delay. Switching to
+                // tools is only useful for out-of-snippet texts anyway, so
+                // snippet texts can still be enabled immediately.
+                this._mutex.exec(() => this._textToolsSwitchingEnabled = true);
             }, 1000);
         });
     },
@@ -1556,6 +1612,14 @@ var SnippetsMenu = Widget.extend({
         var self = this;
         var $html = $(html);
         var $scroll = $html.siblings('#o_scroll');
+
+        // TODO remove me in master: introduced in a 14.0 fix to allow users to
+        // customize their navbar with 'Boxed' website header, which they could
+        // not because of a wrong XML selector they may not update.
+        const $headerNavFix = $html.find('[data-js="HeaderNavbar"][data-selector="#wrapwrap > header > nav"]');
+        if ($headerNavFix.length) {
+            $headerNavFix[0].dataset.selector = '#wrapwrap > header nav.navbar';
+        }
 
         this.templateOptions = [];
         var selectors = [];
@@ -2451,8 +2515,16 @@ var SnippetsMenu = Widget.extend({
         if (!this._textToolsSwitchingEnabled) {
             return;
         }
-        if (!$.summernote.core.range.create()) {
-            // Sometimes not enough...
+        const range = $.summernote.core.range.create();
+        if (!range) {
+            return;
+        }
+        if (range.sc === range.ec && range.sc.nodeType === Node.ELEMENT_NODE
+                && range.sc.classList.contains('oe_structure')
+                && range.sc.children.length === 0) {
+            // Do not switch to text tools if the cursor is in an empty
+            // oe_structure (to encourage using snippets there and actually
+            // avoid breaking tours which suppose the snippet list is visible).
             return;
         }
         this.textEditorPanelEl.classList.add('d-block');

@@ -406,7 +406,7 @@ class StockMove(models.Model):
                 total_availability = self.env['stock.quant']._get_available_quantity(move.product_id, move.location_id) if move.product_id else 0.0
                 move.availability = min(move.product_qty, total_availability)
 
-    @api.depends('product_id', 'picking_type_id', 'picking_id', 'reserved_availability', 'priority', 'state', 'product_uom_qty')
+    @api.depends('product_id', 'picking_type_id', 'picking_id', 'reserved_availability', 'priority', 'state', 'product_uom_qty', 'location_id')
     def _compute_forecast_information(self):
         """ Compute forecasted information of the related product by warehouse."""
         self.forecast_availability = False
@@ -415,16 +415,22 @@ class StockMove(models.Model):
         not_product_moves = self.filtered(lambda move: move.product_id.type != 'product')
         for move in not_product_moves:
             move.forecast_availability = move.product_qty
+
+        product_moves = (self - not_product_moves)
+        warehouse_by_location = {loc: loc.get_warehouse() for loc in product_moves.location_id}
+
         outgoing_unreserved_moves_per_warehouse = defaultdict(lambda: self.env['stock.move'])
-        for move in (self - not_product_moves):
+        for move in product_moves:
             picking_type = move.picking_type_id or move.picking_id.picking_type_id
             is_unreserved = move.state in ('waiting', 'confirmed', 'partially_available')
             if picking_type.code in self._consuming_picking_types() and is_unreserved:
-                outgoing_unreserved_moves_per_warehouse[picking_type.warehouse_id] |= move
+                outgoing_unreserved_moves_per_warehouse[warehouse_by_location[move.location_id]] |= move
             elif picking_type.code in self._consuming_picking_types():
                 move.forecast_availability = move.reserved_availability
 
         for warehouse, moves in outgoing_unreserved_moves_per_warehouse.items():
+            if not warehouse:  # No prediction possible if no warehouse.
+                continue
             product_variant_ids = moves.product_id.ids
             wh_location_ids = [loc['id'] for loc in self.env['stock.location'].search_read(
                 [('id', 'child_of', warehouse.view_location_id.id)],
@@ -486,6 +492,7 @@ class StockMove(models.Model):
                     move_line_vals = self._prepare_move_line_vals(quantity=0)
                     move_line_vals['lot_id'] = lot.id
                     move_line_vals['lot_name'] = lot.name
+                    move_line_vals['product_uom_id'] = move.product_id.uom_id.id
                     move_line_vals['qty_done'] = 1
                     move_lines_commands.append((0, 0, move_line_vals))
             move.write({'move_line_ids': move_lines_commands})
@@ -651,7 +658,8 @@ class StockMove(models.Model):
     def action_product_forecast_report(self):
         self.ensure_one()
         action = self.product_id.action_product_forecast_report()
-        action['context'] = {'warehouse': (self.picking_type_id or self.picking_id.picking_type_id).warehouse_id.id,}
+        warehouse = self.location_id.get_warehouse()
+        action['context'] = {'warehouse': warehouse.id, } if warehouse else {}
         return action
 
     def _do_unreserve(self):
@@ -856,6 +864,9 @@ class StockMove(models.Model):
 
     @api.onchange('lot_ids')
     def _onchange_lot_ids(self):
+        quantity_done = sum(ml.product_uom_id._compute_quantity(ml.qty_done, self.product_uom) for ml in self.move_line_ids.filtered(lambda ml: not ml.lot_id and ml.lot_name))
+        quantity_done += self.product_id.uom_id._compute_quantity(len(self.lot_ids), self.product_uom)
+        self.update({'quantity_done': quantity_done})
         used_lots = self.env['stock.move.line'].search([
             ('company_id', '=', self.company_id.id),
             ('product_id', '=', self.product_id.id),
@@ -863,15 +874,6 @@ class StockMove(models.Model):
             ('move_id', '!=', self._origin.id),
             ('state', '!=', 'cancel')
         ])
-
-        counter = self.env['stock.move.line'].search_count([
-            ('company_id', '=', self.company_id.id),
-            ('product_id', '=', self.product_id.id),
-            ('move_id', '=', self._origin.id),
-            ('lot_id', '=', False),
-            ('lot_name', '!=', False),
-        ])
-        self.update({'quantity_done': len(self.lot_ids) + counter})
         if used_lots:
             return {
                 'warning': {'title': _('Warning'), 'message': _('Existing Serial numbers (%s). Please correct the serial numbers encoded.') % ','.join(used_lots.lot_id.mapped('display_name'))}
