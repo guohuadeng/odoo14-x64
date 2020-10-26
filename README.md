@@ -7,7 +7,8 @@ Green Odoo 14 x64， https://www.Sunpop.cn
 本版本在使用64位的基础上，对postgresql进行了优化，并使用nginx进行反向代理，实现了longpolling，可以使用odoo的桌面消息通知，也不会经常报错了。
 在windows上搭建了一个完整的高性能 Odoo 环境。
 因速度原因，不再支持一键更新至最新版，请手工高速下载后解压覆盖 /source 目录文件。
-http://nightly.odoo.com/13.0/nightly/src/odoo_13.0.latest.zip
+http://nightly.odoo.com/14.0/nightly/src/odoo_14.0.latest.zip
+http://nightly.odoocdn.com/14.0/nightly/src/odoo_14.0.latest.zip
 
 
 ## 版本信息
@@ -34,7 +35,7 @@ http://demo.erpapp.cn
 .\extra\vcredist_x64.exe
 
 ## 操作说明
-- 启动odoo：执行 r.bat后，访问 http://localhost:8013  或者  http://localhost
+- 启动odoo：执行 r.bat后，访问 http://localhost:8014  或者  http://localhost
 - 更新odoo：执行 s.bat 停止odoo运行后，执行 u.bat。如要手工更新至最新odoo，请至官方下载后覆盖 ./source 目录下文件即可
 - 系统已有默认数据库 demo，登录用户/密码:  admin/admin
 - 重新初始化数据库：执行 init.bat
@@ -55,11 +56,11 @@ http://demo.erpapp.cn
 ├─extra  附加包，如 WKHTMLTOPDF
 ├─odoofile  odoo生成的静态文件资源
 ├─runtime   运行库，包括pg数据文件
-└─source    odoo12源码
+└─source    odoo14源码
 
 ## 主要文件说明
 odoo.conf   配置
-db.bat  单独启动数据库，用在pycharm中，debug启动时先启用数据库，假设odoo12是在 d:\odoo12-x64 目录，如有变化自行更改
+db.bat  单独启动数据库，用在pycharm中，debug启动时先启用数据库，假设odoo14是在 d:\odoo14-x64 目录，如有变化自行更改
 ment.bat    将无法在windows处理的企业版模块移出
 r.bat   最常用，odoo服务启动（如果当前有进程则先关闭再启动）
 s.bat 停止
