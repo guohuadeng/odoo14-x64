@@ -143,7 +143,7 @@
                     <button name="print_quotation" string="Print RFQ" type="object" states="sent" groups="base.group_user"/>
                     <button name="button_confirm" type="object" states="draft" string="Confirm Order" id="draft_confirm"/>
                     <button name="action_rfq_send" states="purchase" string="Send PO by Email" type="object" context="{'send_rfq':False}"/>
-                    <button name="confirm_reminder_mail" string="Confirm Receipt Date" type="object" attrs="{'invisible': ['|', ('state', 'not in', ('purchase', 'done')), ('mail_reminder_confirmed', '=', True)]}" groups="base.group_no_one"/>
+                    <button name="confirm_reminder_mail" string="Confirm Receipt Date" type="object" attrs="{'invisible': ['|','|', ('state', 'not in', ('purchase', 'done')), ('mail_reminder_confirmed', '=', True), ('date_planned', '=', False)]}" groups="base.group_no_one"/>
                     <button name="action_create_invoice" string="Create Bill" type="object" context="{'create_bill':True}" attrs="{'invisible': ['|', '|', ('state', 'not in', ('purchase', 'done')), ('invoice_status', 'not in', ('no', 'invoiced')), ('order_line', '=', [])]}"/>
                     <button name="button_draft" states="cancel" string="Set to Draft" type="object" />
                     <button name="button_cancel" states="draft,to approve,sent,purchase" string="Cancel" type="object" />
@@ -197,7 +197,7 @@
                                 <span>Ask confirmation</span>
                                 <div class="o_row oe_inline" attrs="{'invisible': [('receipt_reminder_email', '=', False)]}">
                                     <field name="reminder_date_before_receipt" class="oe_inline"/>
-                                    days before 
+                                    day(s) before 
                                     <widget name='toaster_button' button_name="send_reminder_preview" title="Preview the reminder email by sending it to yourself." attrs="{'invisible': [('id', '=', False)]}"/>
                                 </div>
                             </div>
@@ -276,7 +276,7 @@
                                             <group>
                                                 <field name="date_planned" widget="date" attrs="{'required': [('display_type', '=', False)]}"/>
                                                 <field name="account_analytic_id" colspan="2" domain="['|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" groups="analytic.group_analytic_accounting"/>
-                                                <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting" domain="['|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                                <field name="analytic_tag_ids" groups="analytic.group_analytic_tags" domain="['|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                             </group>
                                             <group colspan="12">
                                             <notebook>
@@ -529,7 +529,7 @@
                     <field name="amount_total" sum="Total amount" widget="monetary" optional="show"/>
                     <field name="currency_id" invisible="1"/>
                     <field name="state" optional="show"/>
-                    <field name="invoice_status" attrs="{'column_invisible': [('parent.state', 'not in', ('purchase', 'done'))]}"/>
+                    <field name="invoice_status" optional="hide"/>
                     <field name="activity_exception_decoration" widget="activity_exception"/>
                 </tree>
             </field>

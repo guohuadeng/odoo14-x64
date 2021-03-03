@@ -321,6 +321,13 @@ class IrActionsActWindowclose(models.Model):
 
     type = fields.Char(default='ir.actions.act_window_close')
 
+    def _get_readable_fields(self):
+        return super()._get_readable_fields() | {
+            # 'effect' is not a real field of ir.actions.act_window_close but is
+            # used to display the rainbowman
+            "effect"
+        }
+
 
 class IrActionsActUrl(models.Model):
     _name = 'ir.actions.act_url'
@@ -604,6 +611,16 @@ class IrActionsServer(models.Model):
                     raise
 
             eval_context = self._get_eval_context(action)
+            records = eval_context.get('record') or eval_context['model']
+            records |= eval_context.get('records') or eval_context['model']
+            if records:
+                try:
+                    records.check_access_rule('write')
+                except AccessError:
+                    _logger.warning("Forbidden server action %r executed while the user %s does not have access to %s.",
+                        action.name, self.env.user.login, records,
+                    )
+                    raise
 
             runner, multi = action._get_runner()
             if runner and multi:

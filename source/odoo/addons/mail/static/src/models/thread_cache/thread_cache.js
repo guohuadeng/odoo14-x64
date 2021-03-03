@@ -30,12 +30,12 @@ function factory(dependencies) {
                 extraDomain: [['id', '<', Math.min(...messageIds)]],
                 limit,
             }));
-            for (const threadView of this.threadViews) {
-                threadView.addComponentHint('more-messages-loaded', { fetchedMessages });
-            }
             this.update({ isLoadingMore: false });
             if (fetchedMessages.length < limit) {
                 this.update({ isAllHistoryLoaded: true });
+            }
+            for (const threadView of this.threadViews) {
+                threadView.addComponentHint('more-messages-loaded', { fetchedMessages });
             }
             return fetchedMessages;
         }
@@ -160,6 +160,15 @@ function factory(dependencies) {
         }
 
         /**
+         *
+         * @private
+         * @returns {mail.message[]}
+         */
+        _computeNonEmptyMessages() {
+            return [['replace', this.messages.filter(message => !message.isEmpty)]];
+        }
+
+        /**
          * @private
          * @returns {mail.message[]}
          */
@@ -186,7 +195,9 @@ function factory(dependencies) {
             }
             const wasCacheRefreshRequested = this.isCacheRefreshRequested;
             // mark hint as processed
-            this.update({ isCacheRefreshRequested: false });
+            if (this.isCacheRefreshRequested) {
+                this.update({ isCacheRefreshRequested: false });
+            }
             if (this.thread.isTemporary) {
                 // temporary threads don't exist on the server
                 return false;
@@ -194,13 +205,17 @@ function factory(dependencies) {
             if (!wasCacheRefreshRequested && this.threadViews.length === 0) {
                 // don't load message that won't be used
                 return false;
-                }
-            if (!wasCacheRefreshRequested && (this.isLoaded || this.isLoading)) {
+            }
+            if (this.isLoading) {
+                // avoid duplicate RPC
+                return false;
+            }
+            if (!wasCacheRefreshRequested && this.isLoaded) {
                 // avoid duplicate RPC
                 return false;
             }
             const isMainCache = this.thread.mainCache === this;
-            if (isMainCache && (this.isLoaded || this.isLoading)) {
+            if (isMainCache && this.isLoaded) {
                 // Ignore request on the main cache if it is already loaded or
                 // loading. Indeed the main cache is automatically sync with
                 // server updates already, so there is never a need to refresh
@@ -290,6 +305,44 @@ function factory(dependencies) {
                 threadCache: this,
             });
             return messages;
+        }
+
+        /**
+         * Calls "mark all as read" when this thread becomes displayed in a
+         * view (which is notified by `isMarkAllAsReadRequested` being `true`),
+         * but delays the call until some other conditions are met, such as the
+         * messages being loaded.
+         * The reason to wait until messages are loaded is to avoid a race
+         * condition because "mark all as read" will change the state of the
+         * messages in parallel to fetch reading them.
+         *
+         * @private
+         */
+        _onChangeMarkAllAsRead() {
+            if (
+                !this.isMarkAllAsReadRequested ||
+                !this.thread ||
+                !this.thread.mainCache ||
+                !this.isLoaded ||
+                this.isLoading
+            ) {
+                // wait for change of state before deciding what to do
+                return;
+            }
+            this.update({ isMarkAllAsReadRequested: false });
+            if (
+                this.thread.isTemporary ||
+                this.thread.model === 'mail.box' ||
+                this.thread.mainCache !== this ||
+                this.threadViews.length === 0
+            ) {
+                // ignore the request
+                return;
+            }
+            this.env.models['mail.message'].markAllAsRead([
+                ['model', '=', this.thread.model],
+                ['res_id', '=', this.thread.id],
+            ]);
         }
 
         /**
@@ -399,6 +452,16 @@ function factory(dependencies) {
             default: false,
         }),
         /**
+         * Determines whether this cache should consider calling "mark all as
+         * read" on this thread.
+         *
+         * This field is a hint that may or may not lead to an actual call.
+         * @see `_onChangeMarkAllAsRead`
+         */
+        isMarkAllAsReadRequested: attr({
+            default: false,
+        }),
+        /**
          * Last message that has been fetched by this thread cache.
          *
          * This DOES NOT necessarily mean the last message linked to this thread
@@ -424,6 +487,40 @@ function factory(dependencies) {
             dependencies: [
                 'fetchedMessages',
                 'threadMessages',
+            ],
+        }),
+        /**
+         * IsEmpty trait of all messages.
+         * Serves as compute dependency.
+         */
+        messagesAreEmpty: attr({
+            related: 'messages.isEmpty'
+        }),
+        /**
+         * List of non empty messages linked to this cache.
+         */
+        nonEmptyMessages: many2many('mail.message', {
+            compute: '_computeNonEmptyMessages',
+            dependencies: [
+                'messages',
+                'messagesAreEmpty',
+            ],
+        }),
+        /**
+         * Not a real field, used to trigger its compute method when one of the
+         * dependencies changes.
+         */
+        onChangeMarkAllAsRead: attr({
+            compute: '_onChangeMarkAllAsRead',
+            dependencies: [
+                'isLoaded',
+                'isLoading',
+                'isMarkAllAsReadRequested',
+                'thread',
+                'threadIsTemporary',
+                'threadMainCache',
+                'threadModel',
+                'threadViews',
             ],
         }),
         /**
@@ -487,6 +584,12 @@ function factory(dependencies) {
         }),
         threadMessages: many2many('mail.message', {
             related: 'thread.messages',
+        }),
+        /**
+         * Serves as compute dependency.
+         */
+        threadModel: attr({
+            related: 'thread.model',
         }),
         /**
          * States the 'mail.thread_view' that are currently displaying `this`.

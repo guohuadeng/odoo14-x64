@@ -12,7 +12,7 @@ class ResPartner(models.Model):
     purchase_line_ids = fields.One2many('purchase.order.line', 'partner_id', string="Purchase Lines")
     on_time_rate = fields.Float(
         "On-Time Delivery Rate", compute='_compute_on_time_rate',
-        help="Over the past 12 months, number of products received on time / total number of ordered products.")
+        help="Over the past 12 months; the number of products received on time divided by the number of ordered products.")
 
     @api.depends('purchase_line_ids')
     def _compute_on_time_rate(self):
@@ -20,7 +20,7 @@ class ResPartner(models.Model):
             ('partner_id', 'in', self.ids),
             ('date_order', '>', fields.Date.today() - timedelta(365)),
             ('qty_received', '!=', 0),
-        ]).filtered(lambda l: l.product_id.product_tmpl_id.type != 'service' and l.order_id.state in ['done', 'purchase'])
+        ]).filtered(lambda l: l.product_id.sudo().product_tmpl_id.type != 'service' and l.order_id.state in ['done', 'purchase'])
         partner_dict = {}
         for line in order_lines:
             on_time, ordered = partner_dict.get(line.partner_id, (0, 0))

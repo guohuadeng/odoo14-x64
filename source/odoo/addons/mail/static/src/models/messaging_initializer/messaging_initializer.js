@@ -3,6 +3,7 @@ odoo.define('mail/static/src/models/messaging_initializer/messaging_initializer.
 
 const { registerNewModel } = require('mail/static/src/model/model_core.js');
 const { one2one } = require('mail/static/src/model/model_field.js');
+const { executeGracefully } = require('mail/static/src/utils/utils.js');
 
 function factory(dependencies) {
 
@@ -79,6 +80,7 @@ function factory(dependencies) {
          * @param {integer} [param0.needaction_inbox_counter=0]
          * @param {Object} param0.partner_root
          * @param {Object} param0.public_partner
+         * @param {Object[]} param0.public_partners
          * @param {Object[]} [param0.shortcodes=[]]
          * @param {integer} [param0.starred_counter=0]
          */
@@ -95,6 +97,7 @@ function factory(dependencies) {
             needaction_inbox_counter = 0,
             partner_root,
             public_partner,
+            public_partners,
             shortcodes = [],
             starred_counter = 0
         }) {
@@ -106,6 +109,7 @@ function factory(dependencies) {
                 moderation_channel_ids,
                 partner_root,
                 public_partner,
+                public_partners,
             });
             // mailboxes after partners and before other initializers that might
             // manipulate threads or messages
@@ -118,7 +122,7 @@ function factory(dependencies) {
             // various suggestions in no particular order
             this._initCannedResponses(shortcodes);
             this._initCommands(commands);
-            await this.async(() => this._initMentionPartnerSuggestions(mention_partner_suggestions));
+            this._initMentionPartnerSuggestions(mention_partner_suggestions);
             // channels when the rest of messaging is ready
             await this.async(() => this._initChannels(channel_slots));
             // failures after channels
@@ -149,10 +153,7 @@ function factory(dependencies) {
             channel_private_group = [],
         } = {}) {
             const channelsData = channel_channel.concat(channel_direct_message, channel_private_group);
-            for (const channelData of channelsData) {
-                // there might be a lot of channels, insert each of them one by
-                // one asynchronously to avoid blocking the UI
-                await this.async(() => new Promise(resolve => setTimeout(resolve)));
+            return executeGracefully(channelsData.map(channelData => () => {
                 const convertedData = this.env.models['mail.thread'].convertData(channelData);
                 if (!convertedData.members) {
                     // channel_info does not return all members of channel for
@@ -169,9 +170,9 @@ function factory(dependencies) {
                 // flux specific: channels received at init have to be
                 // considered pinned. task-2284357
                 if (!channel.isPinned) {
-                    channel.update({ isPendingPinned: true });
+                    channel.pin();
                 }
-            }
+            }));
         }
 
         /**
@@ -212,17 +213,17 @@ function factory(dependencies) {
          * @private
          * @param {Object} mailFailuresData
          */
-        _initMailFailures(mailFailuresData) {
-            const messages = this.env.models['mail.message'].insert(mailFailuresData.map(
-                messageData => this.env.models['mail.message'].convertData(messageData)
-            ));
-            for (const message of messages) {
+        async _initMailFailures(mailFailuresData) {
+            await executeGracefully(mailFailuresData.map(messageData => () => {
+                const message = this.env.models['mail.message'].insert(
+                    this.env.models['mail.message'].convertData(messageData)
+                );
                 // implicit: failures are sent by the server at initialization
                 // only if the current partner is author of the message
                 if (!message.author && this.messaging.currentPartner) {
                     message.update({ author: [['link', this.messaging.currentPartner]] });
                 }
-            }
+            }));
             this.messaging.notificationGroupManager.computeGroups();
             // manually force recompute of counter (after computing the groups)
             this.messaging.messagingMenu.update();
@@ -233,15 +234,12 @@ function factory(dependencies) {
          * @param {Object[]} mentionPartnerSuggestionsData
          */
         async _initMentionPartnerSuggestions(mentionPartnerSuggestionsData) {
-            for (const suggestions of mentionPartnerSuggestionsData) {
-                for (const suggestion of suggestions) {
-                    // there might be a lot of partners, insert each of them one
-                    // by one asynchronously to avoid blocking the UI
-                    await this.async(() => new Promise(resolve => setTimeout(resolve)));
+            return executeGracefully(mentionPartnerSuggestionsData.map(suggestions => () => {
+                return executeGracefully(suggestions.map(suggestion => () => {
                     const { email, id, name } = suggestion;
                     this.env.models['mail.partner'].insert({ email, id, name });
-                }
-            }
+                }));
+            }));
         }
 
         /**
@@ -251,6 +249,7 @@ function factory(dependencies) {
          * @param {integer[]} moderation_channel_ids
          * @param {Object} partner_root
          * @param {Object} public_partner
+         * @param {Object[]} [public_partners=[]]
          */
         _initPartners({
             current_partner,
@@ -258,7 +257,9 @@ function factory(dependencies) {
             moderation_channel_ids = [],
             partner_root,
             public_partner,
+            public_partners = [],
         }) {
+            const publicPartner = this.env.models['mail.partner'].convertData(public_partner);
             this.messaging.update({
                 currentPartner: [['insert', Object.assign(
                     this.env.models['mail.partner'].convertData(current_partner),
@@ -276,7 +277,13 @@ function factory(dependencies) {
                 )]],
                 currentUser: [['insert', { id: currentUserId }]],
                 partnerRoot: [['insert', this.env.models['mail.partner'].convertData(partner_root)]],
-                publicPartner: [['insert', this.env.models['mail.partner'].convertData(public_partner)]],
+                publicPartner: [['insert', publicPartner]],
+                publicPartners: [
+                    ['insert', publicPartner],
+                    ['insert', public_partners.map(
+                        publicPartner => this.env.models['mail.partner'].convertData(publicPartner))
+                    ],
+                ],
             });
         }
 

@@ -15,6 +15,7 @@ import sys
 import threading
 
 import html2text
+import idna
 
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError
@@ -101,16 +102,21 @@ class IrMailServer(models.Model):
                                                                   "is used. Default priority is 10 (smaller number = higher priority)")
     active = fields.Boolean(default=True)
 
+    def _get_test_email_addresses(self):
+        self.ensure_one()
+        email_from = self.env.user.email
+        if not email_from:
+            raise UserError(_('Please configure an email on the current user to simulate '
+                              'sending an email message via this outgoing server'))
+        return email_from, 'noreply@odoo.com'
+
     def test_smtp_connection(self):
         for server in self:
             smtp = False
             try:
                 smtp = self.connect(mail_server_id=server.id)
                 # simulate sending an email from current user's address - without sending it!
-                email_from, email_to = self.env.user.email, 'noreply@odoo.com'
-                if not email_from:
-                    raise UserError(_('Please configure an email on the current user to simulate '
-                                      'sending an email message via this outgoing server'))
+                email_from, email_to = server._get_test_email_addresses()
                 # Testing the MAIL FROM step should detect sender filter problems
                 (code, repl) = smtp.mail(email_from)
                 if code != 250:
@@ -131,7 +137,7 @@ class IrMailServer(models.Model):
             except UserError as e:
                 # let UserErrors (messages) bubble up
                 raise e
-            except UnicodeError as e:
+            except (UnicodeError, idna.core.InvalidCodepoint) as e:
                 raise UserError(_("Invalid server name !\n %s", ustr(e)))
             except (gaierror, timeout) as e:
                 raise UserError(_("No response received. Check server address and port number.\n %s", ustr(e)))
@@ -234,12 +240,10 @@ class IrMailServer(models.Model):
 
         if smtp_user:
             # Attempt authentication - will raise if AUTH service not supported
-            # The user/password must be converted to bytestrings in order to be usable for
-            # certain hashing schemes, like HMAC.
-            # See also bug #597143 and python issue #5285
-            smtp_user = pycompat.to_text(ustr(smtp_user))
-            smtp_password = pycompat.to_text(ustr(smtp_password))
-            connection.login(smtp_user, smtp_password)
+            local, at, domain = smtp_user.rpartition('@')
+            if at:
+                smtp_user = local + at + idna.encode(domain).decode('ascii')
+            connection.login(smtp_user, smtp_password or '')
 
         # Some methods of SMTP don't check whether EHLO/HELO was sent.
         # Anyway, as it may have been sent by login(), all subsequent usages should consider this command as sent.
@@ -290,6 +294,8 @@ class IrMailServer(models.Model):
         body = body or u''
 
         msg = EmailMessage(policy=email.policy.SMTP)
+        msg.set_charset('utf-8')
+
         if not message_id:
             if object_id:
                 message_id = tools.generate_tracking_message_id(object_id)

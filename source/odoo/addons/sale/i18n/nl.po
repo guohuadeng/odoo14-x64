@@ -8,19 +8,19 @@
 # Cécile Collart <cco@odoo.com>, 2020
 # Wynand Tastenhoye <wta@odoo.com>, 2020
 # Alice Van Goethem <vga@odoo.com>, 2020
-# Odoo Experts Consultants <consultants@odooexperts.nl>, 2020
 # Martin Trigaux, 2020
 # Eric Geens <ericgeens@yahoo.com>, 2020
 # Yenthe Van Ginneken <yenthespam@gmail.com>, 2020
-# Erwin van der Ploeg <erwin@odooexperts.nl>, 2020
+# Odoo Experts Consultants <consultants@odooexperts.nl>, 2020
+# Erwin van der Ploeg (Odoo Experts) <erwin@odooexperts.nl>, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:46+0000\n"
+"POT-Creation-Date: 2020-11-27 14:12+0000\n"
 "PO-Revision-Date: 2020-09-07 08:17+0000\n"
-"Last-Translator: Erwin van der Ploeg <erwin@odooexperts.nl>, 2020\n"
+"Last-Translator: Erwin van der Ploeg (Odoo Experts) <erwin@odooexperts.nl>, 2021\n"
 "Language-Team: Dutch (https://www.transifex.com/odoo/teams/41243/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,17 +56,18 @@ msgid ""
 "'pending') and 'Pending Order' or 'Order'} (Ref ${object.name or 'n/a' })"
 msgstr ""
 "${object.company_id.name} ${(object.get_portal_last_transaction().state == "
-"'pending') and 'Lopende bestelling' or 'Bestelling'} (Ref ${object.name or "
-"'n/a' })"
+"'pending') and 'Lopende order' or 'Order'} (Ref ${object.name or 'n/a' })"
 
 #. module: sale
 #: model:mail.template,subject:sale.email_template_edi_sale
 msgid ""
 "${object.company_id.name} ${object.state in ('draft', 'sent') and "
-"'Quotation' or 'Order'} (Ref ${object.name or 'n/a' })"
+"(ctx.get('proforma') and 'Proforma' or 'Quotation') or 'Order'} (Ref "
+"${object.name or 'n/a' })"
 msgstr ""
-"${object.company_id.name} ${object.state in ('draft', 'sent') and 'Offerte' "
-"or 'Orderbevestiging'} (Ref ${object.name or 'n/b' })"
+"${object.company_id.name} ${object.state in ('draft', 'sent') and "
+"(ctx.get('proforma') and 'Proforma' or 'Offerte') or 'Order'} (Ref "
+"${object.name or 'n/a' })"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.portal_my_orders
@@ -80,11 +81,6 @@ msgid "&amp;nbsp;<span>on</span>&amp;nbsp;"
 msgstr "&amp;nbsp;<span>op</span>&amp;nbsp;"
 
 #. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
-msgid "&amp;times;"
-msgstr "&amp;times;"
-
-#. module: sale
 #: model:ir.actions.report,print_report_name:sale.action_report_pro_forma_invoice
 msgid "'PRO-FORMA - %s' % (object.name)"
 msgstr "'PRO-FORMA - %s' % (object.name)"
@@ -96,7 +92,7 @@ msgid ""
 "'Order - %s' % (object.name)"
 msgstr ""
 "(object.state in ('draft', 'sent') and 'Offerte - %s' % (object.name)) or "
-"'Bestelling - %s' % (object.name)"
+"'Order - %s' % (object.name)"
 
 #. module: sale
 #: model:product.product,description_sale:sale.product_product_4e
@@ -110,7 +106,7 @@ msgstr "160x80cm, met grote poten"
 #, python-format
 msgid ""
 "<b>Send the quote</b> to yourself and check what the customer will receive."
-msgstr ""
+msgstr "<b>Stuur de offerte</b> naar jezelf en kijk wat de klant krijgt."
 
 #. module: sale
 #. openerp-web
@@ -292,6 +288,175 @@ msgid ""
 "% endif\n"
 "</div>"
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 12px;\">\n"
+"        Hallo,\n"
+"        <br/><br/>\n"
+"        % set transaction = object.get_portal_last_transaction()\n"
+"        Uw order <strong>${object.name}</strong> voor het bedrag van <strong>${format_amount(object.amount_total, object.currency_id)}</strong>\n"
+"        % if object.state == 'sale' or (transaction and transaction.state in ('done', 'authorized')) :\n"
+"            is bevestigd.<br/>\n"
+"            Bedankt voor het vertrouwen!\n"
+"        % elif transaction and transaction.state == 'pending' :\n"
+"            is in afwachting van. Deze zal worden bevestigd wanneer de betaling is ontvangen.\n"
+"            % if object.reference:\n"
+"                Uw betalingskenmerk is <strong>${object.reference}</strong>.\n"
+"            % endif\n"
+"        % endif\n"
+"        <br/><br/>\n"
+"        Aarzel niet om bij vragen contact met ons op te nemen.\n"
+"        <br/><br/>\n"
+"    </p>\n"
+"% if object.website_id:\n"
+"    <div style=\"margin: 0px; padding: 0px;\">\n"
+"        <table width=\"100%\" style=\"color: #454748; font-size: 12px; border-collapse: collapse;\">\n"
+"            <tr style=\"border-bottom: 2px solid #dee2e6;\">\n"
+"                <td style=\"width: 150px;\"><strong>Products</strong></td>\n"
+"                <td/>\n"
+"                <td width=\"15%\" align=\"center\"><strong>Quantity</strong></td>\n"
+"                <td width=\"20%\" align=\"right\"><strong>\n"
+"                % if object.user_id.has_group('account.group_show_line_subtotals_tax_excluded'):\n"
+"                   Excl. BTW\n"
+"                % else\n"
+"                    Incl. BTW\n"
+"                % endif\n"
+"                </strong></td>\n"
+"            </tr>\n"
+"        </table>\n"
+"        % for line in object.order_line:\n"
+"            % if not line.is_delivery and line.display_type in ['line_section', 'line_note']:\n"
+"                <table width=\"100%\" style=\"color: #454748; font-size: 12px; border-collapse: collapse;\">\n"
+"                    <tr style=\"${loop.cycle('background-color: #f2f2f2', 'background-color: #ffffff')}\">\n"
+"                        <td colspan=\"4\">\n"
+"                            % if line.display_type == 'line_section':\n"
+"                                <strong>${line.name}</strong>\n"
+"                            % elif line.display_type == 'line_note':\n"
+"                                <i>${line.name}</i>\n"
+"                            % endif\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                </table>\n"
+"            % elif not line.is_delivery\n"
+"                <table width=\"100%\" style=\"color: #454748; font-size: 12px; border-collapse: collapse;\">\n"
+"                    <tr style=\"${loop.cycle('background-color: #f2f2f2', 'background-color: #ffffff')}\">\n"
+"                        <td style=\"width: 150px;\">\n"
+"                            <img src=\"/web/image/product.product/${line.product_id.id}/image_128\" style=\"width: 64px; height: 64px; object-fit: contain;\" alt=\"Product image\"/>\n"
+"                        </td>\n"
+"                        <td align=\"left\">${line.product_id.name}</td>\n"
+"                        <td width=\"15%\" align=\"center\">${line.product_uom_qty}</td>\n"
+"                        <td width=\"20%\" align=\"right\"><strong>\n"
+"                        % if object.user_id.has_group('account.group_show_line_subtotals_tax_excluded'):\n"
+"                            ${format_amount(line.price_reduce_taxexcl, object.currency_id)}\n"
+"                        % else\n"
+"                            ${format_amount(line.price_reduce_taxinc, object.currency_id)}\n"
+"                        % endif\n"
+"                        </strong></td>\n"
+"                    </tr>\n"
+"                </table>\n"
+"            % endif\n"
+"        % endfor\n"
+"    </div>\n"
+"    % if object.carrier_id:\n"
+"    <div style=\"margin: 0px; padding: 0px;\">\n"
+"        <table width=\"100%\" style=\"color: #454748; font-size: 12px; border-spacing: 0px 4px;\" align=\"right\">\n"
+"            <tr>\n"
+"                <td style=\"width: 60%\"/>\n"
+"                <td style=\"width: 30%; border-top: 1px solid #dee2e6;\" align=\"right\"><strong>Levering:</strong></td>\n"
+"                <td style=\"width: 10%; border-top: 1px solid #dee2e6;\" align=\"right\">${format_amount(object.amount_delivery, object.currency_id)}</td>\n"
+"            </tr>\n"
+"            <tr>\n"
+"                <td style=\"width: 60%\"/>\n"
+"                <td style=\"width: 30%;\" align=\"right\"><strong>SubTotal:</strong></td>\n"
+"                <td style=\"width: 10%;\" align=\"right\">${format_amount(object.amount_untaxed, object.currency_id)}</td>\n"
+"            </tr>\n"
+"        </table>\n"
+"    </div>\n"
+"    % else:\n"
+"    <div style=\"margin: 0px; padding: 0px;\">\n"
+"        <table width=\"100%\" style=\"color: #454748; font-size: 12px; border-spacing: 0px 4px;\" align=\"right\">\n"
+"            <tr>\n"
+"                <td style=\"width: 60%\"/>\n"
+"                <td style=\"width: 30%; border-top: 1px solid #dee2e6;\" align=\"right\"><strong>SubTotaal:</strong></td>\n"
+"                <td style=\"width: 10%; border-top: 1px solid #dee2e6;\" align=\"right\">${format_amount(object.amount_untaxed, object.currency_id)}</td>\n"
+"            </tr>\n"
+"        </table>\n"
+"    </div>\n"
+"    % endif\n"
+"    <div style=\"margin: 0px; padding: 0px;\">\n"
+"        <table width=\"100%\" style=\"color: #454748; font-size: 12px; border-spacing: 0px 4px;\" align=\"right\">\n"
+"            <tr>\n"
+"                <td style=\"width: 60%\"/>\n"
+"                <td style=\"width: 30%;\" align=\"right\"><strong>BTW:</strong></td>\n"
+"                <td style=\"width: 10%;\" align=\"right\">${format_amount(object.amount_tax, object.currency_id)}</td>\n"
+"            </tr>\n"
+"            <tr>\n"
+"                <td style=\"width: 60%\"/>\n"
+"                <td style=\"width: 30%; border-top: 1px solid #dee2e6;\" align=\"right\"><strong>Total:</strong></td>\n"
+"                <td style=\"width: 10%; border-top: 1px solid #dee2e6;\" align=\"right\">${format_amount(object.amount_total, object.currency_id)}</td>\n"
+"            </tr>\n"
+"        </table>\n"
+"    </div>\n"
+"    % if object.partner_invoice_id:\n"
+"    <div style=\"margin: 0px; padding: 0px;\">\n"
+"        <table width=\"100%\" style=\"color: #454748; font-size: 12px;\">\n"
+"            <tr>\n"
+"                <td style=\"padding-top: 10px;\">\n"
+"                    <strong>Factuur aan:</strong>\n"
+"                    ${object.partner_invoice_id.street or ''}\n"
+"                    ${object.partner_invoice_id.city or ''}\n"
+"                    ${object.partner_invoice_id.state_id.name or ''}\n"
+"                    ${object.partner_invoice_id.zip or ''}\n"
+"                    ${object.partner_invoice_id.country_id.name or ''}\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr>\n"
+"                <td>\n"
+"                    <strong>Betaalwijze:</strong>\n"
+"                    % if transaction.payment_token_id:\n"
+"                        ${transaction.payment_token_id.name}\n"
+"                    % else:\n"
+"                        ${transaction.acquirer_id.name}\n"
+"                    % endif\n"
+"                     (${format_amount(transaction.amount, object.currency_id)})\n"
+"                </td>\n"
+"            </tr>\n"
+"        </table>\n"
+"    </div>\n"
+"    % endif\n"
+"    % if object.partner_shipping_id and not object.only_services:\n"
+"    <div style=\"margin: 0px; padding: 0px;\">\n"
+"        <table width=\"100%\" style=\"color: #454748; font-size: 12px;\">\n"
+"            <tr>\n"
+"                <td>\n"
+"                    <br/>\n"
+"                    <strong>Verzenden naar:</strong>\n"
+"                    ${object.partner_shipping_id.street or ''}\n"
+"                    ${object.partner_shipping_id.city or ''}\n"
+"                    ${object.partner_shipping_id.state_id.name or ''}\n"
+"                    ${object.partner_shipping_id.zip or ''}\n"
+"                    ${object.partner_shipping_id.country_id.name or ''}\n"
+"                </td>\n"
+"            </tr>\n"
+"        </table>\n"
+"        % if object.carrier_id:\n"
+"        <table width=\"100%\" style=\"color: #454748; font-size: 12px;\">\n"
+"            <tr>\n"
+"                <td>\n"
+"                    <strong>Verzendwijze:</strong>\n"
+"                    ${object.carrier_id.name}\n"
+"                    % if object.carrier_id.fixed_price == 0.0:\n"
+"                        (Gratis)\n"
+"                    % else:\n"
+"                        (${format_amount(object.carrier_id.fixed_price, object.currency_id)})\n"
+"                    % endif\n"
+"                </td>\n"
+"            </tr>\n"
+"        </table>\n"
+"        % endif\n"
+"    </div>\n"
+"    % endif\n"
+"% endif\n"
+"</div>"
 
 #. module: sale
 #: model:mail.template,body_html:sale.email_template_edi_sale
@@ -419,7 +584,7 @@ msgstr "<i class=\"fa fa-times\"/> Weiger"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
 msgid "<small><b class=\"text-muted\">This offer expires on</b></small>"
-msgstr "<small><b class=\"text-muted\">Dit aanbod vervalt op</b></small>"
+msgstr "<small><b class=\"text-muted\">Deze offerte vervalt op</b></small>"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
@@ -473,7 +638,7 @@ msgid ""
 "                                <span class=\"o_stat_text\">Preview</span>"
 msgstr ""
 "<span class=\"o_stat_text\">Klant</span>\n"
-"                                <span class=\"o_stat_text\">Preview</span>"
+"                                <span class=\"o_stat_text\">voorbeeld</span>"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.product_form_view_sale_order_button
@@ -496,6 +661,8 @@ msgid ""
 "<span groups=\"account.group_show_line_subtotals_tax_excluded\">Amount</span>\n"
 "                            <span groups=\"account.group_show_line_subtotals_tax_included\">Total Price</span>"
 msgstr ""
+"<span groups=\"account.group_show_line_subtotals_tax_excluded\">Bedrag</span>\n"
+"                            <span groups=\"account.group_show_line_subtotals_tax_included\">Totale prijs</span>"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
@@ -647,7 +814,7 @@ msgstr "Een bevestigde verkooporder vereist een bevestigingsdatum"
 #: code:addons/sale/models/sale.py:0
 #, python-format
 msgid "A journal must be specified for the acquirer %s."
-msgstr ""
+msgstr "Voor de koper moet een journaal worden opgegeven %s."
 
 #. module: sale
 #: code:addons/sale/models/sale.py:0
@@ -707,7 +874,7 @@ msgstr "Accepteer &amp; Betaal"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.mail_notification_paynow_online
 msgid "Accept &amp; Pay Quotation"
-msgstr "Accepteer &amp; Betaal online"
+msgstr "Accepteer &amp; Betaal offerte"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
@@ -842,6 +1009,8 @@ msgid ""
 "An order is to upsell when delivered quantities are above initially\n"
 "                ordered quantities, and the invoicing policy is based on ordered quantities."
 msgstr ""
+"Een order is om te verkopen wanneer de geleverde hoeveelheden aanvankelijk hoger zijn dan\n"
+"bestelde hoeveelheden en het facturatiebeleid is gebaseerd op bestelde hoeveelheden."
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_report_all_channels_sales__analytic_account_id
@@ -895,6 +1064,8 @@ msgid ""
 "As an example, if you sell pre-paid hours of services, Odoo recommends you\n"
 "                to sell extra hours when all ordered hours have been consumed."
 msgstr ""
+"Als je bijvoorbeeld vooraf betaalde uren aan diensten verkoopt, raadt Odoo je aan\n"
+"                 om extra uren te verkopen als alle bestelde uren zijn verbruikt."
 
 #. module: sale
 #: model:ir.model.fields.selection,name:sale.selection__product_template__expense_policy__cost
@@ -1009,8 +1180,8 @@ msgid ""
 "Check this box if you send quotations to your customers rather than "
 "confirming orders straight away."
 msgstr ""
-"Vink dit aan als u offertes naar uw klanten verzendt in plaats van "
-"bestellingen meteen te bevestigen."
+"Vink dit aan als u offertes naar uw klanten verzendt in plaats van orders "
+"meteen te bevestigen."
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_onboarding_order_confirmation_step
@@ -1454,9 +1625,9 @@ msgid ""
 "either use the minimum or maximum lead time of the order lines."
 msgstr ""
 "Leveringsdatum die u aan de klant kunt beloven, berekend vanaf de minimale "
-"doorlooptijd van de orderregels in het geval van serviceproducten. In geval "
-"van verzending wordt rekening gehouden met het verzendbeleid van de "
-"bestelling om de minimale of maximale doorlooptijd van de orderregels te "
+"doorlooptijd van de orderregels in het geval van diensten-producten. In "
+"geval van verzending wordt rekening gehouden met het verzendbeleid van de "
+"order om de minimale of maximale doorlooptijd van de orderregels te "
 "gebruiken."
 
 #. module: sale
@@ -1562,7 +1733,7 @@ msgstr "Bedrag aanbetaling"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_advance_payment_inv__fixed_amount
-msgid "Down Payment Amount(Fixed)"
+msgid "Down Payment Amount (Fixed)"
 msgstr "Bedrag aanbetaling (vast)"
 
 #. module: sale
@@ -1924,8 +2095,7 @@ msgstr ""
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
 msgid "Import Amazon orders and sync deliveries"
-msgstr ""
-"Importeren van Amazon bestellingen en het synchroniseren van leveringen"
+msgstr "Importeren van Amazon orders en het synchroniseren van leveringen"
 
 #. module: sale
 #: code:addons/sale/models/product_template.py:0
@@ -1981,7 +2151,7 @@ msgstr "Factuuradres"
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_order_cancel__display_invoice_alert
 msgid "Invoice Alert"
-msgstr "Factuur waarschuwing"
+msgstr "Factuurwaarschuwing"
 
 #. module: sale
 #: model:mail.message.subtype,name:sale.mt_salesteam_invoice_confirmed
@@ -2243,13 +2413,6 @@ msgstr "Laat klanten inloggen voor toegang tot hun documenten"
 #. openerp-web
 #: code:addons/sale/static/src/js/tours/sale.js:0
 #, python-format
-msgid "Let's enter the address."
-msgstr "Laten we het adres invullen."
-
-#. module: sale
-#. openerp-web
-#: code:addons/sale/static/src/js/tours/sale.js:0
-#, python-format
 msgid "Let's send the quote."
 msgstr "Laten we de offerte versturen."
 
@@ -2269,7 +2432,7 @@ msgstr "Blokkeer"
 #: model:ir.model.fields,field_description:sale.field_res_config_settings__group_auto_done_setting
 #: model:res.groups,name:sale.group_auto_done_setting
 msgid "Lock Confirmed Sales"
-msgstr "Bevestigde orders vastzetten"
+msgstr "Bevestigde orders blokkeren"
 
 #. module: sale
 #: model:ir.model.fields.selection,name:sale.selection__sale_order__state__done
@@ -2686,7 +2849,7 @@ msgstr "Orders om te factureren"
 #: code:addons/sale/models/sale.py:0
 #, python-format
 msgid "Ordered Quantity: %(old_qty)s -> %(new_qty)s"
-msgstr ""
+msgstr "Bestelde hoeveelheid: %(old_qty)s->%(new_qty)s"
 
 #. module: sale
 #: model:ir.model.fields,help:sale.field_product_product__invoice_policy
@@ -2824,7 +2987,7 @@ msgstr "Betalingstransactie"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
 msgid "Payment terms"
-msgstr "Betalingstermijnen"
+msgstr "Betalingstermijn"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_payment_acquirer_onboarding_wizard__paypal_user_type
@@ -2947,7 +3110,7 @@ msgstr "Productsjabloon"
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_order_line__product_uom_readonly
 msgid "Product Uom Readonly"
-msgstr ""
+msgstr "Productmaateenheid Alleen lezen"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_report__product_id
@@ -2964,7 +3127,7 @@ msgstr "Productvarianten"
 #: code:addons/sale/models/sale.py:0
 #, python-format
 msgid "Product prices have been recomputed according to pricelist <b>%s<b> "
-msgstr ""
+msgstr "Productprijzen zijn opnieuw berekend volgens prijslijst <b>%s<b>"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
@@ -3026,7 +3189,7 @@ msgstr "Hoeveelheid"
 #: model:ir.model.fields,field_description:sale.field_product_product__visible_qty_configurator
 #: model:ir.model.fields,field_description:sale.field_product_template__visible_qty_configurator
 msgid "Quantity visible in configurator"
-msgstr ""
+msgstr "Aantal zichtbaar in configurator"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
@@ -3145,7 +3308,7 @@ msgstr "Her-facturatiebeleid zichtbaar"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
 msgid "Recompute all prices based on this pricelist"
-msgstr ""
+msgstr "Bereken alle prijzen opnieuw op basis van deze prijslijst."
 
 #. module: sale
 #: code:addons/sale/controllers/portal.py:0
@@ -3714,7 +3877,7 @@ msgstr "Fase"
 #: code:addons/sale/static/src/js/tours/sale.js:0
 #, python-format
 msgid "Start by checking your company's data."
-msgstr ""
+msgstr "Begin met het controleren van de gegevens van uw bedrijf."
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_res_company__sale_onboarding_order_confirmation_state
@@ -3806,6 +3969,8 @@ msgid ""
 "Technical Field, True if the pricelist was changed;\n"
 " this will then display a recomputation button"
 msgstr ""
+"Technisch veld, 'waar' als de prijslijst is gewijzigd;\n"
+"hierdoor wordt een herberekeningsknop weergegeven."
 
 #. module: sale
 #: model:ir.model.fields,help:sale.field_sale_order_line__display_type
@@ -3896,6 +4061,9 @@ msgid ""
 "%s\n"
 "You can archive these products and recreate them with your company restriction instead, or leave them as shared product."
 msgstr ""
+"Deze producten kunnen niet tot één bedrijf %s beperkt worden omdat die al gebruikt werden voor een offerte of order in een andere bedrijf:\n"
+"%s\n"
+"In plaats daarvan kan u deze producten archiveren en opnieuw aanmaken met een bedrijfsrestrictie, of ze als gemeenschappelijk product laten staan."
 
 #. module: sale
 #: model:ir.model.fields,help:sale.field_res_config_settings__automatic_invoice
@@ -3906,7 +4074,7 @@ msgid ""
 msgstr ""
 "De factuur wordt automatisch gegenereerd en is beschikbaar in het klantportal wanneer de transactie wordt bevestigd door de betalingsverwerker.\n"
 "De factuur is gemarkeerd als betaald en de betaling is geregistreerd in het betalingsdagboek dat is gedefinieerd in de configuratie van de betalingsverwerker.\n"
-"Deze modus wordt aanbevolen als u de eindfactuur bij de bestelling verstrekt en niet na de levering."
+"Deze modus wordt aanbevolen als u de eindfactuur bij de order verstrekt en niet na de levering."
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
@@ -3983,7 +4151,7 @@ msgid ""
 " the order"
 msgstr ""
 "De koers van de valuta naar de valuta van tarief 1 van toepassing op de "
-"datum van de bestelling"
+"datum van de order"
 
 #. module: sale
 #: code:addons/sale/wizard/sale_make_invoice_advance.py:0
@@ -4012,6 +4180,11 @@ msgid ""
 "- You should modify the invoicing policy of your product: Open the product, go to the \"Sales tab\" and modify invoicing policy from \"delivered quantities\" to \"ordered quantities\".\n"
 "        "
 msgstr ""
+"Je hoeft niets te factureren!\n"
+"\n"
+"Reden(en) hiervoor kunnen zijn:\n"
+"- Je dient je producten af te leveren voordat je ze factureert: klik op het \"vrachtwagen\" icoon (rechtsboven in je scherm) en volg de instructies.\n"
+"-  Je dient het facturatiebeleid van je product aan te passen: open het product, ga naar het tabblad \"Verkoop\" en wijzig het facturatiebeleid van \"geleverde hoeveelheden\" naar \"bestelde hoeveelheden\"."
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
@@ -4108,6 +4281,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
 msgid "This will update all unit prices based on the currently set pricelist."
 msgstr ""
+"Hiermee worden alle eenheidsprijzen bijgewerkt op basis van de momenteel "
+"ingestelde prijslijst."
 
 #. module: sale
 #: model:ir.model.fields.selection,name:sale.selection__sale_order__invoice_status__to_invoice
@@ -4147,6 +4322,8 @@ msgid ""
 "To speed up order confirmation, we can activate electronic signatures or "
 "payments."
 msgstr ""
+"Om de orderbevestiging te versnellen, kunnen we elektronische handtekeningen"
+" of betalingen activeren."
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_sales_order_filter
@@ -4279,7 +4456,7 @@ msgstr "Excl. BTW"
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_report__untaxed_amount_invoiced
 msgid "Untaxed Amount Invoiced"
-msgstr "Onbelast bedrag gefactureerd:"
+msgstr "Onbelast bedrag gefactureerd"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_order_line__untaxed_amount_to_invoice
@@ -4391,14 +4568,14 @@ msgstr "Website communicatie geschiedenis"
 #: code:addons/sale/static/src/js/tours/sale.js:0
 #, python-format
 msgid "Write <b>your own email address</b> here in order to test the flow."
-msgstr ""
+msgstr "Schrijf hier <b>je eigen e-mailadres</b> om de stroom te testen."
 
 #. module: sale
 #. openerp-web
 #: code:addons/sale/static/src/js/tours/sale.js:0
 #, python-format
 msgid "Write a company name to create one, or see suggestions."
-msgstr ""
+msgstr "Schrijf een bedrijfsnaam om er één te maken of bekijk suggesties."
 
 #. module: sale
 #: code:addons/sale/models/sale.py:0

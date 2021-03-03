@@ -147,25 +147,25 @@ msgstr ""
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_0
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_2
 msgid "<b>What kinds of questions can I ask here?</b>"
-msgstr ""
+msgstr "<b>Hvad slags spørgsmål kan jeg stille her?</b>"
 
 #. module: website_slides_forum
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_0
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_2
 msgid "<b>What should I avoid in my answers?</b>"
-msgstr ""
+msgstr "<b>Hvad bør jeg undgå i mine svar?</b>"
 
 #. module: website_slides_forum
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_0
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_2
 msgid "<b>What should I avoid in my questions?</b>"
-msgstr ""
+msgstr "<b>Hvad bør jeg undgå i mine spørgsmål?</b>"
 
 #. module: website_slides_forum
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_0
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_2
 msgid "<b>Why can other people edit my questions/answers?</b>"
-msgstr ""
+msgstr "<b>Hvorfor kan andre redigere mine spørgsmål/svar?</b>"
 
 #. module: website_slides_forum
 #: model_terms:ir.ui.view,arch_db:website_slides_forum.slide_fullscreen
@@ -173,6 +173,8 @@ msgid ""
 "<i class=\"fa fa-comments\"/><span class=\"ml-1 d-none d-md-inline-"
 "block\">New Post</span>"
 msgstr ""
+"<i class=\"fa fa-comments\"/><span class=\"ml-1 d-none d-md-inline-"
+"block\">Nyt Indlæg</span>"
 
 #. module: website_slides_forum
 #: model_terms:ir.ui.view,arch_db:website_slides_forum.website_slides_forum_header
@@ -243,7 +245,7 @@ msgstr "Vis navn"
 #. module: website_slides_forum
 #: model:ir.model.fields,help:website_slides_forum.field_forum_forum__slide_channel_ids
 msgid "Edit the course linked to this forum on the course form."
-msgstr ""
+msgstr "Rediger kurset forbundet til dette forum i kursus formularen."
 
 #. module: website_slides_forum
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_0
@@ -282,7 +284,7 @@ msgstr "Forum indlæg"
 #: model:ir.model.fields,help:website_slides_forum.field_forum_forum__visibility
 msgid ""
 "Forum linked to a Course, the visibility is the one applied on the course."
-msgstr ""
+msgstr "Forum forbundet til et Kursus; synligheden er den anvendt på kurset."
 
 #. module: website_slides_forum
 #: model:ir.ui.menu,name:website_slides_forum.website_slides_menu_forum_forum
@@ -293,7 +295,7 @@ msgstr "Fora"
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_0
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_2
 msgid "Here a table with the privileges and the karma level"
-msgstr ""
+msgstr "Her er en tabel med privilegier og karma niveau"
 
 #. module: website_slides_forum
 #: model_terms:forum.forum,welcome_message:website_slides_forum.forum_forum_demo_channel_0
@@ -312,6 +314,8 @@ msgstr "ID"
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_2
 msgid "If this approach is not for you, please respect the community."
 msgstr ""
+"Hvis denne tilgang ikke er for dig, bedes du venligst respektere "
+"sammenholdet."
 
 #. module: website_slides_forum
 #: model_terms:forum.forum,faq:website_slides_forum.forum_forum_demo_channel_0
@@ -353,7 +357,7 @@ msgstr "Antal aktive forum indlæg"
 #. module: website_slides_forum
 #: model:ir.model.constraint,message:website_slides_forum.constraint_slide_channel_forum_uniq
 msgid "Only one course per forum!"
-msgstr ""
+msgstr "Kun et kursus per forum!"
 
 #. module: website_slides_forum
 #: model:ir.ui.menu,name:website_slides_forum.website_slides_menu_forum_post

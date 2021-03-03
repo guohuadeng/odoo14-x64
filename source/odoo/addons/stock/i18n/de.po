@@ -18,7 +18,6 @@
 # Christian Oechsner <carinachristian@gmail.com>, 2020
 # Bettina Pfeifer <betzilla@web.de>, 2020
 # Silvan Wyden <silvan.wyden@braintec-group.com>, 2020
-# Niki Waibel, 2020
 # brokemeister <work@maltejansen.de>, 2020
 # Robert Förster <hello@suppliot.eu>, 2020
 # Max-Milan Stoyanov, 2020
@@ -39,14 +38,18 @@
 # philku79 <philip.kuss@gmx.de>, 2020
 # Florian Pose <fp@igh.de>, 2020
 # Chris Egal <sodaswed@web.de>, 2020
+# Tobias Arndt, 2020
+# TomTietze <t.tietze94@web.de>, 2020
+# Gab_Odoo <gab@odoo.com>, 2020
+# Niki Waibel, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-02 14:11+0000\n"
+"POT-Creation-Date: 2020-11-27 11:23+0000\n"
 "PO-Revision-Date: 2020-09-07 08:19+0000\n"
-"Last-Translator: Chris Egal <sodaswed@web.de>, 2020\n"
+"Last-Translator: Niki Waibel, 2021\n"
 "Language-Team: German (https://www.transifex.com/odoo/teams/41243/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -86,6 +89,9 @@ msgid ""
 "\n"
 "Transfers %s: You cannot validate these transfers if no quantities are reserved nor done. To force these transfers, switch in edit more and encode the done quantities."
 msgstr ""
+"\n"
+"\n"
+"Transfer %s\\: Sie können diesen Transfer nicht validieren, wenn keine Menge reserviert oder erledigt sind. Um diesen Transfer zu erzwingen, müssen Sie in den Bearbeitungsmodus wechseln und die fertigen Mengen eintragen."
 
 #. module: stock
 #: code:addons/stock/models/stock_picking.py:0
@@ -110,12 +116,24 @@ msgid ""
 " * Done: The transfer has been processed.\n"
 " * Cancelled: The transfer has been cancelled."
 msgstr ""
+"* Entwurf\\: Dieser Transfer ist noch nicht bestätigt. Reservierungen werden"
+" nicht angewendet. * Auf anderen Vorgang warten\\: Bevor dieser Transfer "
+"bereit ist, muss auf einen anderen Vorgang gewartet werden. * Wartet\\: "
+"Dieser Transfer wartet auf die Verfügbarkeit von einigen Produkten. (a) Die "
+"Versandpolitik ist \"Sobald wie möglich\"\\: keine Produkte können "
+"reserviert werden. (b) Die Versandpolitik ist „Wenn alle Produkte bereit“\\:"
+" nicht alle Produkte können reserviert. * Bereit\\: Der Transfer ist zur "
+"Bearbeitung bereit. (a) Die Versandpolitik ist „Sobald wie möglich\"\\: "
+"wenigstens ein Produkt kann reserviert werden. (b) Die Versandpolitik ist "
+"„Wenn alle Produkte bereit\"\\: alle Produkte können reserviert werden. * "
+"Fertig\\: Der Transfer wurde getätigt. * Storniert\\: Der Transfer wurde "
+"storniert."
 
 #. module: stock
 #: code:addons/stock/models/stock_production_lot.py:0
 #, python-format
 msgid " - Product: %s, Serial Number: %s"
-msgstr ""
+msgstr "- Produkt\\: %s, Seriennummer\\: %s "
 
 #. module: stock
 #: model:mail.template,report_name:stock.mail_template_data_delivery_confirmation
@@ -133,7 +151,7 @@ msgstr ""
 #: code:addons/stock/models/stock_warehouse.py:0
 #, python-format
 msgid "%(warehouse)s: Supply Product from %(supplier)s"
-msgstr ""
+msgstr "%(warehouse)s\\: Kaufe Produkt bei %(supplier)s "
 
 #. module: stock
 #: code:addons/stock/models/stock_inventory.py:0
@@ -169,7 +187,7 @@ msgstr "'Lagerort - %s' % object.name"
 #. module: stock
 #: model:ir.actions.report,print_report_name:stock.action_report_lot_label
 msgid "'Lot-Serial - %s' % object.name"
-msgstr "'Lot-Serialnummer - %s' % object.name"
+msgstr "'Lot-Seriennummer - %s' % object.name"
 
 #. module: stock
 #: model:ir.actions.report,print_report_name:stock.action_report_picking_type_label
@@ -229,7 +247,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_orderpoint_snooze__predefined_date__day
 msgid "1 Day"
-msgstr ""
+msgstr "1 Tag"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_orderpoint_snooze__predefined_date__month
@@ -239,20 +257,20 @@ msgstr "1 Monat"
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_orderpoint_snooze__predefined_date__week
 msgid "1 Week"
-msgstr ""
+msgstr "1 Woche"
 
 #. module: stock
 #: code:addons/stock/models/stock_scrap.py:0
 #, python-format
 msgid ": Insufficient Quantity To Scrap"
-msgstr ""
+msgstr ": unzureichende Menge als Ausschuss"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_warn_insufficient_qty_form_view
 msgid ""
 "<br/>\n"
 "                    <strong>Current Inventory: </strong>"
-msgstr ""
+msgstr "<br/> <strong>derzeitiges Inventar\\: </strong> "
 
 #. module: stock
 #: code:addons/stock/models/stock_rule.py:0
@@ -450,6 +468,8 @@ msgid ""
 "<span>All items couldn't be shipped, the following items will be shipped as "
 "soon as they become available.</span>"
 msgstr ""
+"<span> Alle Artikel können nicht versandt werden. Sobald die fehlenden "
+"Artikel verfügbar sind, werden diese versandt.</span>"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_move_operations
@@ -469,12 +489,12 @@ msgstr "<span>Neu</span>"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_small
 msgid "<span>Package Type: </span>"
-msgstr ""
+msgstr " <span>Verpackungsart\\: </span> "
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_report_delivery_no_package_section_line
 msgid "<span>Products with no package assigned</span>"
-msgstr ""
+msgstr "<span>Produkte ohne Verpackung</span> "
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.message_head
@@ -606,6 +626,8 @@ msgstr "<strong>Wo möchten Sie diese Produkte versenden ?</strong>"
 #: model_terms:ir.ui.view,arch_db:stock.stock_warn_insufficient_qty_scrap_form_view
 msgid "? This may lead to inconsistencies in your inventory."
 msgstr ""
+"Sind Sie sich sicher, dass Sie diesen Vorgang bestätigen möchten? Dies kann "
+"zu Inkonsistenzen in Ihrem Bestand führen."
 
 #. module: stock
 #: code:addons/stock/models/stock_move_line.py:0
@@ -799,18 +821,16 @@ msgid "Allowed Route"
 msgstr ""
 
 #. module: stock
+#: model:ir.model.fields,help:stock.field_stock_inventory__prefill_counted_quantity
+msgid ""
+"Allows to start with a pre-filled counted quantity for each lines or with "
+"all counted quantities set to zero."
+msgstr ""
+
+#. module: stock
 #: model:ir.model.fields,help:stock.field_stock_inventory__start_empty
 msgid "Allows to start with an empty inventory."
 msgstr "Erlaubt es, mit einem leeren Bestand zu beginnen."
-
-#. module: stock
-#: model:ir.model.fields,help:stock.field_stock_inventory__prefill_counted_quantity
-msgid ""
-"Allows to start with prefill counted quantity for each lines or with all "
-"counted quantity set to zero."
-msgstr ""
-"Erlaubt es, mit der Vorfüllung der Zählmenge für jede Zeile oder mit der "
-"Nullsetzung aller Zählmengen zu beginnen."
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_rule_form
@@ -944,13 +964,13 @@ msgstr "Verfügbare Produkte"
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_quant__available_quantity
 msgid "Available Quantity"
-msgstr ""
+msgstr "Verfügbare Menge"
 
 #. module: stock
 #: code:addons/stock/models/product.py:0
 #, python-format
 msgid "Available quantity should be set to zero before changing type"
-msgstr ""
+msgstr "Bevor der Typ geändert wird, sollte die verfügbare Menge 0 sein"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__backorder_id
@@ -1753,7 +1773,7 @@ msgstr ""
 #. module: stock
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
-msgid "Deadline updates due to delay on %s"
+msgid "Deadline updated due to delay on %s"
 msgstr ""
 
 #. module: stock
@@ -1851,7 +1871,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock.field_stock_move__delay_alert_date
 #: model:ir.model.fields,field_description:stock.field_stock_picking__delay_alert_date
 msgid "Delay Alert Date"
-msgstr ""
+msgstr "Warntag verzögern"
 
 #. module: stock
 #: code:addons/stock/models/stock_rule.py:0
@@ -2445,16 +2465,6 @@ msgid "Font awesome icon e.g. fa-tasks"
 msgstr "FontAwesome Icon, z.B. fa-tasks"
 
 #. module: stock
-#: model:ir.model.fields,field_description:stock.field_stock_move__forecast_availability
-msgid "Forcast Availability"
-msgstr ""
-
-#. module: stock
-#: model:ir.model.fields,field_description:stock.field_stock_move__forecast_expected_date
-msgid "Forcasted Expected date"
-msgstr ""
-
-#. module: stock
 #: model:ir.model.fields,field_description:stock.field_product_category__removal_strategy_id
 msgid "Force Removal Strategy"
 msgstr "Erzwinge Verbrauchsfolge"
@@ -2463,6 +2473,11 @@ msgstr "Erzwinge Verbrauchsfolge"
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse_orderpoint__qty_forecast
 msgid "Forecast"
 msgstr "Prognose"
+
+#. module: stock
+#: model:ir.model.fields,field_description:stock.field_stock_move__forecast_availability
+msgid "Forecast Availability"
+msgstr ""
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse_orderpoint_tree_editable
@@ -2508,12 +2523,17 @@ msgstr "Vorhergesagt"
 #: code:addons/stock/static/src/xml/stock_orderpoint.xml:0
 #, python-format
 msgid "Forecasted Date"
-msgstr ""
+msgstr "Prognostiziertes Datum"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__report_stock_quantity__state__out
 #: model_terms:ir.ui.view,arch_db:stock.stock_report_view_search
 msgid "Forecasted Deliveries"
+msgstr "prognostizierte Lieferungen"
+
+#. module: stock
+#: model:ir.model.fields,field_description:stock.field_stock_move__forecast_expected_date
+msgid "Forecasted Expected date"
 msgstr ""
 
 #. module: stock
@@ -2553,7 +2573,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock.selection__report_stock_quantity__state__forecast
 #: model_terms:ir.ui.view,arch_db:stock.stock_report_view_search
 msgid "Forecasted Stock"
-msgstr ""
+msgstr "Prognostizierter Bestand"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_product_product_replenishment
@@ -2716,6 +2736,11 @@ msgstr "Lagerort Etage (Z)"
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_warehouse_orderpoint__snoozed_until
 msgid "Hidden until next scheduler."
+msgstr ""
+
+#. module: stock
+#: model:ir.model.fields,field_description:stock.field_stock_picking__hide_picking_type
+msgid "Hide Picking Type"
 msgstr ""
 
 #. module: stock
@@ -3286,7 +3311,7 @@ msgstr ""
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_picking__has_deadline_issue
-msgid "Is late or will be late depending of the deadline and scheduled date"
+msgid "Is late or will be late depending on the deadline and scheduled date"
 msgstr ""
 
 #. module: stock
@@ -3598,7 +3623,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_type_form
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse
 msgid "Locations"
-msgstr "Veranstaltungsorte"
+msgstr "Lagerorte"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
@@ -3949,7 +3974,6 @@ msgstr "Neu"
 
 #. module: stock
 #: code:addons/stock/models/stock_move_line.py:0
-#: code:addons/stock/models/stock_picking.py:0
 #, python-format
 msgid "New Move:"
 msgstr "Neue Buchung:"
@@ -4019,7 +4043,7 @@ msgstr "Kein Vorgang wurde für dieses Los ausgeführt."
 #. module: stock
 #: model_terms:ir.actions.act_window,help:stock.product_template_action_product
 msgid "No product found. Let's create one!"
-msgstr ""
+msgstr "Es wurde kein Produkt gefunden. Bitte erstelle eins!"
 
 #. module: stock
 #: code:addons/stock/wizard/stock_picking_return.py:0
@@ -4086,7 +4110,7 @@ msgstr "Normal"
 #: model_terms:ir.ui.view,arch_db:stock.report_product_product_replenishment
 #, python-format
 msgid "Not Available"
-msgstr ""
+msgstr "nicht verfügbar"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_reorder_report_search
@@ -4176,6 +4200,8 @@ msgid ""
 "On hand quantity which hasn't been reserved on a transfer, in the default "
 "unit of measure of the product"
 msgstr ""
+"Verfügbare Lagermenge, welche nicht für einen Transfer reserviert wurde.  "
+"Lagermenge ist in der Maßeinheit des Produktes."
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.product_template_kanban_stock_view
@@ -5067,7 +5093,7 @@ msgstr ""
 #. module: stock
 #: model:ir.model,name:stock.model_stock_putaway_rule
 msgid "Putaway Rule"
-msgstr ""
+msgstr "Einlagerungsregel"
 
 #. module: stock
 #: code:addons/stock/models/product.py:0
@@ -5087,7 +5113,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.view_putaway_search
 #, python-format
 msgid "Putaway Rules"
-msgstr ""
+msgstr "Einlagerungsregeln"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_stock_rule
@@ -5317,7 +5343,7 @@ msgstr "Anlieferungen"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_form
 msgid "Receive From"
-msgstr "Partner"
+msgstr "Erhalte von"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_warehouse__reception_steps__one_step
@@ -5482,7 +5508,7 @@ msgstr "Aufstocken"
 #. module: stock
 #: model:stock.location.route,name:stock.route_warehouse0_mto
 msgid "Replenish on Order (MTO)"
-msgstr ""
+msgstr "Auffüllung nach Auftrag (MTO)"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_product_replenish
@@ -5497,13 +5523,13 @@ msgstr "Assistent zum Aufstocken"
 #: model_terms:ir.ui.view,arch_db:stock.report_product_product_replenishment
 #, python-format
 msgid "Replenishment"
-msgstr ""
+msgstr "Auffüllung"
 
 #. module: stock
 #: code:addons/stock/models/stock_orderpoint.py:0
 #, python-format
 msgid "Replenishment Report"
-msgstr ""
+msgstr "Aufstockbericht"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_reorder_report_search
@@ -5552,13 +5578,13 @@ msgstr "Reservierte Menge"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_product_product_replenishment
 msgid "Reserved from stock"
-msgstr ""
+msgstr "vom Lager reserviert"
 
 #. module: stock
 #: code:addons/stock/models/stock_move_line.py:0
 #, python-format
 msgid "Reserving a negative quantity is not allowed."
-msgstr ""
+msgstr "Reservieren einer negative Menge ist nicht erlaubt."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_res_config_settings__module_procurement_jit
@@ -5588,7 +5614,7 @@ msgstr "Manager Veranstaltung"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_warehouse
 msgid "Resupply"
-msgstr ""
+msgstr "Beschaffung"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse__resupply_wh_ids
@@ -5742,7 +5768,7 @@ msgstr "Scheduler starten"
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_res_config_settings__module_stock_sms
 msgid "SMS Confirmation"
-msgstr ""
+msgstr "SMS Bestätigung"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_inventory__message_has_sms_error
@@ -6308,6 +6334,7 @@ msgstr "Statistik Lagerbuchungen"
 
 #. module: stock
 #: code:addons/stock/models/stock_quant.py:0
+#: model:ir.actions.act_window,name:stock.dashboard_open_quants
 #, python-format
 msgid "Stock On Hand"
 msgstr " Auf Lager"
@@ -6353,7 +6380,7 @@ msgstr "Bericht Bestandsmenge"
 #: model:ir.model,name:stock.model_report_stock_report_product_product_replenishment
 #: model:ir.model,name:stock.model_report_stock_report_product_template_replenishment
 msgid "Stock Replenishment Report"
-msgstr ""
+msgstr "Bestandsauffüllbericht"
 
 #. module: stock
 #: model:ir.model,name:stock.model_stock_rule
@@ -6406,7 +6433,7 @@ msgstr "Verarbeitete Lagerbuchungen"
 #. module: stock
 #: model:ir.model,name:stock.model_report_stock_report_stock_rule
 msgid "Stock rule report"
-msgstr ""
+msgstr "Lagerregelbericht"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__product_template__type__product
@@ -6457,7 +6484,7 @@ msgstr "Vom Lager entnehmen"
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_rule__procure_method__mts_else_mto
 msgid "Take From Stock, if unavailable, Trigger Another Rule"
-msgstr ""
+msgstr "Lagerentnahme, falls nicht verfügbar wird eine andere Regel ausgelöst"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_rule__procure_method
@@ -6690,7 +6717,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_warn_insufficient_qty_form_view
 msgid "The product is not available in sufficient quantity"
-msgstr ""
+msgstr "Das Produkt ist in ausreichender Menge nicht verfügbar."
 
 #. module: stock
 #: code:addons/stock/models/stock_move_line.py:0
@@ -6730,7 +6757,7 @@ msgstr ""
 #: code:addons/stock/models/stock_move.py:0
 #, python-format
 msgid "The serial number must contain at least one digit."
-msgstr ""
+msgstr "Die Seriennummer muss mindestens eine Zahl enthalten."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_res_partner__property_stock_customer
@@ -6915,6 +6942,16 @@ msgstr ""
 "stellen Sie sicher, dass Sie die zurückgegebene Kommissionierung <b>wieder "
 "rückgängig machen,</b> um zu verhindern, dass Logistikregeln erneut "
 "angewandt werden (was duplizierte Vorgänge erzeugen würde)."
+
+#. module: stock
+#: code:addons/stock/models/product.py:0
+#, python-format
+msgid ""
+"This product has been used in at least one inventory movement. It is not "
+"advised to change the Product Type since it can lead to inconsistencies. A "
+"better solution could be to archive the product and create a new one "
+"instead."
+msgstr ""
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_change_product_qty__new_quantity
@@ -8048,11 +8085,9 @@ msgstr ""
 #: code:addons/stock/models/stock_orderpoint.py:0
 #, python-format
 msgid ""
-"You have to select a product unit of measure that is in the same category "
-"than the default unit of measure of the product"
+"You have to select a product unit of measure that is in the same category as"
+" the default unit of measure of the product"
 msgstr ""
-"Sie müssen eine Produktmengeneinheit auswählen, die derselben Kategorie "
-"entspricht wie die Standardmengeneinheit des Produkts"
 
 #. module: stock
 #: code:addons/stock/wizard/stock_picking_return.py:0
@@ -8190,7 +8225,7 @@ msgstr "z.B. PO0032"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_warn_insufficient_qty_scrap_form_view
 msgid "from location"
-msgstr ""
+msgstr "vom Ort"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_warn_insufficient_qty_form_view
@@ -8219,7 +8254,7 @@ msgstr "von"
 #: code:addons/stock/static/src/xml/popover_widget.xml:0
 #, python-format
 msgid "planned on"
-msgstr ""
+msgstr "geplant am"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.exception_on_picking
@@ -8236,4 +8271,20 @@ msgstr "report_stock_quantity_graph"
 #: code:addons/stock/static/src/xml/stock_orderpoint.xml:0
 #, python-format
 msgid "should be replenished to reach the maximum of"
+msgstr ""
+
+#. module: stock
+#: code:addons/stock/models/res_config_settings.py:0
+#, python-format
+msgid ""
+"You can't desactivate the multi-location if you have more than once "
+"warehouse by company"
+msgstr ""
+
+#. module: stock
+#: code:addons/stock/models/stock_warehouse.py:0
+#, python-format
+msgid ""
+"Creating a new warehouse will automatically activate the Storage Locations "
+"setting"
 msgstr ""

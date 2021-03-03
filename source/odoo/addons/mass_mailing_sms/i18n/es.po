@@ -3,22 +3,17 @@
 # 	* mass_mailing_sms
 # 
 # Translators:
-# Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2020
-# Martin Trigaux, 2020
-# Pedro M. Baeza <pedro.baeza@gmail.com>, 2020
-# Sarai Osorio <sarai.osorio@jarsa.com.mx>, 2020
-# Cristopher Cravioto <ccr@odoo.com>, 2020
 # Jon Perez <jop@odoo.com>, 2020
-# Osiris Román <osiris.roman@yachaytech.edu.ec>, 2020
 # VivianMontana23 <vivianpvm@gmail.com>, 2020
+# Martin Trigaux, 2020
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-11-27 11:24+0000\n"
 "PO-Revision-Date: 2020-09-07 08:14+0000\n"
-"Last-Translator: VivianMontana23 <vivianpvm@gmail.com>, 2020\n"
+"Last-Translator: Martin Trigaux, 2020\n"
 "Language-Team: Spanish (https://www.transifex.com/odoo/teams/41243/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -319,8 +314,8 @@ msgstr ""
 #. module: mass_mailing_sms
 #: model:ir.model.fields,help:mass_mailing_sms.field_mailing_mailing__sms_subject
 msgid ""
-"For an Email, Subject your Recipients will see in their inbox.\n"
-"For an SMS Text Message, internal Title of the Message."
+"For an email, the subject your recipients will see in their inbox.\n"
+"For an SMS, the internal title of the message."
 msgstr ""
 
 #. module: mass_mailing_sms

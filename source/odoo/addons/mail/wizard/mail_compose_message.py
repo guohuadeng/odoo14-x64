@@ -63,25 +63,22 @@ class MailComposer(models.TransientModel):
             if missing_author:
                 result['author_id'] = author_id
 
-        result['composition_mode'] = result.get('composition_mode', 'comment')
-        result['model'] = result.get('model', self._context.get('active_model'))
-        result['res_id'] = result.get('res_id', self._context.get('active_id'))
-        if 'no_auto_thread' not in result and (result['model'] not in self.env or not hasattr(self.env[result['model']], 'message_post')):
-            result['no_auto_thread'] = True
+        if 'model' in fields and 'model' not in result:
+            result['model'] = self._context.get('active_model')
+        if 'res_id' in fields and 'res_id' not in result:
+            result['res_id'] = self._context.get('active_id')
+        if 'no_auto_thread' in fields and 'no_auto_thread' not in result and result.get('model'):
+            # doesn't support threading
+            if result['model'] not in self.env or not hasattr(self.env[result['model']], 'message_post'):
+                result['no_auto_thread'] = True
 
-        vals = {}
         if 'active_domain' in self._context:  # not context.get() because we want to keep global [] domains
-            vals['active_domain'] = '%s' % self._context.get('active_domain')
-        if result['composition_mode'] == 'comment':
-            vals.update(self.get_record_data(result))
+            result['active_domain'] = '%s' % self._context.get('active_domain')
+        if result.get('composition_mode') == 'comment' and (set(fields) & set(['model', 'res_id', 'partner_ids', 'record_name', 'subject'])):
+            result.update(self.get_record_data(result))
 
-        for field in vals:
-            if field in fields:
-                result[field] = vals[field]
-
-        if fields is not None:
-            [result.pop(field, None) for field in list(result) if field not in fields]
-        return result
+        filtered_result = dict((fname, result[fname]) for fname in result if fname in fields)
+        return filtered_result
 
     # content
     subject = fields.Char('Subject')
@@ -137,7 +134,8 @@ class MailComposer(models.TransientModel):
         'wizard_id', 'partner_id', 'Additional Contacts')
     # mass mode options
     notify = fields.Boolean('Notify followers', help='Notify followers of the document (mass post only)')
-    auto_delete = fields.Boolean('Delete Emails', help='This option permanently removes any track of email after send, including from the Technical menu in the Settings, in order to preserve storage space of your Odoo database.')
+    auto_delete = fields.Boolean('Delete Emails',
+        help='This option permanently removes any track of email after it\'s been sent, including from the Technical menu in the Settings, in order to preserve storage space of your Odoo database.')
     auto_delete_message = fields.Boolean('Delete Message Copy', help='Do not keep a copy of the email in the document communication history (mass mailing only)')
     mail_server_id = fields.Many2one('ir.mail_server', 'Outgoing mail server')
 
@@ -177,7 +175,7 @@ class MailComposer(models.TransientModel):
     # to ensure the context is passed correctly
     def action_send_mail(self):
         self.send_mail()
-        return {'type': 'ir.actions.act_window_close', 'infos': 'mail_sent'}
+        return {'type': 'ir.actions.act_window_close'}
 
     def send_mail(self, auto_commit=False):
         """ Process the wizard content and proceed with sending the related

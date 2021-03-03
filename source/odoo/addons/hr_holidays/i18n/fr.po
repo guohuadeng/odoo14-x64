@@ -8,14 +8,11 @@
 # Olivier ANDRE <frsw194@gmail.com>, 2020
 # Florian Laboureix <fll@odoo.com>, 2020
 # Melanie Bernard <mbe@odoo.com>, 2020
-# Nicolas Martinelli <nim@odoo.com>, 2020
+# Nicolas Martinelli, 2020
 # Aurore Lesage, 2020
 # Benoît Fontaine <benoitfontaine.ba@gmail.com>, 2020
 # Priscilla (prs) Odoo <prs@odoo.com>, 2020
 # Pauline Thiry <pth@odoo.com>, 2020
-# Vallen Delobel <edv@odoo.com>, 2020
-# Julien Goergen <jgo@odoo.com>, 2020
-# Martin Trigaux, 2020
 # Nicolas Roussey <nro@odoo.com>, 2020
 # Eloïse Stilmant <est@odoo.com>, 2020
 # Laura Piraux <lap@odoo.com>, 2020
@@ -23,6 +20,11 @@
 # thomas quertinmont <tqu@odoo.com>, 2020
 # Gilles Mangin <gilles.mangin@phidias.fr>, 2020
 # Frédéric GILSON <frederic.gilson@logicasoft.eu>, 2020
+# guillaume bauer <guillaume.bauer@syentys.fr>, 2020
+# Martin Trigaux, 2020
+# Vallen Delobel <edv@odoo.com>, 2020
+# Julien Goergen <jgo@odoo.com>, 2020
+# Arnaud Willem <contact@arnaud-willem.eu>, 2020
 # Jonathan Quique <jqu@odoo.com>, 2020
 # Cécile Collart <cco@odoo.com>, 2020
 # 
@@ -30,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-11-27 15:27+0000\n"
 "PO-Revision-Date: 2020-09-07 08:13+0000\n"
 "Last-Translator: Cécile Collart <cco@odoo.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/odoo/teams/41243/fr/)\n"
@@ -190,18 +192,6 @@ msgid "(Expire on"
 msgstr ""
 
 #. module: hr_holidays
-#: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_from__0_5
-#: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_to__0_5
-msgid "0:30 AM"
-msgstr "00:30"
-
-#. module: hr_holidays
-#: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_from__12_5
-#: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_to__12_5
-msgid "0:30 PM"
-msgstr "12:30"
-
-#. module: hr_holidays
 #: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_from__10
 #: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_to__10
 msgid "10:00 AM"
@@ -260,6 +250,18 @@ msgstr "00:00"
 #: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_to__12
 msgid "12:00 PM"
 msgstr "12:00"
+
+#. module: hr_holidays
+#: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_from__0_5
+#: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_to__0_5
+msgid "12:30 AM"
+msgstr ""
+
+#. module: hr_holidays
+#: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_from__12_5
+#: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_to__12_5
+msgid "12:30 PM"
+msgstr ""
 
 #. module: hr_holidays
 #: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave__request_hour_from__1
@@ -749,7 +751,7 @@ msgstr "État de l'Activité"
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave__activity_type_icon
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_allocation__activity_type_icon
 msgid "Activity Type Icon"
-msgstr ""
+msgstr "Icône de type d'activité"
 
 #. module: hr_holidays
 #: model:ir.actions.act_window,name:hr_holidays.mail_activity_type_action_config_hr_holidays
@@ -925,10 +927,10 @@ msgstr ""
 #, python-format
 msgid ""
 "Allocation request state must be \"Refused\" or \"To Approve\" in order to "
-"reset to Draft."
+"be reset to Draft."
 msgstr ""
-"L'état de la demande d'allocation doit être \"Refusé\" ou \"A Approuver\" "
-"pour pouvoir être réinitialisé sur Brouillon."
+"L'état de la demande d'allocation doit être «Refusé» ou «À approuver» pour "
+"être réinitialisé en Brouillon."
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_department__allocation_to_approve_count
@@ -1731,7 +1733,9 @@ msgstr "Si coché, de nouveaux messages demandent votre attention."
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave__message_has_error
+#: model:ir.model.fields,help:hr_holidays.field_hr_leave__message_has_sms_error
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_allocation__message_has_error
+#: model:ir.model.fields,help:hr_holidays.field_hr_leave_allocation__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Si actif, certains messages ont une erreur de livraison."
 
@@ -2137,7 +2141,7 @@ msgstr "Pas de validation"
 #: model_terms:ir.actions.act_window,help:hr_holidays.action_hr_available_holidays_report
 #: model_terms:ir.actions.act_window,help:hr_holidays.hr_leave_action_action_department
 msgid "No data yet!"
-msgstr ""
+msgstr "Pas de données"
 
 #. module: hr_holidays
 #. openerp-web
@@ -2253,6 +2257,14 @@ msgid "On leave"
 msgstr ""
 
 #. module: hr_holidays
+#. openerp-web
+#: code:addons/hr_holidays/static/src/components/partner_im_status_icon/partner_im_status_icon.xml:0
+#: code:addons/hr_holidays/static/src/components/thread_icon/thread_icon.xml:0
+#, python-format
+msgid "Online"
+msgstr "En ligne"
+
+#. module: hr_holidays
 #: code:addons/hr_holidays/models/hr_leave.py:0
 #, python-format
 msgid "Only a Time Off Manager can approve/refuse its own requests."
@@ -2318,6 +2330,21 @@ msgid "Other"
 msgstr "Autre"
 
 #. module: hr_holidays
+#. openerp-web
+#: code:addons/hr_holidays/static/src/components/partner_im_status_icon/partner_im_status_icon.xml:0
+#: code:addons/hr_holidays/static/src/components/thread_icon/thread_icon.xml:0
+#, python-format
+msgid "Out of office"
+msgstr "Absent du bureau"
+
+#. module: hr_holidays
+#. openerp-web
+#: code:addons/hr_holidays/static/src/components/thread_view/thread_view.js:0
+#, python-format
+msgid "Out of office until %s."
+msgstr ""
+
+#. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.holiday_status_cl
 msgid "Paid Time Off"
 msgstr "Congés payés"
@@ -2330,8 +2357,8 @@ msgstr "Parent"
 
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.hr_holiday_status_dv
-msgid "Parental Time Off"
-msgstr "Congé parental"
+msgid "Parental Leaves"
+msgstr "Congés parentaux"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.edit_holiday_status_form
@@ -2491,6 +2518,12 @@ msgstr "Utilisateur Responsable"
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_allocation_view_form_manager
 msgid "Run until"
 msgstr "En cours jusqu'au "
+
+#. module: hr_holidays
+#: model:ir.model.fields,field_description:hr_holidays.field_hr_leave__message_has_sms_error
+#: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_allocation__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Erreur d'envoi SMS"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_form_dashboard_new_time_off
@@ -2739,9 +2772,12 @@ msgstr ""
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_allocation__second_approver_id
 msgid ""
-"This area is automaticly filled by the user who validates the allocation "
+"This area is automatically filled by the user who validates the allocation "
 "with second level (If allocation type need second validation)"
 msgstr ""
+"Cet espace est rempli automatiquement par l'utilisateur qui valide "
+"l'allocation au deuxième niveau (si le type d'allocation nécessite une "
+"deuxième validation)"
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__color_name
@@ -2767,8 +2803,12 @@ msgstr "Cette modification n'est pas autorisée dans l'état actuel."
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__responsible_id
 msgid ""
 "This user will be responsible for approving this type of time off. This is "
-"only used when validation is 'hr' or 'both'"
+"only used when validation is 'By Time Off Officer' or 'By Employee's Manager"
+" and Time Off Officer'"
 msgstr ""
+"Cet utilisateur sera responsable de l'approbation de ce type de congé. Ceci "
+"n'est utilisé que lorsque la validation est effectuée 'Par le responsable "
+"des congés' ou 'Par le manager de l'employé et le responsable des congés'"
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__leaves_taken
@@ -3153,6 +3193,20 @@ msgid "User"
 msgstr "Utilisateur"
 
 #. module: hr_holidays
+#. openerp-web
+#: code:addons/hr_holidays/static/src/components/partner_im_status_icon/partner_im_status_icon.xml:0
+#, python-format
+msgid "User is online"
+msgstr "L'utilisateur est en ligne"
+
+#. module: hr_holidays
+#. openerp-web
+#: code:addons/hr_holidays/static/src/components/partner_im_status_icon/partner_im_status_icon.xml:0
+#, python-format
+msgid "User is out of office"
+msgstr "Utilisateur est absent du bureau"
+
+#. module: hr_holidays
 #: model:ir.model,name:hr_holidays.model_res_users
 msgid "Users"
 msgstr "Utilisateurs"
@@ -3404,3 +3458,10 @@ msgstr "à"
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_kanban
 msgid "validated"
 msgstr "validé"
+
+#. module: hr_holidays
+#. openerp-web
+#: code:addons/hr_holidays/static/src/bugfix/bugfix.js:0
+#, python-format
+msgid "Out of office until %s"
+msgstr "Absent du bureau jusqu'au %s"

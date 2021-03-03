@@ -3,9 +3,11 @@
 // ------------------------------------------------------------------
 
 .o_Chatter {
+    position: relative;
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
+    width: map-get($sizes, 100);
 }
 
 .o_Chatter_composer {
@@ -15,6 +17,10 @@
         border-left: $border-width solid;
         border-right: $border-width solid;
     }
+}
+
+.o_Chatter_scrollPanel {
+    overflow-y: auto;
 }
 
 // ------------------------------------------------------------------

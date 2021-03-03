@@ -414,9 +414,13 @@ class IrModel(models.Model):
     def _add_manual_models(self):
         """ Add extra models to the registry. """
         # clean up registry first
-        custom_models = [name for name, model_class in self.pool.items() if model_class._custom]
-        for name in custom_models:
-            del self.pool[name]
+        for name, Model in list(self.pool.items()):
+            if Model._custom:
+                del self.pool.models[name]
+                # remove the model's name from its parents' _inherit_children
+                for Parent in Model.__bases__:
+                    if hasattr(Parent, 'pool'):
+                        Parent._inherit_children.discard(name)
         # add manual models
         cr = self.env.cr
         cr.execute('SELECT * FROM ir_model WHERE state=%s', ['manual'])
@@ -2004,7 +2008,9 @@ class IrModelData(models.Model):
             INSERT INTO ir_model_data (module, name, model, res_id, noupdate)
             VALUES {rows}
             ON CONFLICT (module, name)
-            DO UPDATE SET write_date=(now() at time zone 'UTC') {where}
+            DO UPDATE SET (model, res_id, write_date) =
+                (EXCLUDED.model, EXCLUDED.res_id, now() at time zone 'UTC')
+                {where}
         """.format(
             rows=", ".join([rowf] * len(sub_rows)),
             where="WHERE NOT ir_model_data.noupdate" if update else "",
@@ -2057,6 +2063,19 @@ class IrModelData(models.Model):
                 constraint_ids.append(data.res_id)
             else:
                 records_items.append((data.model, data.res_id))
+
+        # avoid prefetching fields that are going to be deleted: during uninstall, it is
+        # possible to perform a recompute (via flush_env) after the database columns have been
+        # deleted but before the new registry has been created, meaning the recompute will
+        # be executed on a stale registry, and if some of the data for executing the compute
+        # methods is not in cache it will be fetched, and fields that exist in the registry but not
+        # in the database will be prefetched, this will of course fail and prevent the uninstall.
+        for ir_field in self.env['ir.model.fields'].browse(field_ids):
+            model = self.pool.get(ir_field.model)
+            if model is not None:
+                field = model._fields.get(ir_field.name)
+                if field is not None:
+                    field.prefetch = False
 
         # to collect external ids of records that cannot be deleted
         undeletable_ids = []

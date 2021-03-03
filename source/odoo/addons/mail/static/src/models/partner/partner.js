@@ -95,7 +95,8 @@ function factory(dependencies) {
                 if (partners.length < limit) {
                     if (
                         partner !== currentPartner &&
-                        searchRegexp.test(partner.name)
+                        searchRegexp.test(partner.name) &&
+                        partner.user
                     ) {
                         partners.push(partner);
                     }
@@ -221,7 +222,7 @@ function factory(dependencies) {
         static async _fetchImStatus() {
             const partnerIds = [];
             for (const partner of this.all()) {
-                if (partner.im_status !== 'im_partner') {
+                if (partner.im_status !== 'im_partner' && partner.id > 0) {
                     partnerIds.push(partner.id);
                 }
             }
@@ -254,6 +255,14 @@ function factory(dependencies) {
          */
         _computeDisplayName() {
             return this.display_name || this.user && this.user.display_name;
+        }
+
+        /**
+         * @private
+         * @returns {mail.messaging}
+         */
+        _computeMessaging() {
+            return [['link', this.env.messaging]];
         }
 
         /**
@@ -306,6 +315,12 @@ function factory(dependencies) {
         }),
         messagesAsAuthor: one2many('mail.message', {
             inverse: 'author',
+        }),
+        /**
+         * Serves as compute dependency.
+         */
+        messaging: many2one('mail.messaging', {
+            compute: '_computeMessaging',
         }),
         model: attr({
             default: 'res.partner',

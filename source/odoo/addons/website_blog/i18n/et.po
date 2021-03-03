@@ -3,8 +3,6 @@
 # 	* website_blog
 # 
 # Translators:
-# Piia Paurson <piia@avalah.ee>, 2020
-# Triine Aavik <triine@avalah.ee>, 2020
 # Martin Trigaux, 2020
 # Arma Gedonsky <armagedonsky@hot.ee>, 2020
 # Maidu Targama <m.targama@gmail.com>, 2020
@@ -14,14 +12,16 @@
 # Algo Kärp <algokarp@gmail.com>, 2020
 # Rivo Zängov <eraser@eraser.ee>, 2020
 # Egon Raamat <egon@avalah.ee>, 2020
+# Piia Paurson <piia@avalah.ee>, 2020
+# atriine <triine@avalah.ee>, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-11-27 15:41+0000\n"
 "PO-Revision-Date: 2020-09-07 08:20+0000\n"
-"Last-Translator: Egon Raamat <egon@avalah.ee>, 2020\n"
+"Last-Translator: atriine <triine@avalah.ee>, 2021\n"
 "Language-Team: Estonian (https://www.transifex.com/odoo/teams/41243/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -326,6 +326,22 @@ msgstr ""
 #. module: website_blog
 #: model_terms:blog.post,content:website_blog.blog_post_6
 msgid "Along those lines, how difficult is the set up and break down?"
+msgstr ""
+
+#. module: website_blog
+#. openerp-web
+#: code:addons/website_blog/static/src/js/website_blog.js:0
+#, python-format
+msgid "Amazing blog article: %s! Check it live: %s"
+msgstr ""
+
+#. module: website_blog
+#. openerp-web
+#: code:addons/website_blog/static/src/snippets/s_latest_posts/000.js:0
+#, python-format
+msgid ""
+"An error occured with this latest posts block. If the problem persists, "
+"please consider deleting it and adding a new one"
 msgstr ""
 
 #. module: website_blog
@@ -636,6 +652,13 @@ msgstr ""
 #: code:addons/website_blog/static/src/js/tours/website_blog.js:0
 #, python-format
 msgid "Choose an image from the library."
+msgstr ""
+
+#. module: website_blog
+#. openerp-web
+#: code:addons/website_blog/static/src/js/tours/website_blog.js:0
+#, python-format
+msgid "Click here to add new content to your website."
 msgstr ""
 
 #. module: website_blog
@@ -1245,6 +1268,13 @@ msgid "New tag"
 msgstr ""
 
 #. module: website_blog
+#. openerp-web
+#: code:addons/website_blog/static/src/snippets/s_latest_posts/000.js:0
+#, python-format
+msgid "No blog post was found. Make sure your posts are published."
+msgstr ""
+
+#. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.posts_loop
 msgid "No blog post yet."
 msgstr ""
@@ -1651,7 +1681,7 @@ msgstr ""
 #: model:ir.ui.menu,name:website_blog.menu_website_blog_tag_category_global
 #: model_terms:ir.ui.view,arch_db:website_blog.blog_tag_category_tree
 msgid "Tag Categories"
-msgstr ""
+msgstr "Siltide kategooriad"
 
 #. module: website_blog
 #: model:ir.actions.act_window,name:website_blog.action_tag_category
@@ -2113,7 +2143,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_blog_post_regular_cover
 #: model_terms:ir.ui.view,arch_db:website_blog.post_heading
 msgid "by"
-msgstr ""
+msgstr "   "
 
 #. module: website_blog
 #: model:blog.tag,name:website_blog.blog_tag_5

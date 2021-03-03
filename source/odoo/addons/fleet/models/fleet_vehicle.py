@@ -33,10 +33,11 @@ class FleetVehicle(models.Model):
 
     @api.depends('model_id')
     def _compute_manager_id(self):
-        if self.model_id:
-            self.manager_id = self.model_id.manager_id
-        else:
-            self.manager_id = None
+        for vehicle in self:
+            if vehicle.model_id:
+                vehicle.manager_id = vehicle.model_id.manager_id
+            else:
+                vehicle.manager_id = None
 
     brand_id = fields.Many2one('fleet.vehicle.model.brand', 'Brand', related="model_id.brand_id", store=True, readonly=False)
     log_drivers = fields.One2many('fleet.vehicle.assignation.log', 'vehicle_id', string='Assignment Logs')
@@ -200,7 +201,12 @@ class FleetVehicle(models.Model):
 
     @api.model
     def create(self, vals):
+        # Fleet administrator may not have rights to create the plan_to_change_car value when the driver_id is a res.user
+        # This trick is used to prevent access right error.
+        ptc_value = 'plan_to_change_car' in vals.keys() and {'plan_to_change_car': vals.pop('plan_to_change_car')}
         res = super(FleetVehicle, self).create(vals)
+        if ptc_value:
+            res.sudo().write(ptc_value)
         if 'driver_id' in vals and vals['driver_id']:
             res.create_driver_history(vals['driver_id'])
         if 'future_driver_id' in vals and vals['future_driver_id']:

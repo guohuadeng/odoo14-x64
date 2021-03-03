@@ -126,7 +126,7 @@ class EventEvent(models.Model):
         compute='_compute_event_mail_ids', readonly=False, store=True)
     tag_ids = fields.Many2many(
         'event.tag', string="Tags", readonly=False,
-        store=True, compute="_compute_from_event_type")
+        store=True, compute="_compute_tag_ids")
     # Kanban fields
     kanban_state = fields.Selection([('normal', 'In Progress'), ('done', 'Done'), ('blocked', 'Blocked')], default='normal')
     kanban_state_label = fields.Char(
@@ -141,7 +141,7 @@ class EventEvent(models.Model):
     # Seats and computation
     seats_max = fields.Integer(
         string='Maximum Attendees Number',
-        compute='_compute_from_event_type', readonly=False, store=True,
+        compute='_compute_seats_max', readonly=False, store=True,
         help="For each event you can define a maximum registration of seats(number of attendees), above this numbers the registrations are not accepted.")
     seats_limited = fields.Boolean('Maximum Attendees', required=True, compute='_compute_seats_limited',
                                    readonly=False, store=True)
@@ -162,7 +162,7 @@ class EventEvent(models.Model):
         compute_sudo=True, readonly=True, compute='_compute_seats_expected')
     # Registration fields
     auto_confirm = fields.Boolean(
-        string='Autoconfirmation', compute='_compute_from_event_type', readonly=False, store=True,
+        string='Autoconfirmation', compute='_compute_auto_confirm', readonly=False, store=True,
         help='Autoconfirm Registrations. Registrations will automatically be confirmed upon creation.')
     registration_ids = fields.One2many('event.registration', 'event_id', string='Attendees')
     event_ticket_ids = fields.One2many(
@@ -170,13 +170,16 @@ class EventEvent(models.Model):
         compute='_compute_event_ticket_ids', readonly=False, store=True)
     event_registrations_open = fields.Boolean(
         'Registration open', compute='_compute_event_registrations_open', compute_sudo=True,
-        help='Registrations are open if event is not ended, seats are available on event and if tickets are sellable if ticketing is used.')
+        help="Registrations are open if:\n"
+        "- the event is not ended\n"
+        "- there are seats available on event\n"
+        "- the tickets are sellable (if ticketing is used)")
     event_registrations_sold_out = fields.Boolean(
         'Sold Out', compute='_compute_event_registrations_sold_out', compute_sudo=True,
-        help='Event is sold out if no more seats are available on event. If ticketing is used and all tickets are sold out event is sold out.')
+        help='The event is sold out if no more seats are available on event. If ticketing is used and all tickets are sold out, the event will be sold out.')
     start_sale_date = fields.Date(
         'Start sale date', compute='_compute_start_sale_date',
-        help='If ticketing is used, this is the lowest starting sale date of tickets.')
+        help='If ticketing is used, contains the earliest starting sale date of tickets.')
     # Date fields
     date_tz = fields.Selection(
         _tz_get, string='Timezone', required=True,
@@ -341,52 +344,47 @@ class EventEvent(models.Model):
             if not event.date_tz:
                 event.date_tz = self.env.user.tz or 'UTC'
 
+    # seats
+
+    @api.depends('event_type_id')
+    def _compute_seats_max(self):
+        """ Update event configuration from its event type. Depends are set only
+        on event_type_id itself, not its sub fields. Purpose is to emulate an
+        onchange: if event type is changed, update event configuration. Changing
+        event type content itself should not trigger this method. """
+        for event in self:
+            if not event.event_type_id:
+                event.seats_max = event.seats_max or 0
+            else:
+                event.seats_max = event.event_type_id.seats_max or 0
+
     @api.depends('event_type_id')
     def _compute_seats_limited(self):
-        """ Make it separate from ``_compute_from_event_type`` because otherwise
-        a value given at create (see create override) would protect all other fields
-        depending on event type id from being computed as compute method will be
-        blacklisted during create (see ``registry.field_computed`` attribute used in create
-        to compute protected field from re-computation) """
+        """ Update event configuration from its event type. Depends are set only
+        on event_type_id itself, not its sub fields. Purpose is to emulate an
+        onchange: if event type is changed, update event configuration. Changing
+        event type content itself should not trigger this method. """
         for event in self:
-            if event.event_type_id.seats_max:
-                event.seats_limited = True
+            if event.event_type_id.has_seats_limitation != event.seats_limited:
+                event.seats_limited = event.event_type_id.has_seats_limitation
             if not event.seats_limited:
                 event.seats_limited = False
 
     @api.depends('event_type_id')
-    def _compute_from_event_type(self):
+    def _compute_auto_confirm(self):
         """ Update event configuration from its event type. Depends are set only
-        on event_type_id itself, not its sub fields. Indeed purpose is to emulate
-        an onchange: if event type is changed, update event configuration. Changing
-        event type content itself should not trigger this method.
-
-        Updated by this method
-          * seats_max -> triggers _compute_seats (all seats computation)
-          * seats_limited
-          * auto_confirm
-          * tag_ids
-        """
+        on event_type_id itself, not its sub fields. Purpose is to emulate an
+        onchange: if event type is changed, update event configuration. Changing
+        event type content itself should not trigger this method. """
         for event in self:
-            if not event.event_type_id:
-                if not event.seats_max:
-                    event.seats_max = 0
-                continue
-
-            event.seats_max = event.event_type_id.seats_max
-
-            if event.event_type_id.has_seats_limitation != event.seats_limited:
-                event.seats_limited = event.event_type_id.has_seats_limitation
-
             event.auto_confirm = event.event_type_id.auto_confirm
-            if not event.tag_ids and event.event_type_id.tag_ids:
-                event.tag_ids = event.event_type_id.tag_ids
 
     @api.depends('event_type_id')
     def _compute_event_mail_ids(self):
-        """ Update event mails from its event type. Depends are set only on
-        event_type_id itself to emulate an onchange. Changing event type content
-        itself should not trigger this method.
+        """ Update event configuration from its event type. Depends are set only
+        on event_type_id itself, not its sub fields. Purpose is to emulate an
+        onchange: if event type is changed, update event configuration. Changing
+        event type content itself should not trigger this method.
 
         When synchronizing mails:
 
@@ -412,10 +410,21 @@ class EventEvent(models.Model):
                 event.event_mail_ids = command
 
     @api.depends('event_type_id')
+    def _compute_tag_ids(self):
+        """ Update event configuration from its event type. Depends are set only
+        on event_type_id itself, not its sub fields. Purpose is to emulate an
+        onchange: if event type is changed, update event configuration. Changing
+        event type content itself should not trigger this method. """
+        for event in self:
+            if not event.tag_ids and event.event_type_id.tag_ids:
+                event.tag_ids = event.event_type_id.tag_ids
+
+    @api.depends('event_type_id')
     def _compute_event_ticket_ids(self):
-        """ Update event tickets from its event type. Depends are set only on
-        event_type_id itself to emulate an onchange. Changing event type content
-        itself should not trigger this method.
+        """ Update event configuration from its event type. Depends are set only
+        on event_type_id itself, not its sub fields. Purpose is to emulate an
+        onchange: if event type is changed, update event configuration. Changing
+        event type content itself should not trigger this method.
 
         When synchronizing tickets:
 
@@ -480,7 +489,7 @@ class EventEvent(models.Model):
 
     @api.model
     def create(self, vals):
-        # Temporary fix for ``seats_limited`` and ``date_tz`` required fields (see ``_compute_from_event_type``
+        # Temporary fix for ``seats_limited`` and ``date_tz`` required fields
         vals.update(self._sync_required_computed(vals))
 
         res = super(EventEvent, self).create(vals)
@@ -508,7 +517,8 @@ class EventEvent(models.Model):
         missing_fields = list(set(['seats_limited', 'date_tz']).difference(set(values.keys())))
         if missing_fields and values:
             cache_event = self.new(values)
-            cache_event._compute_from_event_type()
+            cache_event._compute_seats_limited()
+            cache_event._compute_date_tz()
             return dict((fname, cache_event[fname]) for fname in missing_fields)
         else:
             return {}

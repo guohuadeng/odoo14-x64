@@ -3,7 +3,6 @@
 # 	* web_editor
 # 
 # Translators:
-# Martin Trigaux, 2020
 # Marc Tormo i Bochaca <mtbochaca@gmail.com>, 2020
 # Carles Antoli <carlesantoli@hotmail.com>, 2020
 # Eric Rial <erialmedina@gmail.com>, 2020
@@ -11,14 +10,17 @@
 # Quim - eccit <quim@eccit.com>, 2020
 # Manel Fernandez Ramirez <manelfera@outlook.com>, 2020
 # Arnau Ros, 2020
+# Martin Trigaux, 2020
+# Susanna Pujol, 2020
+# Josep Anton Belchi, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-02 14:12+0000\n"
+"POT-Creation-Date: 2020-11-27 14:13+0000\n"
 "PO-Revision-Date: 2020-09-07 08:20+0000\n"
-"Last-Translator: Arnau Ros, 2020\n"
+"Last-Translator: Josep Anton Belchi, 2021\n"
 "Language-Team: Catalan (https://www.transifex.com/odoo/teams/41243/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,13 +48,6 @@ msgstr ""
 #, python-format
 msgid "%spx"
 msgstr ""
-
-#. module: web_editor
-#. openerp-web
-#: code:addons/web_editor/static/src/xml/ace.xml:0
-#, python-format
-msgid "&times;"
-msgstr "&vegades;"
 
 #. module: web_editor
 #. openerp-web
@@ -191,7 +186,7 @@ msgstr ""
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_background_options
-msgid "Airy"
+msgid "Airy & Zigs"
 msgstr ""
 
 #. module: web_editor
@@ -327,7 +322,7 @@ msgstr "Bloquejar"
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_background_options
-msgid "Blocks"
+msgid "Blocks & Rainy"
 msgstr ""
 
 #. module: web_editor
@@ -364,6 +359,7 @@ msgstr "Botó "
 #. module: web_editor
 #. openerp-web
 #: code:addons/web_editor/static/src/js/editor/snippets.editor.js:0
+#: code:addons/web_editor/static/src/js/editor/snippets.options.js:0
 #, python-format
 msgid "Cancel"
 msgstr "Cancel·la"
@@ -602,7 +598,7 @@ msgstr "Rebutgi"
 #: model:ir.model.fields,field_description:web_editor.field_web_editor_assets__display_name
 #: model:ir.model.fields,field_description:web_editor.field_web_editor_converter_test_sub__display_name
 msgid "Display Name"
-msgstr "Mostrar Nom"
+msgstr "Nom mostrat"
 
 #. module: web_editor
 #. openerp-web
@@ -1020,7 +1016,7 @@ msgstr ""
 #: code:addons/web_editor/static/src/js/editor/rte.summernote.js:0
 #, python-format
 msgid "Image URL"
-msgstr ""
+msgstr "Enllaç de la imatge"
 
 #. module: web_editor
 #: model:ir.model.fields,field_description:web_editor.field_ir_attachment__image_width
@@ -1564,11 +1560,6 @@ msgid "Qweb Field qweb"
 msgstr ""
 
 #. module: web_editor
-#: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_background_options
-msgid "Rainy"
-msgstr ""
-
-#. module: web_editor
 #. openerp-web
 #: code:addons/web_editor/static/src/js/editor/rte.js:0
 #, python-format
@@ -1743,6 +1734,13 @@ msgstr ""
 #: code:addons/web_editor/static/src/js/editor/snippets.editor.js:0
 #, python-format
 msgid "Save and Install"
+msgstr ""
+
+#. module: web_editor
+#. openerp-web
+#: code:addons/web_editor/static/src/js/editor/snippets.options.js:0
+#, python-format
+msgid "Save and Reload"
 msgstr ""
 
 #. module: web_editor
@@ -2069,6 +2067,15 @@ msgstr ""
 
 #. module: web_editor
 #. openerp-web
+#: code:addons/web_editor/static/src/js/editor/snippets.options.js:0
+#, python-format
+msgid ""
+"To save a snippet, we need to save all your previous modifications and "
+"reload the page."
+msgstr ""
+
+#. module: web_editor
+#. openerp-web
 #: code:addons/web_editor/static/src/js/editor/rte.summernote.js:0
 #, python-format
 msgid "To what URL should this link go?"
@@ -2326,11 +2333,6 @@ msgstr ""
 #: code:addons/web_editor/static/src/xml/wysiwyg.xml:0
 #, python-format
 msgid "Youtube"
-msgstr ""
-
-#. module: web_editor
-#: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_background_options
-msgid "Zigs"
 msgstr ""
 
 #. module: web_editor

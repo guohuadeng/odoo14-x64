@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-11-27 14:12+0000\n"
 "PO-Revision-Date: 2020-09-07 08:11+0000\n"
 "Last-Translator: Erwin van der Ploeg <erwin@odooexperts.nl>, 2020\n"
 "Language-Team: Dutch (https://www.transifex.com/odoo/teams/41243/nl/)\n"
@@ -54,7 +54,7 @@ msgstr "# Verkoopkansen"
 #. module: crm
 #: model:ir.model.fields,field_description:crm.field_crm_team__opportunities_overdue_count
 msgid "# Overdue Opportunities"
-msgstr "# Achterstallige verkoopkansen"
+msgstr "# Verkoopkansen te laat"
 
 #. module: crm
 #: model:ir.model.fields,field_description:crm.field_crm_team__lead_unassigned_count
@@ -592,20 +592,6 @@ msgid "Bounce"
 msgstr "Bounce"
 
 #. module: crm
-#: model_terms:ir.ui.view,arch_db:crm.res_config_settings_view_form
-msgid ""
-"By <b>updating lead probabilities</b>, you will regenerate the frequency table and recompute the probability of all the leads.\n"
-"                                        This can be useful after changing the start date (you need to save first !) or to ensure every lead probabilities are up to date.\n"
-"                                        <br/>\n"
-"                                        This can take up to several minutes depending on the number of leads you have !!!"
-msgstr ""
-"Door de <b>leadkansen bij te werken</b>, genereert u de frequentietabel opnieuw en berekent u de waarschijnlijkheid van alle leads opnieuw.\n"
-"Dit kan handig zijn na het wijzigen van de startdatum (u moet eerst opslaan!) of om ervoor te zorgen dat alle leadkansen up-to-date zijn.\n"
-"\n"
-"                         <br/>\n"
-"Dit kan enkele minuten duren, afhankelijk van het aantal leads dat u heeft !!!"
-
-#. module: crm
 #: code:addons/crm/models/crm_lead.py:0
 #, python-format
 msgid ""
@@ -788,6 +774,11 @@ msgid "Congrats, best of luck catching such big fish! :)"
 msgstr "Gefeliciteerd! Veel succes om zo'n grote vis binnen te halen! :)"
 
 #. module: crm
+#: model_terms:ir.ui.view,arch_db:crm.res_config_settings_view_form
+msgid "Consider leads created as of the"
+msgstr "Alleen voor leads aangemaakt vanaf"
+
+#. module: crm
 #: model:ir.model,name:crm.model_res_partner
 msgid "Contact"
 msgstr "Contact"
@@ -932,7 +923,7 @@ msgstr "Maak een nieuwe lead"
 #: code:addons/crm/models/crm_lead.py:0
 #, python-format
 msgid "Create an opportunity to start playing with your pipeline."
-msgstr "Maak een kans aan om met je pijplijn aan de gang te gaan."
+msgstr "Maak een verkoopkans aan om met je pijplijn aan de gang te gaan."
 
 #. module: crm
 #: model_terms:ir.ui.view,arch_db:crm.res_config_settings_view_form
@@ -2435,7 +2426,7 @@ msgstr "Over 5 jaar"
 #: model:ir.actions.act_window,name:crm.crm_lead_action_team_overdue_opportunity
 #: model_terms:ir.ui.view,arch_db:crm.crm_team_salesteams_view_kanban
 msgid "Overdue Opportunities"
-msgstr "Over tijd verkoopkansen"
+msgstr "Verkoopkansen te laat"
 
 #. module: crm
 #: model:ir.model.fields,field_description:crm.field_crm_team__opportunities_overdue_amount
@@ -2475,7 +2466,7 @@ msgstr ""
 #. module: crm
 #: model:ir.model.fields,field_description:crm.field_crm_lead__partner_is_blacklisted
 msgid "Partner is blacklisted"
-msgstr "Relatie staat op de blacklist"
+msgstr "Relatie staat op de zwarte lijst"
 
 #. module: crm
 #: model:ir.model.fields,field_description:crm.field_crm_lead__phone
@@ -2486,7 +2477,7 @@ msgstr "Telefoon"
 #. module: crm
 #: model:ir.model.fields,field_description:crm.field_crm_lead__phone_sanitized_blacklisted
 msgid "Phone Blacklisted"
-msgstr "Telefoon blacklist"
+msgstr "Telefoon op zwarte lijst"
 
 #. module: crm
 #: model:crm.lead.scoring.frequency.field,name:crm.frequency_field_phone_state
@@ -2809,7 +2800,7 @@ msgstr "Toon het Lead menu"
 #. module: crm
 #: model:res.groups,name:crm.group_use_recurring_revenues
 msgid "Show Recurring Revenues Menu"
-msgstr "Menu terugkerende inkomsten weergeven"
+msgstr "Toon menu herhalende omzet"
 
 #. module: crm
 #: model_terms:ir.ui.view,arch_db:crm.view_crm_case_leads_filter
@@ -2907,11 +2898,6 @@ msgid ""
 msgstr ""
 "Fases biedt verkopers de mogelijkheid om eenvoudig te bepalen \n"
 "waar een verkoopkans zich in de verkoopcyclus bevindt."
-
-#. module: crm
-#: model_terms:ir.ui.view,arch_db:crm.res_config_settings_view_form
-msgid "Start Date: Consider leads created as of the"
-msgstr "Startdatum: Neem leads mee die zijn gemaakt vanaf"
 
 #. module: crm
 #: model_terms:ir.actions.act_window,help:crm.crm_activity_report_action
@@ -3286,8 +3272,8 @@ msgstr "Aantal ongelezen berichten"
 
 #. module: crm
 #: model_terms:ir.ui.view,arch_db:crm.res_config_settings_view_form
-msgid "Update"
-msgstr "Bijwerken"
+msgid "Update Probabilities"
+msgstr "Kansen bijwerken"
 
 #. module: crm
 #: model:ir.model.fields,field_description:crm.field_utm_campaign__use_leads
@@ -3345,6 +3331,15 @@ msgid ""
 msgstr ""
 "Gebruik de <i>Aanmaken </i> knop linksboven, of stuur een e-mail naar %s om "
 "de e-mail gateway te testen."
+
+#. module: crm
+#: model_terms:ir.ui.view,arch_db:crm.res_config_settings_view_form
+msgid ""
+"Use this button to update the probabilities of all leads. This can take up "
+"to several minutes depending on how many there are."
+msgstr ""
+"Gebruik deze knop om de kansen van alle leads bij te werken. Dit kan enkele "
+"minuten duren, afhankelijk van het aantal."
 
 #. module: crm
 #: model:ir.model.fields,help:crm.field_crm_lead__user_login

@@ -9,7 +9,7 @@ from collections import defaultdict
 from operator import itemgetter
 
 from odoo import _, api, fields, models, modules, tools
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, UserError
 from odoo.http import request
 from odoo.osv import expression
 from odoo.tools import groupby
@@ -160,9 +160,9 @@ class Message(models.Model):
 
     @api.model
     def _search_needaction(self, operator, operand):
-        if operator == '=' and operand:
-            return ['&', ('notification_ids.res_partner_id', '=', self.env.user.partner_id.id), ('notification_ids.is_read', '=', False)]
-        return ['&', ('notification_ids.res_partner_id', '=', self.env.user.partner_id.id), ('notification_ids.is_read', '=', True)]
+        is_read = False if operator == '=' and operand else True
+        notification_ids = self.env['mail.notification']._search([('res_partner_id', '=', self.env.user.partner_id.id), ('is_read', '=', is_read)])
+        return [('notification_ids', 'in', notification_ids)]
 
     def _compute_has_error(self):
         error_from_notification = self.env['mail.notification'].sudo().search([
@@ -204,7 +204,7 @@ class Message(models.Model):
                     ('res_id', 'in', self.env.user.moderation_channel_ids.ids)]
 
         # no support for other operators
-        return ValueError(_('Unsupported search filter on moderation status'))
+        raise UserError(_('Unsupported search filter on moderation status'))
 
     # ------------------------------------------------------
     # CRUD / ORM
@@ -367,7 +367,7 @@ class Message(models.Model):
                                     message.id = ANY (%%s)''' % (self._table), ('comment', self.ids,))
             if self._cr.fetchall():
                 raise AccessError(
-                    _('The requested operation cannot be completed due to security restrictions. Please contact your system administrator.\n\n(Document type: %s, Operation: %s)') % (self._description, operation)
+                    _('The requested operation cannot be completed due to security restrictions. Please contact your system administrator.\n\n(Document type: %s, Operation: %s)', self._description, operation)
                     + ' - ({} {}, {} {})'.format(_('Records:'), self.ids[:6], _('User:'), self._uid)
                 )
 
@@ -580,7 +580,7 @@ class Message(models.Model):
         if not self.browse(messages_to_check).exists():
             return
         raise AccessError(
-            _('The requested operation cannot be completed due to security restrictions. Please contact your system administrator.\n\n(Document type: %s, Operation: %s)') % (self._description, operation)
+            _('The requested operation cannot be completed due to security restrictions. Please contact your system administrator.\n\n(Document type: %s, Operation: %s)', self._description, operation)
             + ' - ({} {}, {} {})'.format(_('Records:'), list(messages_to_check)[:6], _('User:'), self._uid)
         )
 
@@ -704,17 +704,17 @@ class Message(models.Model):
         notif_domain = [
             ('res_partner_id', '=', partner_id),
             ('is_read', '=', False)]
-
         if domain:
-            messages_ids = self.search(domain).ids  # need sudo?
-            notif_domain = expression.AND([notif_domain, [('mail_message_id', 'in', messages_ids)]])
+            messages = self.search(domain)
+            messages.set_message_done()
+            return messages.ids
 
         notifications = self.env['mail.notification'].sudo().search(notif_domain)
         notifications.write({'is_read': True})
 
         ids = [n['mail_message_id'] for n in notifications.read(['mail_message_id'])]
 
-        notification = {'type': 'mark_as_read', 'message_ids': [id[0] for id in ids]}
+        notification = {'type': 'mark_as_read', 'message_ids': [id[0] for id in ids], 'needaction_inbox_counter': self.env.user.partner_id.get_needaction_count()}
         self.env['bus.bus'].sendone((self._cr.dbname, 'res.partner', partner_id), notification)
 
         return ids
@@ -752,7 +752,8 @@ class Message(models.Model):
         notifications.write({'is_read': True})
 
         for (msg_ids, channel_ids) in groups:
-            notification = {'type': 'mark_as_read', 'message_ids': msg_ids, 'channel_ids': [c.id for c in channel_ids]}
+            # channel_ids in result is deprecated and will be removed in a future version
+            notification = {'type': 'mark_as_read', 'message_ids': msg_ids, 'channel_ids': [c.id for c in channel_ids], 'needaction_inbox_counter': self.env.user.partner_id.get_needaction_count()}
             self.env['bus.bus'].sendone((self._cr.dbname, 'res.partner', partner_id.id), notification)
 
     @api.model

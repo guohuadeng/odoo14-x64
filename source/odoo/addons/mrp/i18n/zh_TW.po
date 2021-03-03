@@ -4,13 +4,14 @@
 # 
 # Translators:
 # sejun huang <sejun.huang@gmail.com>, 2020
+# zhengwei wu <wzw15199@gmail.com>, 2020
 # 敬雲 林 <chingyun@yuanchih-consult.com>, 2020
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-10-29 15:48+0000\n"
 "PO-Revision-Date: 2020-09-07 08:14+0000\n"
 "Last-Translator: 敬雲 林 <chingyun@yuanchih-consult.com>, 2020\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/odoo/teams/41243/zh_TW/)\n"
@@ -1737,10 +1738,6 @@ msgstr "完全的生產力"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_unbuild_search_view
-msgid "Future Activitie"
-msgstr "未來的活動"
-
-#. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.view_mrp_production_filter
 msgid "Future Activities"
 msgstr "未來活動"
@@ -3006,7 +3003,7 @@ msgstr "在製造製程類型前揀貨"
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_stock_warehouse__pbm_route_id
 msgid "Picking Before Manufacturing Route"
-msgstr "在製造途程前揀貨"
+msgstr "在製造前揀貨"
 
 #. module: mrp
 #: model:ir.model,name:mrp.model_stock_picking_type
@@ -3053,7 +3050,7 @@ msgstr "計劃的日期"
 #. module: mrp
 #: code:addons/mrp/models/mrp_workorder.py:0
 #, python-format
-msgid "Planned at the same time than other workorder(s) at %s"
+msgid "Planned at the same time as other workorder(s) at %s"
 msgstr ""
 
 #. module: mrp
@@ -3110,7 +3107,7 @@ msgstr "生產後"
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.res_config_settings_view_form
 msgid ""
-"Prevent manufacturing users to modify quantities to consume, unless a "
+"Prevent manufacturing users from modifying quantities to consume, unless a "
 "manager has unlocked the document"
 msgstr ""
 
@@ -3946,7 +3943,7 @@ msgstr "存儲的文件名"
 #. module: mrp
 #: model:ir.model.fields.selection,name:mrp.selection__mrp_workorder__consumption__strict
 msgid "Strict"
-msgstr ""
+msgstr "嚴格的"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_bom_form_view
@@ -4717,7 +4714,7 @@ msgid ""
 " operation type. That allows to define stock rules which trigger different "
 "manufacturing orders with different BoMs."
 msgstr ""
-"當採購具有具有操作類型集的\"生產\"途程路線時，它將嘗試使用相同工序類型的 BoM 為該產品創建制造訂單。這允許定義用不同的 BoM "
+"當採購具有具有操作類型集的\"生產\"路線時，它將嘗試使用相同工序類型的 BoM 為該產品創建制造訂單。這允許定義用不同的 BoM "
 "觸發不同製造訂單的庫存規則。"
 
 #. module: mrp
@@ -5008,7 +5005,7 @@ msgstr "不能更改正在進行或已完成的工作訂單的工作中心。"
 #: code:addons/mrp/models/mrp_bom.py:0
 #, python-format
 msgid "You cannot create a new Bill of Material from here."
-msgstr ""
+msgstr "您無法於此處建立新的物料清單 (BOM)"
 
 #. module: mrp
 #: code:addons/mrp/models/mrp_unbuild.py:0

@@ -20,13 +20,16 @@ class PadCommon(models.AbstractModel):
     _name = 'pad.common'
     _description = 'Pad Common'
 
+    def _valid_field_parameter(self, field, name):
+        return name == 'pad_content_field' or super()._valid_field_parameter(field, name)
+
     @api.model
     def pad_is_configured(self):
         return bool(self.env.company.pad_server)
 
     @api.model
     def pad_generate_url(self):
-        company = self.env.user.sudo().company_id
+        company = self.env.company.sudo()
 
         pad = {
             "server": company.pad_server,
@@ -75,7 +78,7 @@ class PadCommon(models.AbstractModel):
 
     @api.model
     def pad_get_content(self, url):
-        company = self.env.user.sudo().company_id
+        company = self.env.company.sudo()
         myPad = EtherpadLiteClient(company.pad_key, (company.pad_server or '') + '/api')
         content = ''
         if url:

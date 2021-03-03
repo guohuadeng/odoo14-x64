@@ -379,17 +379,22 @@ class TestAccountMove(AccountTestInvoicingCommon):
         copy2.journal_id = new_journal
         self.assertEqual(copy2.name, 'MISC2/2016/01/0001')
         with Form(copy2) as move_form:  # It is editable in the form
-            move_form.name = 'MyMISC/2099/0001'
+            move_form.name = 'MyMISC/2016/0001'
+            move_form.journal_id = self.test_move.journal_id
+            self.assertEqual(move_form.name, '/')
+            move_form.journal_id = new_journal
+            self.assertEqual(move_form.name, 'MISC2/2016/01/0001')
+            move_form.name = 'MyMISC/2016/0001'
         copy2.action_post()
-        self.assertEqual(copy2.name, 'MyMISC/2099/0001')
+        self.assertEqual(copy2.name, 'MyMISC/2016/0001')
 
         copy3 = copy2.copy({'date': copy2.date})
         self.assertEqual(copy3.name, '/')
         with self.assertRaises(AssertionError):
             with Form(copy2) as move_form:  # It is not editable in the form
-                move_form.name = 'MyMISC/2099/0002'
+                move_form.name = 'MyMISC/2016/0002'
         copy3.action_post()
-        self.assertEqual(copy3.name, 'MyMISC/2099/0002')
+        self.assertEqual(copy3.name, 'MyMISC/2016/0002')
         copy3.name = 'MISC2/2016/00002'
 
         copy4 = copy2.copy({'date': copy2.date})
@@ -412,10 +417,11 @@ class TestAccountMove(AccountTestInvoicingCommon):
             ('JRNL/2016/00001', 'JRNL/2016/00002', 'JRNL/2016/00003', 'JRNL/2017/00001'),
             ('1234567', '1234568', '1234569', '1234570'),
             ('20190910', '20190911', '20190912', '20190913'),
-            ('2019-0910', '2019-0911', '2019-0912', '2017-0001'),
-            ('201909-10', '201909-11', '201604-01', '201703-01'),
-            ('20-10-10', '20-10-11', '16-04-01', '17-03-01'),
-            ('2010-10', '2010-11', '2010-12', '2017-01'),
+            ('2016-0910', '2016-0911', '2016-0912', '2017-0001'),
+            ('201603-10', '201603-11', '201604-01', '201703-01'),
+            ('16-03-10', '16-03-11', '16-04-01', '17-03-01'),
+            ('2016-10', '2016-11', '2016-12', '2017-01'),
+            ('045-001-000002', '045-001-000003', '045-001-000004', '045-001-000005'),
             ('JRNL/2016/00001suffix', 'JRNL/2016/00002suffix', 'JRNL/2016/00003suffix', 'JRNL/2017/00001suffix'),
         ]
         other_moves = self.env['account.move'].search([('journal_id', '=', self.test_move.journal_id.id)]) - self.test_move
@@ -469,9 +475,36 @@ class TestAccountMove(AccountTestInvoicingCommon):
         self.assertEqual(refund.name, 'RINV/2016/01/0001')
         self.assertEqual(refund2.name, 'RINV/2016/01/0002')
 
+    def test_journal_sequence_groupby_compute(self):
+        # Setup two journals with a sequence that resets yearly
+        journals = self.env['account.journal'].create([{
+            'name': f'Journal{i}',
+            'code': f'J{i}',
+            'type': 'general',
+        } for i in range(2)])
+        account = self.env['account.account'].search([], limit=1)
+        moves = self.env['account.move'].create([{
+            'journal_id': journals[i].id,
+            'line_ids': [(0, 0, {'account_id': account.id, 'name': 'line'})],
+        } for i in range(2)])._post()
+        year = moves[0].date.year
+        for i in range(2):
+            moves[i].name = f'J{i}/{year}/00001'
+
+        # Check that the moves are correctly batched
+        moves = self.env['account.move'].create([{
+            'journal_id': journals[i].id,
+            'line_ids': [(0, 0, {'account_id': account.id, 'name': 'line'})],
+        } for i in [1, 0, 1]])._post()
+        self.assertEqual(
+            moves.mapped('name'),
+            [f'J1/{year}/00002', f'J0/{year}/00002', f'J1/{year}/00003'],
+        )
+
     def test_journal_override_sequence_regex(self):
         other_moves = self.env['account.move'].search([('journal_id', '=', self.test_move.journal_id.id)]) - self.test_move
         other_moves.unlink()  # Do not interfere when trying to get the highest name for new periods
+        self.test_move.date = '2020-01-01'
         self.test_move.name = '00000876-G 0002/2020'
         next = self.test_move.copy({'date': self.test_move.date})
         next.action_post()

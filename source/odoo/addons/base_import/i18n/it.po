@@ -372,7 +372,7 @@ msgstr "Tipo file"
 #: code:addons/base_import/models/base_import.py:0
 #, python-format
 msgid "File size exceeds configured maximum (%s bytes)"
-msgstr "Dimensione del file superiore alla massima configurata (%sbyte)"
+msgstr "Dimensione del file superiore alla massima configurata (%s byte)"
 
 #. module: base_import
 #: model:ir.model.fields,help:base_import.field_base_import_import__file
@@ -506,9 +506,9 @@ msgid ""
 "may be too big for the system's configuration, try to split it (import less "
 "records per file)."
 msgstr ""
-"Importazione in pausa. Prova ancora. Se il problema persiste, il file "
-"potrebbe essere troppo grande per la configurazione del sistema, prova a "
-"dividerlo  (importa meno record per file)"
+"Importazione scaduta, riprovare. Se il problema persiste, il file potrebbe "
+"essere troppo grande per la configurazione del sistema, provare a "
+"suddividerlo (importa meno record per file)"
 
 #. module: base_import
 #: code:addons/base_import/models/base_import.py:0
@@ -691,7 +691,7 @@ msgstr "Seleziona un file CSV o Excel da importare."
 #: code:addons/base_import/static/src/xml/base_import.xml:0
 #, python-format
 msgid "Selected Sheet:"
-msgstr ""
+msgstr "Foglio selezionato:"
 
 #. module: base_import
 #. openerp-web

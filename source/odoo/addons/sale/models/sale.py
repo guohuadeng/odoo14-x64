@@ -332,6 +332,11 @@ class SaleOrder(models.Model):
                 raise UserError(_('You can not delete a sent quotation or a confirmed sales order. You must first cancel it.'))
         return super(SaleOrder, self).unlink()
 
+    def validate_taxes_on_sales_order(self):
+        # Override for correct taxcloud computation
+        # when using coupon and delivery
+        return True
+
     def _track_subtype(self, init_values):
         self.ensure_one()
         if 'state' in init_values and self.state == 'sale':
@@ -356,6 +361,7 @@ class SaleOrder(models.Model):
         - Payment terms
         - Invoice address
         - Delivery address
+        - Sales Team
         """
         if not self.partner_id:
             self.update({
@@ -384,13 +390,17 @@ class SaleOrder(models.Model):
         if self.env['ir.config_parameter'].sudo().get_param('account.use_invoice_terms') and self.env.company.invoice_terms:
             values['note'] = self.with_context(lang=self.partner_id.lang).env.company.invoice_terms
         if not self.env.context.get('not_self_saleperson') or not self.team_id:
-            values['team_id'] = self.env['crm.team']._get_default_team_id(domain=['|', ('company_id', '=', self.company_id.id), ('company_id', '=', False)],user_id=user_id)
+            values['team_id'] = self.env['crm.team'].with_context(
+                default_team_id=self.partner_id.team_id.id
+            )._get_default_team_id(domain=['|', ('company_id', '=', self.company_id.id), ('company_id', '=', False)], user_id=user_id)
         self.update(values)
 
     @api.onchange('user_id')
     def onchange_user_id(self):
         if self.user_id:
-            self.team_id = self.env['crm.team']._get_default_team_id(user_id=self.user_id.id)
+            self.team_id = self.env['crm.team'].with_context(
+                default_team_id=self.team_id.id
+            )._get_default_team_id(user_id=self.user_id.id)
 
     @api.onchange('partner_id')
     def onchange_partner_id_warning(self):
@@ -436,7 +446,7 @@ class SaleOrder(models.Model):
 
     @api.onchange('pricelist_id')
     def _onchange_pricelist_id(self):
-        if self.order_line and self.pricelist_id and self._origin.pricelist_id and self._origin.pricelist_id != self.pricelist_id:
+        if self.order_line and self.pricelist_id and self._origin.pricelist_id != self.pricelist_id:
             self.show_update_pricelist = True
         else:
             self.show_update_pricelist = False
@@ -454,7 +464,7 @@ class SaleOrder(models.Model):
             )
             price_unit = self.env['account.tax']._fix_tax_included_price_company(
                 line._get_display_price(product), line.product_id.taxes_id, line.tax_id, line.company_id)
-            if self.pricelist_id.discount_policy == 'without_discount':
+            if self.pricelist_id.discount_policy == 'without_discount' and price_unit:
                 discount = max(0, (price_unit - product.price) * 100 / price_unit)
             else:
                 discount = 0
@@ -615,6 +625,33 @@ Reason(s) of this behavior could be:
         """)
         return UserError(msg)
 
+    def _get_invoiceable_lines(self, final=False):
+        """Return the invoiceable lines for order `self`."""
+        down_payment_line_ids = []
+        invoiceable_line_ids = []
+        pending_section = None
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+
+        for line in self.order_line:
+            if line.display_type == 'line_section':
+                # Only invoice the section if one of its lines is invoiceable
+                pending_section = line
+                continue
+            if line.display_type != 'line_note' and float_is_zero(line.qty_to_invoice, precision_digits=precision):
+                continue
+            if line.qty_to_invoice > 0 or (line.qty_to_invoice < 0 and final) or line.display_type == 'line_note':
+                if line.is_downpayment:
+                    # Keep down payment lines separately, to put them together
+                    # at the end of the invoice, in a specific dedicated section.
+                    down_payment_line_ids.append(line.id)
+                    continue
+                if pending_section:
+                    invoiceable_line_ids.append(pending_section.id)
+                    pending_section = None
+                invoiceable_line_ids.append(line.id)
+
+        return self.env['sale.order.line'].browse(invoiceable_line_ids + down_payment_line_ids)
+
     def _create_invoices(self, grouped=False, final=False, date=None):
         """
         Create the invoice associated to the SO.
@@ -630,54 +667,41 @@ Reason(s) of this behavior could be:
             except AccessError:
                 return self.env['account.move']
 
-        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
-
         # 1) Create invoices.
         invoice_vals_list = []
-        invoice_item_sequence = 0
+        invoice_item_sequence = 0 # Incremental sequencing to keep the lines order on the invoice.
         for order in self:
             order = order.with_company(order.company_id)
             current_section_vals = None
             down_payments = order.env['sale.order.line']
 
-            # Invoice values.
             invoice_vals = order._prepare_invoice()
+            invoiceable_lines = order._get_invoiceable_lines(final)
 
-            # Invoice line values (keep only necessary sections).
-            invoice_lines_vals = []
-            for line in order.order_line:
-                if line.display_type == 'line_section':
-                    current_section_vals = line._prepare_invoice_line(sequence=invoice_item_sequence + 1)
-                    continue
-                if line.display_type != 'line_note' and float_is_zero(line.qty_to_invoice, precision_digits=precision):
-                    continue
-                if line.qty_to_invoice > 0 or (line.qty_to_invoice < 0 and final) or line.display_type == 'line_note':
-                    if line.is_downpayment:
-                        down_payments += line
-                        continue
-                    if current_section_vals:
-                        invoice_item_sequence += 1
-                        invoice_lines_vals.append(current_section_vals)
-                        current_section_vals = None
-                    invoice_item_sequence += 1
-                    prepared_line = line._prepare_invoice_line(sequence=invoice_item_sequence)
-                    invoice_lines_vals.append(prepared_line)
-
-            # If down payments are present in SO, group them under common section
-            if down_payments:
-                invoice_item_sequence += 1
-                down_payments_section = order._prepare_down_payment_section_line(sequence=invoice_item_sequence)
-                invoice_lines_vals.append(down_payments_section)
-                for down_payment in down_payments:
-                    invoice_item_sequence += 1
-                    invoice_down_payment_vals = down_payment._prepare_invoice_line(sequence=invoice_item_sequence)
-                    invoice_lines_vals.append(invoice_down_payment_vals)
-
-            if not any(new_line['display_type'] is False for new_line in invoice_lines_vals):
+            if not any(not line.display_type for line in invoiceable_lines):
                 raise self._nothing_to_invoice_error()
 
-            invoice_vals['invoice_line_ids'] = [(0, 0, invoice_line_id) for invoice_line_id in invoice_lines_vals]
+            invoice_line_vals = []
+            down_payment_section_added = False
+            for line in invoiceable_lines:
+                if not down_payment_section_added and line.is_downpayment:
+                    # Create a dedicated section for the down payments
+                    # (put at the end of the invoiceable_lines)
+                    invoice_line_vals.append(
+                        (0, 0, order._prepare_down_payment_section_line(
+                            sequence=invoice_item_sequence,
+                        )),
+                    )
+                    dp_section = True
+                    invoice_item_sequence += 1
+                invoice_line_vals.append(
+                    (0, 0, line._prepare_invoice_line(
+                        sequence=invoice_item_sequence,
+                    )),
+                )
+                invoice_item_sequence += 1
 
+            invoice_vals['invoice_line_ids'] = invoice_line_vals
             invoice_vals_list.append(invoice_vals)
 
         if not invoice_vals_list:
@@ -709,9 +733,37 @@ Reason(s) of this behavior could be:
             invoice_vals_list = new_invoice_vals_list
 
         # 3) Create invoices.
+
+        # As part of the invoice creation, we make sure the sequence of multiple SO do not interfere
+        # in a single invoice. Example:
+        # SO 1:
+        # - Section A (sequence: 10)
+        # - Product A (sequence: 11)
+        # SO 2:
+        # - Section B (sequence: 10)
+        # - Product B (sequence: 11)
+        #
+        # If SO 1 & 2 are grouped in the same invoice, the result will be:
+        # - Section A (sequence: 10)
+        # - Section B (sequence: 10)
+        # - Product A (sequence: 11)
+        # - Product B (sequence: 11)
+        #
+        # Resequencing should be safe, however we resequence only if there are less invoices than
+        # orders, meaning a grouping might have been done. This could also mean that only a part
+        # of the selected SO are invoiceable, but resequencing in this case shouldn't be an issue.
+        if len(invoice_vals_list) < len(self):
+            SaleOrderLine = self.env['sale.order.line']
+            for invoice in invoice_vals_list:
+                sequence = 1
+                for line in invoice['invoice_line_ids']:
+                    line[2]['sequence'] = SaleOrderLine._get_invoice_line_sequence(new=sequence, old=line[2]['sequence'])
+                    sequence += 1
+
         # Manage the creation of invoices in sudo because a salesperson must be able to generate an invoice from a
         # sale order without "billing" access rights. However, he should not be able to create an invoice from scratch.
         moves = self.env['account.move'].sudo().with_context(default_move_type='out_invoice').create(invoice_vals_list)
+
         # 4) Some moves might actually be refunds: convert them if the total amount is negative
         # We do this after the moves have been created since we need taxes, etc. to know if the total
         # is actually negative or not
@@ -918,11 +970,11 @@ Reason(s) of this behavior could be:
         transaction = self.get_portal_last_transaction()
         return (self.state == 'sent' or (self.state == 'draft' and include_draft)) and not self.is_expired and self.require_payment and transaction.state != 'done' and self.amount_total
 
-    def _notify_get_groups(self):
+    def _notify_get_groups(self, msg_vals=None):
         """ Give access button to users and portal customer as portal is integrated
         in sale. Customer and portal group have probably no right to see
         the document so they don't have the access button. """
-        groups = super(SaleOrder, self)._notify_get_groups()
+        groups = super(SaleOrder, self)._notify_get_groups(msg_vals=msg_vals)
 
         self.ensure_one()
         if self.state not in ('draft', 'cancel'):
@@ -987,7 +1039,7 @@ Reason(s) of this behavior could be:
             'currency_id': currency.id,
             'partner_id': partner.id,
             'sale_order_ids': [(6, 0, self.ids)],
-            'type': self[0]._get_payment_type(),
+            'type': self[0]._get_payment_type(vals.get('type')=='form_save'),
         })
 
         transaction = self.env['payment.transaction'].create(vals)
@@ -1044,9 +1096,9 @@ Reason(s) of this behavior could be:
             return self.get_portal_url(query_string='&%s' % auth_param)
         return super(SaleOrder, self)._get_share_url(redirect, signup_partner, pid)
 
-    def _get_payment_type(self):
+    def _get_payment_type(self, tokenize=False):
         self.ensure_one()
-        return 'form'
+        return 'form_save' if tokenize else 'form'
 
     def _get_portal_return_action(self):
         """ Return the action used to display orders when returning from customer portal. """
@@ -1144,6 +1196,7 @@ class SaleOrderLine(models.Model):
             else:
                 line.product_updatable = True
 
+    # no trigger product_id.invoice_policy to avoid retroactively changing SO
     @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state')
     def _get_to_invoice_qty(self):
         """
@@ -1506,7 +1559,12 @@ class SaleOrderLine(models.Model):
                     # As included taxes are not excluded from the computed subtotal, `compute_all()` method
                     # has to be called to retrieve the subtotal without them.
                     # `price_reduce_taxexcl` cannot be used as it is computed from `price_subtotal` field. (see upper Note)
-                    price_subtotal = line.tax_id.compute_all(price_subtotal)['total_excluded']
+                    price_subtotal = line.tax_id.compute_all(
+                        price_subtotal,
+                        currency=line.order_id.currency_id,
+                        quantity=line.product_uom_qty,
+                        product=line.product_id,
+                        partner=line.order_id.partner_shipping_id)['total_excluded']
 
                 if any(line.invoice_lines.mapped(lambda l: l.discount != line.discount)):
                     # In case of re-invoicing with different discount we try to calculate manually the
@@ -1523,6 +1581,18 @@ class SaleOrderLine(models.Model):
                     amount_to_invoice = price_subtotal - line.untaxed_amount_invoiced
 
             line.untaxed_amount_to_invoice = amount_to_invoice
+
+    def _get_invoice_line_sequence(self, new=0, old=0):
+        """
+        Method intended to be overridden in third-party module if we want to prevent the resequencing
+        of invoice lines.
+
+        :param int new:   the new line sequence
+        :param int old:   the old line sequence
+
+        :return:          the sequence of the SO line, by default the new one.
+        """
+        return new or old
 
     def _prepare_invoice_line(self, **optional_values):
         """
@@ -1579,7 +1649,7 @@ class SaleOrderLine(models.Model):
             )
 
         if self.order_id.pricelist_id.discount_policy == 'with_discount':
-            return product.with_context(pricelist=self.order_id.pricelist_id.id).price
+            return product.with_context(pricelist=self.order_id.pricelist_id.id, uom=self.product_uom.id).price
         product_context = dict(self.env.context, partner_id=self.order_id.partner_id.id, date=self.order_id.date_order, uom=self.product_uom.id)
 
         final_price, rule_id = self.order_id.pricelist_id.with_context(product_context).get_product_price_rule(product or self.product_id, self.product_uom_qty or 1.0, self.order_id.partner_id)
@@ -1819,8 +1889,10 @@ class SaleOrderLine(models.Model):
         for ptav in (no_variant_ptavs - custom_ptavs):
             name += "\n" + ptav.with_context(lang=self.order_id.partner_id.lang).display_name
 
+        # Sort the values according to _order settings, because it doesn't work for virtual records in onchange
+        custom_values = sorted(self.product_custom_attribute_value_ids, key=lambda r: (r.custom_product_template_attribute_value_id.id, r.id))
         # display the is_custom values
-        for pacv in self.product_custom_attribute_value_ids:
+        for pacv in custom_values:
             name += "\n" + pacv.with_context(lang=self.order_id.partner_id.lang).display_name
 
         return name

@@ -4,15 +4,15 @@
 # 
 # Translators:
 # Simone Bernini <simone@aperturelabs.it>, 2020
-# Sergio Zanchetta <primes2h@gmail.com>, 2020
+# Sergio Zanchetta <primes2h@gmail.com>, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-02 14:12+0000\n"
+"POT-Creation-Date: 2020-11-16 13:33+0000\n"
 "PO-Revision-Date: 2020-09-07 08:21+0000\n"
-"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2020\n"
+"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2021\n"
 "Language-Team: Italian (https://www.transifex.com/odoo/teams/41243/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,7 +33,7 @@ msgstr ""
 #. module: website_event_track_exhibitor
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.exhibitor_card
 msgid "<i class=\"fa fa-ban mr-2\"/>Unpublished"
-msgstr ""
+msgstr "<i class=\"fa fa-ban mr-2\"/>Non pubblicato"
 
 #. module: website_event_track_exhibitor
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.exhibitors_topbar_country
@@ -61,7 +61,7 @@ msgstr ""
 #. module: website_event_track_exhibitor
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.exhibitor_aside
 msgid "<span class=\"h5 mb-0 pt-0 pt-md-3 pb-0 pb-md-2\">Other exhibitors</span>"
-msgstr ""
+msgstr "<span class=\"h5 mb-0 pt-0 pt-md-3 pb-0 pb-md-2\">Altri espositori</span>"
 
 #. module: website_event_track_exhibitor
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.exhibitor_main
@@ -110,7 +110,7 @@ msgstr ""
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_sponsor__chat_room_id
 msgid "Chat Room"
-msgstr ""
+msgstr "Stanza chat"
 
 #. module: website_event_track_exhibitor
 #. openerp-web
@@ -156,7 +156,7 @@ msgstr "Nome visualizzato"
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,help:website_event_track_exhibitor.field_event_type__exhibitor_menu
 msgid "Display exhibitors on website"
-msgstr ""
+msgstr "Mostra gli espositori nel sito web"
 
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_sponsor__hour_to
@@ -192,24 +192,24 @@ msgstr "Modello evento"
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.event_sponsor_view_form
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.event_sponsor_view_search
 msgid "Exhibitor"
-msgstr ""
+msgstr "Espositore"
 
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_sponsor__is_exhibitor
 msgid "Exhibitor's Chat"
-msgstr ""
+msgstr "Chat espositore"
 
 #. module: website_event_track_exhibitor
 #: code:addons/website_event_track_exhibitor/models/event_event.py:0
 #, python-format
 msgid "Exhibitors"
-msgstr ""
+msgstr "Espositori"
 
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_event__exhibitor_menu_ids
 #: model:ir.model.fields.selection,name:website_event_track_exhibitor.selection__website_event_menu__menu_type__exhibitor
 msgid "Exhibitors Menus"
-msgstr ""
+msgstr "Menù espositori"
 
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_event__id
@@ -227,7 +227,7 @@ msgstr "È pubblicato"
 #. module: website_event_track_exhibitor
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.event_sponsor_view_form
 msgid "Jitsi Name"
-msgstr ""
+msgstr "Nome Jitsi"
 
 #. module: website_event_track_exhibitor
 #. openerp-web
@@ -273,7 +273,7 @@ msgstr "Capacità massima"
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,help:website_event_track_exhibitor.field_event_sponsor__room_max_participant_reached
 msgid "Maximum number of participant reached in the room at the same time"
-msgstr ""
+msgstr "Numero massimo di partecipanti contemporanei raggiunto nella stanza"
 
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_website_event_menu__menu_type
@@ -283,7 +283,7 @@ msgstr "Tipo di menù"
 #. module: website_event_track_exhibitor
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.exhibitors_main
 msgid "No exhibitor found."
-msgstr ""
+msgstr "Nessun espositore trovato."
 
 #. module: website_event_track_exhibitor
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.event_sponsor_view_form
@@ -313,7 +313,7 @@ msgstr "Registrati"
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_sponsor__room_is_full
 msgid "Room Is Full"
-msgstr ""
+msgstr "La stanza è piena"
 
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_sponsor__room_name
@@ -324,7 +324,7 @@ msgstr "Nome stanza"
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_event__exhibitor_menu
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_type__exhibitor_menu
 msgid "Showcase Exhibitors"
-msgstr ""
+msgstr "Mostra espositori"
 
 #. module: website_event_track_exhibitor
 #: model:ir.model.fields,field_description:website_event_track_exhibitor.field_event_sponsor__subtitle
@@ -334,9 +334,11 @@ msgstr ""
 #. module: website_event_track_exhibitor
 #: model_terms:ir.actions.act_window,help:website_event_track_exhibitor.event_sponsor_action
 msgid ""
-"Sponsors might be advertised on you event pages footer.<br>\n"
+"Sponsors might be advertised on your event pages footer.<br>\n"
 "    Exhibitors might have a dedicated page with chat room for people to connect with them."
 msgstr ""
+"Gli sponsor possono essere pubblicizzati nel piè di pagina delle pagine evento.<br>\n"
+"    Gli espositori possono avere una pagina dedicata, con una stanza chat per comunicare con le persone."
 
 #. module: website_event_track_exhibitor
 #: code:addons/website_event_track_exhibitor/controllers/website_event_main.py:0
@@ -418,7 +420,7 @@ msgstr "minuti"
 #. module: website_event_track_exhibitor
 #: model_terms:ir.ui.view,arch_db:website_event_track_exhibitor.exhibitors_main
 msgid "search."
-msgstr ""
+msgstr "ricerca"
 
 #. module: website_event_track_exhibitor
 #. openerp-web

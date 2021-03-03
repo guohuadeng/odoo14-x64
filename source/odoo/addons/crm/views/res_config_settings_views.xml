@@ -38,7 +38,7 @@
                                     <div class="mt16">
                                         <field name="crm_alias_prefix" class="oe_inline"
                                             attrs="{'required': [('generate_lead_from_alias', '=', True)]}"/>
-                                        <label for="alias_domain" string="@"/>
+                                        <label class="mr-0" for="alias_domain" string="@"/>
                                         <field name="alias_domain" readonly="1" force_save="1" class="oe_inline"/>
                                     </div>
                                     <div attrs="{'invisible': [('alias_domain', 'not in', ['localhost', '', False])]}">
@@ -82,18 +82,15 @@
                                     <field name="predictive_lead_scoring_fields_str" invisible="1"/>
                                 </div>
                                 <div class="mt16">
-                                    Start Date: Consider leads created as of the
+                                    Consider leads created as of the
                                     <field name="predictive_lead_scoring_start_date_str" invisible="1"/>
-                                    <field name="predictive_lead_scoring_start_date" required="1"/>
+                                    <field name="predictive_lead_scoring_start_date" class="oe_inline" required="1"/>
                                 </div>
                                 <div class="mt16" groups="base.group_erp_manager">
                                     <div class="text-muted">
-                                        By <b>updating lead probabilities</b>, you will regenerate the frequency table and recompute the probability of all the leads.
-                                        This can be useful after changing the start date (you need to save first !) or to ensure every lead probabilities are up to date.
-                                        <br/>
-                                        This can take up to several minutes depending on the number of leads you have !!!
+                                        Use this button to update the probabilities of all leads. This can take up to several minutes depending on how many there are.
                                     </div>
-                                    <button name="action_reset_lead_probabilities" type="object" string="Update" class="btn-primary"/>
+                                    <button name="action_reset_lead_probabilities" type="object" string="Update Probabilities" class="btn-primary"/>
                                 </div>
                             </div>
                         </div>
@@ -170,7 +167,7 @@
         <field name="view_id" ref="res_config_settings_view_form"/>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
-        <field name="context">{'module' : 'crm'}</field>
+        <field name="context">{'module' : 'crm', 'bin_size': False}</field>
     </record>
 
     <record id="crm_config_settings_menu" model="ir.ui.menu">

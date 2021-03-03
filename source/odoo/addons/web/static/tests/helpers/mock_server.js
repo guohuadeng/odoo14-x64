@@ -1209,12 +1209,18 @@ var MockServer = Class.extend({
      */
     _mockNameGet: function (model, args) {
         var ids = args[0];
+        if (!args.length) {
+            throw new Error("name_get: expected one argument");
+        }
+        else if (!ids) {
+            return []
+        }
         if (!_.isArray(ids)) {
             ids = [ids];
         }
         var records = this.data[model].records;
         var names = _.map(ids, function (id) {
-            return [id, _.findWhere(records, {id: id}).display_name];
+            return id ? [id, _.findWhere(records, {id: id}).display_name] : [null, "False"];
         });
         return names;
     },
@@ -1635,7 +1641,10 @@ var MockServer = Class.extend({
      */
     _mockSearch: function (model, args, kwargs) {
         const limit = kwargs.limit || Number.MAX_VALUE;
-        return this._getRecords(model, args[0]).map(r => r.id).slice(0, limit);
+        const { context } = kwargs;
+        const active_test =
+          context && "active_test" in context ? context.active_test : true;
+        return this._getRecords(model, args[0], { active_test }).map(r => r.id).slice(0, limit);
     },
     /**
      * Simulate a 'search_count' operation
@@ -1689,7 +1698,12 @@ var MockServer = Class.extend({
      */
     _mockSearchReadController: function (args) {
         var self = this;
-        var records = this._getRecords(args.model, args.domain || []);
+        const { context } = args;
+        const active_test =
+          context && "active_test" in context ? context.active_test : true;
+        var records = this._getRecords(args.model, args.domain || [], {
+          active_test,
+        });
         var fields = args.fields && args.fields.length ? args.fields : _.keys(this.data[args.model].fields);
         var nbRecords = records.length;
         var offset = args.offset || 0;

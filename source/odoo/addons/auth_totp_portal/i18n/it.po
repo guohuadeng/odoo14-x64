@@ -49,14 +49,14 @@ msgstr ""
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook
 msgid "Enable two-factor authentication"
-msgstr ""
+msgstr "Abilita autenticazione a due fattori"
 
 #. module: auth_totp_portal
 #. openerp-web
 #: code:addons/auth_totp_portal/static/src/js/totp_frontend.js:0
 #, python-format
 msgid "Operation failed for unknown reason."
-msgstr ""
+msgstr "Operazione non riuscita per motivi sconosciuti."
 
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook

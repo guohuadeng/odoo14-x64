@@ -88,6 +88,12 @@ class Meeting(models.Model):
         attendee_commands = []
         partner_commands = []
         google_attendees = google_event.attendees or []
+        if len(google_attendees) == 0 and google_event.organizer and google_event.organizer.get('self', False):
+            user = google_event.owner(self.env)
+            google_attendees += [{
+                'email': user.partner_id.email,
+                'status': {'response': 'accepted'},
+            }]
         emails = [a.get('email') for a in google_attendees]
         existing_attendees = self.env['calendar.attendee']
         if google_event.exists(self.env):
@@ -101,7 +107,7 @@ class Meeting(models.Model):
                 attendee_commands += [(1, attendees_by_emails[email].id, {'state': attendee.get('responseStatus')})]
             else:
                 # Create new attendees
-                partner = self.env['res.partner'].find_or_create(attendee.get('email'))
+                partner = self.env.user.partner_id if attendee.get('self') else self.env['res.partner'].find_or_create(attendee.get('email'))
                 attendee_commands += [(0, 0, {'state': attendee.get('responseStatus'), 'partner_id': partner.id})]
                 partner_commands += [(4, partner.id)]
                 if attendee.get('displayName') and not partner.name:
@@ -167,7 +173,7 @@ class Meeting(models.Model):
             'method': "email" if alarm.alarm_type == "email" else "popup",
             'minutes': alarm.duration_minutes
         } for alarm in self.alarm_ids]
-        attendee_ids = self.attendee_ids.filtered(lambda a: a.partner_id != self.env.user.partner_id)
+        attendee_ids = self.attendee_ids.filtered(lambda a: a.partner_id not in self.user_id.partner_id)
         values = {
             'id': self.google_id,
             'start': start,
@@ -177,7 +183,7 @@ class Meeting(models.Model):
             'location': self.location or '',
             'guestsCanModify': True,
             'organizer': {'email': self.user_id.email, 'self': self.user_id == self.env.user},
-            'attendees': [{'email': attendee.email, 'responseStatus': attendee.state} for attendee in attendee_ids],
+            'attendees': [{'email': attendee.email, 'responseStatus': attendee.state} for attendee in self.attendee_ids],
             'extendedProperties': {
                 'shared': {
                     '%s_odoo_id' % self.env.cr.dbname: self.id,

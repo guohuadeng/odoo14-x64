@@ -5,15 +5,16 @@
 # Translators:
 # Martin Trigaux, 2020
 # Yenthe Van Ginneken <yenthespam@gmail.com>, 2020
-# Erwin van der Ploeg <erwin@odooexperts.nl>, 2020
+# Erwin van der Ploeg (Odoo Experts) <erwin@odooexperts.nl>, 2020
+# Odoo Experts Consultants <consultants@odooexperts.nl>, 2020
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server saas~13.5\n"
+"Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-07 07:33+0000\n"
+"POT-Creation-Date: 2020-11-27 14:12+0000\n"
 "PO-Revision-Date: 2020-09-07 08:17+0000\n"
-"Last-Translator: Erwin van der Ploeg <erwin@odooexperts.nl>, 2020\n"
+"Last-Translator: Odoo Experts Consultants <consultants@odooexperts.nl>, 2020\n"
 "Language-Team: Dutch (https://www.transifex.com/odoo/teams/41243/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,7 +31,7 @@ msgstr "% Op-tijd geleverd"
 #: code:addons/purchase_stock/models/purchase.py:0
 #, python-format
 msgid "<p>Corresponding receipt not found.</p>"
-msgstr ""
+msgstr "<p>Corresponderende bon niet gevonden.</p>"
 
 #. module: purchase_stock
 #: code:addons/purchase_stock/models/purchase.py:0
@@ -39,12 +40,23 @@ msgid ""
 "<p>Those dates couldn’t be modified accordingly on the receipt %s which had "
 "already been validated.</p>"
 msgstr ""
+"<p>De datums konden niet overeenkomstig de ontvangst %s worden gewijzigd, "
+"omdat deze al was bevestigd.</p>"
 
 #. module: purchase_stock
 #: code:addons/purchase_stock/models/purchase.py:0
 #, python-format
 msgid "<p>Those dates have been updated accordingly on the receipt %s.</p>"
+msgstr "<p>Die data zijn dienovereenkomstig bijgewerkt op de bon %s.</p>"
+
+#. module: purchase_stock
+#: model_terms:ir.ui.view,arch_db:purchase_stock.purchase_order_view_form_inherit
+msgid ""
+"<span attrs=\"{'invisible': [('on_time_rate', '&gt;=', 0)]}\">No On-time "
+"Delivery Data</span>"
 msgstr ""
+"<span attrs=\"{'invisible': [('on_time_rate', '&gt;=', 0)]}\">Geen tijdige "
+"leveringsgegevens</span>"
 
 #. module: purchase_stock
 #: model_terms:ir.ui.view,arch_db:purchase_stock.res_config_settings_view_form_stock
@@ -91,13 +103,13 @@ msgstr "<strong>Verzendadres:</strong>"
 #. module: purchase_stock
 #: model:ir.model.fields,help:purchase_stock.field_purchase_order_line__qty_received_method
 msgid ""
-"According to product configuration, the recieved quantity can be automatically computed by mechanism :\n"
+"According to product configuration, the received quantity can be automatically computed by mechanism :\n"
 "  - Manual: the quantity is set manually on the line\n"
 "  - Stock Moves: the quantity comes from confirmed pickings\n"
 msgstr ""
-"Afhankelijk van de productinstellingen kan de ontvangen hoeveelheid automatisch berekend worden met behulp van het mechanisme:\n"
-"- Handmatig: het aantal wordt handmatig op de regel ingesteld\n"
-"- Voorraadverplaatstingen: de hoeveelheid komt van bevestigde pickings\n"
+"Volgens de productconfiguratie kan de ontvangen hoeveelheid automatisch worden berekend door het mechanisme:\n"
+"- Handmatig: het aantal wordt handmatig op de lijn ingesteld\n"
+"- Voorraadbewegingen: de hoeveelheid is afkomstig van bevestigde pickings\n"
 
 #. module: purchase_stock
 #: model:ir.model.fields,field_description:purchase_stock.field_stock_rule__action
@@ -112,11 +124,15 @@ msgid ""
 "average value, therefore only use this as an aggregated value with "
 "group_operator=avg"
 msgstr ""
+"Tijd tussen verwachte en effectieve ontvangstdatum. Vanwege een hack die "
+"nodig is om dit te berekenen,        zal elk record dezelfde gemiddelde "
+"waarde tonen. Gebruik deze daarom alleen als een toegevoegde waarde met "
+"group_operator = avg"
 
 #. module: purchase_stock
 #: model:ir.model.fields,field_description:purchase_stock.field_purchase_report__avg_receipt_delay
 msgid "Average Receipt Delay"
-msgstr ""
+msgstr "Gemiddelde ontvangstvertraging"
 
 #. module: purchase_stock
 #: code:addons/purchase_stock/models/stock.py:0
@@ -145,7 +161,7 @@ msgstr "Bedrijven"
 #. module: purchase_stock
 #: model:ir.model.fields,help:purchase_stock.field_purchase_order__effective_date
 msgid "Completion date of the first receipt order."
-msgstr ""
+msgstr "Voltooiïngsdatum van de eerste ontvangstopdracht."
 
 #. module: purchase_stock
 #: model:ir.model,name:purchase_stock.model_res_config_settings
@@ -260,7 +276,7 @@ msgstr "Boekdatum"
 #. module: purchase_stock
 #: model_terms:ir.ui.view,arch_db:purchase_stock.vendor_delay_report_filter
 msgid "Effective Date Last Year"
-msgstr ""
+msgstr "Ingangsdatum vorig jaar"
 
 #. module: purchase_stock
 #: model_terms:ir.ui.view,arch_db:purchase_stock.exception_on_po
@@ -277,14 +293,14 @@ msgstr "Foutmelding(en):"
 #: code:addons/purchase_stock/static/src/js/tours/purchase_stock.js:0
 #, python-format
 msgid "Generate the draft vendor bill."
-msgstr ""
+msgstr "Genereer de conceptfactuur van de leverancier."
 
 #. module: purchase_stock
 #. openerp-web
 #: code:addons/purchase_stock/static/src/js/tours/purchase_stock.js:0
 #, python-format
 msgid "Go back to the purchase order to generate the vendor bill."
-msgstr ""
+msgstr "Ga terug naar de inkooporder om de leveranciersfactuur te genereren."
 
 #. module: purchase_stock
 #: model:ir.model.fields,field_description:purchase_stock.field_account_move__id
@@ -378,6 +394,12 @@ msgid "Lot/Serial"
 msgstr "Partij/Serienummer"
 
 #. module: purchase_stock
+#: code:addons/purchase_stock/models/stock_rule.py:0
+#, python-format
+msgid "Manual Replenishment"
+msgstr "Handmatige aanvulling"
+
+#. module: purchase_stock
 #: model_terms:ir.ui.view,arch_db:purchase_stock.exception_on_po
 msgid "Manual actions may be needed."
 msgstr "Handmatige acties zijn mogelijk nodig."
@@ -410,12 +432,19 @@ msgid "Next transfer(s) impacted:"
 msgstr "Volgende verplaatsing(en) beïnvloed:"
 
 #. module: purchase_stock
+#: model_terms:ir.ui.view,arch_db:purchase_stock.res_partner_view_purchase_buttons_inherit
+msgid "No data yet"
+msgstr "Nog geen gegevens"
+
+#. module: purchase_stock
 #: code:addons/purchase_stock/models/account_invoice.py:0
 #, python-format
 msgid ""
 "Odoo is not able to generate the anglo saxon entries. The total valuation of"
 " %s is zero."
 msgstr ""
+"Odoo kan de Angelsaksische inzendingen niet genereren. De totale waardering "
+"van %s is nul."
 
 #. module: purchase_stock
 #: model_terms:ir.ui.view,arch_db:purchase_stock.vendor_delay_report_view_graph
@@ -456,9 +485,11 @@ msgstr "Aanvulregel"
 #: model:ir.model.fields,help:purchase_stock.field_res_partner__on_time_rate
 #: model:ir.model.fields,help:purchase_stock.field_res_users__on_time_rate
 msgid ""
-"Over the past 12 months, number of products received on time / total number "
-"of ordered products."
+"Over the past 12 months; the number of products received on time divided by "
+"the number of ordered products."
 msgstr ""
+"In de afgelopen 12 maanden; het aantal op tijd ontvangen producten gedeeld "
+"door het aantal bestelde producten."
 
 #. module: purchase_stock
 #: model:ir.model.fields,field_description:purchase_stock.field_purchase_order__picking_count
@@ -470,7 +501,7 @@ msgstr "Pick aantallen"
 #: code:addons/purchase_stock/static/src/js/tours/purchase_stock.js:0
 #, python-format
 msgid "Process all the receipt quantities."
-msgstr ""
+msgstr "Verwerk alle ontvangsthoeveelheden."
 
 #. module: purchase_stock
 #: model:ir.model.fields,field_description:purchase_stock.field_purchase_order__group_id
@@ -567,6 +598,12 @@ msgid "Receptions"
 msgstr "Ontvangsten"
 
 #. module: purchase_stock
+#: code:addons/purchase_stock/models/stock_rule.py:0
+#, python-format
+msgid "Replenishment Report"
+msgstr "Voorraadaanvullen rapportage"
+
+#. module: purchase_stock
 #: model_terms:ir.ui.view,arch_db:purchase_stock.res_config_settings_view_form_purchase
 msgid "Request your vendors to deliver to your customers"
 msgstr "Vraag uw leveranciers om direct te leveren aan uw klanten"
@@ -647,6 +684,8 @@ msgid ""
 "The quantities on your purchase order indicate less than billed. You should "
 "ask for a refund."
 msgstr ""
+"De hoeveelheden op je order geven minder aan dan gefactureerd. Je moet om "
+"terugbetaling vragen."
 
 #. module: purchase_stock
 #: code:addons/purchase_stock/models/stock_rule.py:0
@@ -706,7 +745,7 @@ msgstr ""
 #: code:addons/purchase_stock/static/src/js/tours/purchase_stock.js:0
 #, python-format
 msgid "Validate the receipt of all ordered products."
-msgstr ""
+msgstr "Bevestig de ontvangst van alle bestelde producten."
 
 #. module: purchase_stock
 #: model:ir.model.fields,field_description:purchase_stock.field_stock_warehouse_orderpoint__supplier_id

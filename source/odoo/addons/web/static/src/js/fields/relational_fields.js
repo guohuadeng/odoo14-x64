@@ -1192,6 +1192,7 @@ var FieldX2Many = AbstractField.extend(WidgetAdapterMixin, {
         if (!fieldChanged && !actionsChanged) {
             var newEval = this._evalColumnInvisibleFields();
             if (_.isEqual(this.currentColInvisibleFields, newEval)) {
+                this._reset(record, ev); // update the internal state, but do not re-render
                 return Promise.resolve();
             }
         } else if (ev && ev.target === this && ev.data.changes && this.view.arch.tag === 'tree') {
@@ -1210,12 +1211,7 @@ var FieldX2Many = AbstractField.extend(WidgetAdapterMixin, {
                 return this.renderer.confirmUpdate(state, command.id, fieldNames, ev.initialEvent);
             }
         }
-        return this._super.apply(this, arguments).then(() => {
-            if (this.view) {
-                this._renderButtons();
-                this._updateControlPanel();
-            }
-        });
+        return this._super.apply(this, arguments);
     },
 
     /**
@@ -1348,7 +1344,7 @@ var FieldX2Many = AbstractField.extend(WidgetAdapterMixin, {
                 columnInvisibleFields: this.currentColInvisibleFields,
                 keepWidths: true,
             }).then(() => {
-                this._updateControlPanel({ size: this.value.count });
+                return this._updateControlPanel({ size: this.value.count });
             });
         }
         var arch = this.view.arch;
@@ -1460,9 +1456,16 @@ var FieldX2Many = AbstractField.extend(WidgetAdapterMixin, {
      */
     _updateControlPanel: function (pagingState) {
         if (this._controlPanelWrapper) {
+            this._renderButtons();
+            const pagerProps = Object.assign(this.pagingState, pagingState, {
+                // sometimes, we temporarily want to increase the pager limit
+                // (for instance, when we add a new record on a page that already
+                // contains the maximum number of records)
+                limit: Math.max(this.value.limit, this.value.data.length),
+            });
             const newProps = {
                 cp_content: { $buttons: this.$buttons },
-                pager: Object.assign(this.pagingState, pagingState),
+                pager: pagerProps,
             };
             return this._controlPanelWrapper.update(newProps);
         }
@@ -1851,16 +1854,6 @@ var FieldOne2Many = FieldX2Many.extend({
                     var index = 0;
                     if (self.editable !== 'top') {
                         index = self.value.data.length - 1;
-                        // we consider that a new record, created in the bottom,
-                        // does not count as a record worth mentioning in the
-                        // pager, at least not until the line has been saved.
-                        // We prevent the pager from increasing its size, which
-                        // means that the pager is not displayed when we just
-                        // reach the limit.  For example, if limit is 3, if we
-                        // have 3 records, and we click on add, we will see the
-                        // 4 records on the same page, but we do not want a
-                        // pager.
-                        self._updateControlPanel({ size: self.value.count - 1 });
                     }
                     var newID = self.value.data[index].id;
                     self.renderer.editRecord(newID);
@@ -3053,22 +3046,6 @@ var FieldRadio = FieldSelection.extend({
     //--------------------------------------------------------------------------
 
     /**
-     * @override
-     * @returns {jQuery}
-     */
-    getFocusableElement: function () {
-        return this.mode === 'edit' && this.$input || this.$el;
-    },
-
-    /**
-     * @override
-     * @returns {boolean} always true
-     */
-    isSet: function () {
-        return true;
-    },
-
-    /**
      * Returns the currently-checked radio button, or the first one if no radio
      * button is checked.
      *
@@ -3077,6 +3054,14 @@ var FieldRadio = FieldSelection.extend({
     getFocusableElement: function () {
         var checked = this.$("[checked='true']");
         return checked.length ? checked : this.$("[data-index='0']");
+    },
+
+    /**
+     * @override
+     * @returns {boolean} always true
+     */
+    isSet: function () {
+        return true;
     },
 
     /**

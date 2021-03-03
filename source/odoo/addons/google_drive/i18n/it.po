@@ -149,6 +149,14 @@ msgstr ""
 "La creazione di un google drive può essere fatta uno documento alla volta."
 
 #. module: google_drive
+#: code:addons/google_drive/models/google_drive.py:161
+#, python-format
+msgid ""
+"The document filter must not include any 'dynamic' part, so it should not be"
+" based on the current time or current user, for example."
+msgstr ""
+
+#. module: google_drive
 #: model:ir.filters,name:google_drive.filter_partner
 msgid "Customer"
 msgstr "Cliente"
@@ -308,7 +316,7 @@ msgstr "Impossibile trovare il modello Google, forse è stato eliminato."
 #. module: google_drive
 #: model:ir.model.fields,help:google_drive.field_res_config_settings__google_drive_uri
 msgid "The URL to generate the authorization code from Google"
-msgstr "L'URL per generare il codice di autorizzazione di Google"
+msgstr "URL per generare il codice di autorizzazione da Google"
 
 #. module: google_drive
 #: model_terms:ir.ui.view,arch_db:google_drive.view_google_drive_config_form

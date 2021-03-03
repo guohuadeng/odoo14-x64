@@ -35,14 +35,17 @@
 # Guilhaume Bordiau <github@guilhaume.fr>, 2020
 # Léonie Bouchat <lbo@odoo.com>, 2020
 # omaodoo <oma@odoo.com>, 2020
+# Arnaud Willem <contact@arnaud-willem.eu>, 2020
+# Christophe Ricevuto <cri@nalios.be>, 2021
+# guillaume bauer <guillaume.bauer@syentys.fr>, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-10-29 15:48+0000\n"
 "PO-Revision-Date: 2020-09-07 08:14+0000\n"
-"Last-Translator: omaodoo <oma@odoo.com>, 2020\n"
+"Last-Translator: guillaume bauer <guillaume.bauer@syentys.fr>, 2021\n"
 "Language-Team: French (https://www.transifex.com/odoo/teams/41243/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -264,7 +267,7 @@ msgstr ""
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_production_form_view
 msgid "<span class=\"text-bf\">To Produce</span>"
-msgstr ""
+msgstr "<span class=\"text-bf\">A fabriquer</span>"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.report_mrp_bom
@@ -465,7 +468,7 @@ msgstr "État de l'Activité"
 #: model:ir.model.fields,field_description:mrp.field_mrp_production__activity_type_icon
 #: model:ir.model.fields,field_description:mrp.field_mrp_unbuild__activity_type_icon
 msgid "Activity Type Icon"
-msgstr ""
+msgstr "Icône de type d'activité"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_workcenter_block_wizard_form
@@ -571,7 +574,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:mrp.selection__mrp_consumption_warning__consumption__warning
 #: model:ir.model.fields.selection,name:mrp.selection__mrp_production__consumption__warning
 msgid "Allowed with warning"
-msgstr ""
+msgstr "Autorisé avec avertissement"
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_workcenter__alternative_workcenter_ids
@@ -1338,7 +1341,7 @@ msgstr "Quantité actuellement produite"
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_production__product_description_variants
 msgid "Custom Description"
-msgstr ""
+msgstr "Description personnalisée"
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_document__db_datas
@@ -1755,7 +1758,7 @@ msgstr "Flexible"
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_bom__consumption
 msgid "Flexible Consumption"
-msgstr ""
+msgstr "Consommation Flexible"
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_bom__message_follower_ids
@@ -1796,10 +1799,6 @@ msgstr "Pleinement productif"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_unbuild_search_view
-msgid "Future Activitie"
-msgstr "Activités futures"
-
-#. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.view_mrp_production_filter
 msgid "Future Activities"
 msgstr "Activités futures"
@@ -2757,7 +2756,7 @@ msgstr "Pas de données disponibles. "
 #: model_terms:ir.actions.act_window,help:mrp.action_mrp_workcenter_load_report_graph
 #: model_terms:ir.actions.act_window,help:mrp.mrp_production_report
 msgid "No data yet!"
-msgstr ""
+msgstr "Pas de données"
 
 #. module: mrp
 #: model_terms:ir.actions.act_window,help:mrp.mrp_production_action
@@ -2807,7 +2806,7 @@ msgstr "Normale"
 #: code:addons/mrp/models/mrp_production.py:0
 #, python-format
 msgid "Not Available"
-msgstr ""
+msgstr "Pas disponible"
 
 #. module: mrp
 #: model:ir.model.fields,help:mrp.field_stock_scrap__workorder_id
@@ -3150,7 +3149,7 @@ msgstr "Date planifiée"
 #. module: mrp
 #: code:addons/mrp/models/mrp_workorder.py:0
 #, python-format
-msgid "Planned at the same time than other workorder(s) at %s"
+msgid "Planned at the same time as other workorder(s) at %s"
 msgstr ""
 
 #. module: mrp
@@ -3208,7 +3207,7 @@ msgstr "Pré-fabrication"
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.res_config_settings_view_form
 msgid ""
-"Prevent manufacturing users to modify quantities to consume, unless a "
+"Prevent manufacturing users from modifying quantities to consume, unless a "
 "manager has unlocked the document"
 msgstr ""
 
@@ -3708,13 +3707,14 @@ msgstr "Date de démarrage planifiée"
 msgid ""
 "Scheduled before the previous work order, planned from %(start)s to %(end)s"
 msgstr ""
+"Planifié avant le bon de travail précédent, planifié du %(start)s au %(end)s"
 
 #. module: mrp
 #. openerp-web
 #: code:addons/mrp/static/src/js/mrp_workorder_popover.js:0
 #, python-format
 msgid "Scheduling Information"
-msgstr ""
+msgstr "Informations de planification "
 
 #. module: mrp
 #: code:addons/mrp/models/mrp_production.py:0
@@ -4029,7 +4029,7 @@ msgstr "Mouvements de stocks"
 #. module: mrp
 #: model:ir.model,name:mrp.model_report_stock_report_product_product_replenishment
 msgid "Stock Replenishment Report"
-msgstr ""
+msgstr "Rapport de Réapprovisionnements de Stock"
 
 #. module: mrp
 #: model:ir.model,name:mrp.model_stock_rule
@@ -4207,7 +4207,7 @@ msgstr "L'objet de la base de données auquel cette pièce-jointe sera liée."
 #: code:addons/mrp/models/stock_orderpoint.py:0
 #, python-format
 msgid "The following replenishment order has been generated"
-msgstr ""
+msgstr "La commande de  réapprovisionnement suivante a été générée"
 
 #. module: mrp
 #: model:ir.model.fields,help:mrp.field_mrp_workorder__qty_produced
@@ -4277,7 +4277,7 @@ msgstr ""
 #: code:addons/mrp/models/mrp_workorder.py:0
 #, python-format
 msgid "The work order should have already been processed."
-msgstr ""
+msgstr "L'ordre de fabrication devrait déjà avoir été traité."
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_document__theme_template_id
@@ -4500,7 +4500,7 @@ msgstr "Total ordres en cours"
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.view_stock_move_operations_raw
 msgid "Total To Consume"
-msgstr ""
+msgstr "Total A Consommer"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_production_workorder_form_view_inherit
@@ -5220,6 +5220,15 @@ msgid ""
 "                            <span attrs=\"{'invisible':[('mrp_production_count', '=', 1)]}\">these manufacturing orders</span>.\n"
 "                        </b>"
 msgstr ""
+"Vous avez consommé une quantité différente de celle prévue pour les produits suivants.\n"
+"<b attrs=\"{'invisible': [('consumption', '=', 'strict')]}\">\n"
+" Merci de confirmer le changement.\n"
+"</b>\n"
+"<b attrs=\"{'invisible': [('consumption', '!=', 'strict')]}\">\n"
+"Veuillez vérifier la consommation de vos composants ou demander à un responsable de valider \n"
+"<span attrs=\"{'invisible':[('mrp_production_count', '!=', 1)]}\">cet ordre de fabrication</span>\n"
+"<span attrs=\"{'invisible':[('mrp_production_count', '=', 1)]}\">ces ordres de fabrication</span>.\n"
+"</b>"
 
 #. module: mrp
 #: code:addons/mrp/wizard/change_production_qty.py:0

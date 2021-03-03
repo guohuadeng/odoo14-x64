@@ -13,6 +13,7 @@
 # Martin Trigaux, 2020
 # Pernille Kristensen <pernillekristensen1994@gmail.com>, 2020
 # Sanne Kristensen <sanne@vkdata.dk>, 2020
+# Mads Søndergaard <mads@vkdata.dk>, 2020
 # 
 msgid ""
 msgstr ""
@@ -20,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-09-29 13:46+0000\n"
 "PO-Revision-Date: 2020-09-07 08:18+0000\n"
-"Last-Translator: Sanne Kristensen <sanne@vkdata.dk>, 2020\n"
+"Last-Translator: Mads Søndergaard <mads@vkdata.dk>, 2020\n"
 "Language-Team: Danish (https://www.transifex.com/odoo/teams/41243/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -107,7 +108,7 @@ msgstr "Stor Flot Knap :)"
 #. module: sales_team
 #: model:ir.model,name:sales_team.model_crm_tag
 msgid "CRM Tag"
-msgstr ""
+msgstr "CRM Tag"
 
 #. module: sales_team
 #: code:addons/sales_team/models/crm_team.py:0
@@ -282,6 +283,8 @@ msgid ""
 "If set, this Sales Team will be used for sales and assignments related to "
 "this partner"
 msgstr ""
+"Hvis angivet, vil dette salgshold bruges til salg og tildelinger relateret "
+"til denne partner"
 
 #. module: sales_team
 #: model:ir.model.fields,help:sales_team.field_crm_team__active
@@ -500,6 +503,8 @@ msgid ""
 "Use Sales Teams to organize your sales departments.\n"
 "                Each team will work with a separate pipeline."
 msgstr ""
+"Brug Salgshold til at organisere dine salgsafdelinger.\n"
+"                 Hvert hold vil arbejde med separate pipelines."
 
 #. module: sales_team
 #: model:ir.model.fields,field_description:sales_team.field_res_users__sale_team_id

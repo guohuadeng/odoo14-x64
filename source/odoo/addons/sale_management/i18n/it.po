@@ -7,15 +7,15 @@
 # Paolo Valier, 2020
 # Luigia Cimmino Caserta <lcc@odoo.com>, 2020
 # Léonie Bouchat <lbo@odoo.com>, 2020
-# Sergio Zanchetta <primes2h@gmail.com>, 2020
+# Sergio Zanchetta <primes2h@gmail.com>, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-10-29 15:48+0000\n"
 "PO-Revision-Date: 2020-09-07 08:18+0000\n"
-"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2020\n"
+"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2021\n"
 "Language-Team: Italian (https://www.transifex.com/odoo/teams/41243/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -160,7 +160,7 @@ msgstr "Creato il"
 #. module: sale_management
 #: model:ir.model.fields,field_description:sale_management.field_res_company__sale_order_template_id
 msgid "Default Sale Template"
-msgstr ""
+msgstr "Modello vendita predefinito"
 
 #. module: sale_management
 #: model:ir.model.fields,field_description:sale_management.field_res_config_settings__company_so_template_id
@@ -182,7 +182,7 @@ msgid ""
 "Design your quotation templates using building blocks<br/>\n"
 "                            <em attrs=\"{'invisible': [('module_sale_quotation_builder','=',False)]}\">Warning: this option will install the Website app.</em>"
 msgstr ""
-"Progetta i modelli di preventivo utilizzando i blocchi<br/>\n"
+"Progetta modelli di preventivo utilizzando componenti<br/>\n"
 "                            <em attrs=\"{'invisible': [('module_sale_quotation_builder','=',False)]}\">Avvertenza: questa opzione installa l'applicazione sito web.</em>"
 
 #. module: sale_management
@@ -218,7 +218,7 @@ msgstr "Nome visualizzato"
 #. module: sale_management
 #: model:ir.model.fields,field_description:sale_management.field_sale_order_template_line__display_type
 msgid "Display Type"
-msgstr "Tipo visualizzato"
+msgstr "Tipo di visualizzazione"
 
 #. module: sale_management
 #: code:addons/sale_management/models/digest.py:0
@@ -244,12 +244,14 @@ msgstr ""
 #: model:ir.model.fields,help:sale_management.field_sale_order_option__sequence
 msgid "Gives the sequence order when displaying a list of optional products."
 msgstr ""
-"Fornisce l'ordine quando si visualizza una lista di prodotti opzionali."
+"Stabilisce l'ordine con cui visualizzare un elenco di prodotti opzionali."
 
 #. module: sale_management
 #: model:ir.model.fields,help:sale_management.field_sale_order_template_line__sequence
 msgid "Gives the sequence order when displaying a list of sale quote lines."
 msgstr ""
+"Stabilisce l'ordine con cui visualizzare un elenco righe di preventivo di "
+"vendita."
 
 #. module: sale_management
 #: model:ir.model.fields,field_description:sale_management.field_digest_digest__id
@@ -270,6 +272,8 @@ msgid ""
 "If unchecked, it will allow you to hide the quotation template without "
 "removing it."
 msgstr ""
+"Se non selezionata, consente di nascondere la modello di preventivo senza "
+"rimuoverlo."
 
 #. module: sale_management
 #: model:ir.model.fields,field_description:sale_management.field_digest_digest__kpi_all_sale_total_value
@@ -368,7 +372,7 @@ msgstr "Opzioni"
 #. module: sale_management
 #: model:ir.model.fields,field_description:sale_management.field_sale_order_option__is_present
 msgid "Present on Quotation"
-msgstr ""
+msgstr "Presente nel preventivo"
 
 #. module: sale_management
 #: model:ir.model.fields,field_description:sale_management.field_sale_order_option__product_id
@@ -460,7 +464,7 @@ msgid ""
 "Request a online signature to the customer in order to confirm orders "
 "automatically."
 msgstr ""
-"Chiedi una firma online al cliente per confermare automaticamente gli "
+"Richiede al cliente una firma online per confermare automaticamente gli "
 "ordini."
 
 #. module: sale_management
@@ -469,7 +473,7 @@ msgid ""
 "Request an online payment to the customer in order to confirm orders "
 "automatically."
 msgstr ""
-"Chiedi un pagamento online al cliente per confermare automaticamente gli "
+"Richiede al cliente un pagamento online per confermare automaticamente gli "
 "ordini."
 
 #. module: sale_management
@@ -495,7 +499,7 @@ msgstr "Riga ordine di vendita"
 #. module: sale_management
 #: model:ir.model.fields,field_description:sale_management.field_sale_order_option__order_id
 msgid "Sales Order Reference"
-msgstr ""
+msgstr "Riferimento ordine di vendita"
 
 #. module: sale_management
 #: model_terms:ir.ui.view,arch_db:sale_management.sale_order_form_quote

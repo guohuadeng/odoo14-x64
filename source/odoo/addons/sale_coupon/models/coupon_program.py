@@ -83,7 +83,7 @@ class CouponProgram(models.Model):
             untaxed_amount = order_amount['amount_untaxed'] - sum(line.price_subtotal for line in lines)
             tax_amount = order_amount['amount_tax'] - sum(line.price_tax for line in lines)
             program_amount = program._compute_program_amount('rule_minimum_amount', order.currency_id)
-            if program.rule_minimum_amount_tax_inclusion == 'tax_included' and program_amount <= (untaxed_amount + tax_amount) or program.rule_minimum_amount_tax_inclusion == 'tax_excluded' and program_amount <= untaxed_amount:
+            if program.rule_minimum_amount_tax_inclusion == 'tax_included' and program_amount <= (untaxed_amount + tax_amount) or program_amount <= untaxed_amount:
                 program_ids.append(program.id)
 
         return self.browse(program_ids)
@@ -174,6 +174,11 @@ class CouponProgram(models.Model):
             # Checking if rewards are in the SO should not be performed for rewards on_next_order
             programs += programs_curr_order._filter_not_ordered_reward_programs(order)
         return programs
+
+    def _get_discount_product_values(self):
+        res = super()._get_discount_product_values()
+        res['invoice_policy'] = 'order'
+        return res
 
     def _is_global_discount_program(self):
         self.ensure_one()

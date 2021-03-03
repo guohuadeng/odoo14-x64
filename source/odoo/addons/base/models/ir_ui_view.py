@@ -692,7 +692,14 @@ actual arch.
     def inherit_branding(self, specs_tree):
         for node in specs_tree.iterchildren(tag=etree.Element):
             xpath = node.getroottree().getpath(node)
-            if node.tag == 'data' or node.tag == 'xpath' or node.get('position') or node.get('t-field'):
+            if node.tag == 'data' or node.tag == 'xpath' or node.get('position'):
+                self.inherit_branding(node)
+            elif node.get('t-field'):
+                # Note: 'data-oe-field-xpath' and not 'data-oe-xpath' as this
+                # was introduced as a fix. To avoid breaking customizations and
+                # to make a minimal diff fix, a separated attribute was used.
+                # TODO Try to use a common attribute in master (14.1).
+                node.set('data-oe-field-xpath', xpath)
                 self.inherit_branding(node)
             else:
                 node.set('data-oe-id', str(self.id))
@@ -1572,7 +1579,8 @@ actual arch.
 
     @api.model
     def read_template(self, xml_id):
-        """ Return a template content based on external id
+        """ This method is deprecated
+        Return a template content based on external id
         Read access on ir.ui.view required
         """
         template_id = self.get_view_id(xml_id)
@@ -1628,9 +1636,16 @@ actual arch.
         node_path = e.get('data-oe-xpath')
         if node_path is None:
             node_path = "%s/%s[%d]" % (parent_xpath, e.tag, index_map[e.tag])
-        if branding and not (e.get('data-oe-model') or e.get('t-field')):
-            e.attrib.update(branding)
-            e.set('data-oe-xpath', node_path)
+        if branding:
+            if e.get('t-field'):
+                # Note: 'data-oe-field-xpath' and not 'data-oe-xpath' as this
+                # was introduced as a fix. To avoid breaking customizations and
+                # to make a minimal diff fix, a separated attribute was used.
+                # TODO Try to use a common attribute in master (14.1).
+                e.set('data-oe-field-xpath', node_path)
+            elif not e.get('data-oe-model'):
+                e.attrib.update(branding)
+                e.set('data-oe-xpath', node_path)
         if not e.get('data-oe-model'):
             return
 
@@ -1649,7 +1664,7 @@ actual arch.
                 # running index by tag type, for XPath query generation
                 indexes = collections.defaultdict(lambda: 0)
                 for child in e.iterchildren(tag=etree.Element):
-                    if child.get('data-oe-xpath'):
+                    if child.get('data-oe-xpath') or child.get('data-oe-field-xpath'):
                         # injected by view inheritance, skip otherwise
                         # generated xpath is incorrect
                         # Also, if a node is known to have been replaced during applying xpath
@@ -1811,14 +1826,31 @@ actual arch.
             noupdate behavior on views having an ir.model.data.
         """
         if self.type == 'qweb':
-            # Update also specific views
             for cow_view in self._get_specific_views():
                 authorized_vals = {}
                 for key in values:
-                    if cow_view[key] == self[key]:
+                    if key != 'inherit_id' and cow_view[key] == self[key]:
                         authorized_vals[key] = values[key]
-                cow_view.write(authorized_vals)
+                # if inherit_id update, replicate change on cow view but
+                # only if that cow view inherit_id wasn't manually changed
+                inherit_id = values.get('inherit_id')
+                if inherit_id and self.inherit_id.id != inherit_id and \
+                   cow_view.inherit_id.key == self.inherit_id.key:
+                    self._load_records_write_on_cow(cow_view, inherit_id, authorized_vals)
+                else:
+                    cow_view.with_context(no_cow=True).write(authorized_vals)
         super(View, self)._load_records_write(values)
+
+    def _load_records_write_on_cow(self, cow_view, inherit_id, values):
+        # for modules updated before `website`, we need to
+        # store the change to replay later on cow views
+        if not hasattr(self.pool, 'website_views_to_adapt'):
+            self.pool.website_views_to_adapt = []
+        self.pool.website_views_to_adapt.append((
+            cow_view.id,
+            inherit_id,
+            values,
+        ))
 
 
 class ResetViewArchWizard(models.TransientModel):
@@ -1873,10 +1905,10 @@ class ResetViewArchWizard(models.TransientModel):
                 diff_to = view.view_id.arch_prev
                 diff_to_name = _("Previous Arch")
             elif view.reset_mode == 'other_view':
-                diff_to = view.compare_view_id.arch
+                diff_to = view.compare_view_id.with_context(lang=None).arch
                 diff_to_name = get_table_name(view.compare_view_id)
             elif view.reset_mode == 'hard' and view.view_id.arch_fs:
-                diff_to = view.view_id.with_context(read_arch_from_file=True).arch
+                diff_to = view.view_id.with_context(read_arch_from_file=True, lang=None).arch
                 diff_to_name = _("File Arch")
 
             view.arch_to_compare = diff_to
@@ -1885,11 +1917,12 @@ class ResetViewArchWizard(models.TransientModel):
                 view.arch_diff = False
                 view.has_diff = False
             else:
+                view_arch = view.view_id.with_context(lang=None).arch
                 view.arch_diff = get_diff(
-                    (view.view_id.arch, get_table_name(view.view_id) if view.reset_mode == 'other_view' else _("Current Arch")),
+                    (view_arch, get_table_name(view.view_id) if view.reset_mode == 'other_view' else _("Current Arch")),
                     (diff_to, diff_to_name),
                 )
-                view.has_diff = view.view_id.arch != diff_to
+                view.has_diff = view_arch != diff_to
 
     def reset_view_button(self):
         self.ensure_one()

@@ -414,6 +414,8 @@ class MrpProduction(models.Model):
 
     @api.depends('product_id', 'company_id')
     def _compute_production_location(self):
+        if not self.company_id:
+            return
         location_by_company = self.env['stock.location'].read_group([
             ('company_id', 'in', self.company_id.ids),
             ('usage', '=', 'production')
@@ -592,9 +594,9 @@ class MrpProduction(models.Model):
         self.move_finished_ids = [(2, move.id) for move in self.move_finished_ids]
         self.picking_type_id = self.bom_id.picking_type_id or self.picking_type_id
 
-    @api.onchange('date_planned_start')
+    @api.onchange('date_planned_start', 'product_id')
     def _onchange_date_planned_start(self):
-        if not self.is_planned:
+        if self.date_planned_start and not self.is_planned:
             date_planned_finished = self.date_planned_start + relativedelta(days=self.product_id.produce_delay)
             date_planned_finished = date_planned_finished + relativedelta(days=self.company_id.manufacturing_lead)
             if date_planned_finished == self.date_planned_start:
@@ -716,6 +718,8 @@ class MrpProduction(models.Model):
                     raise UserError(_('You cannot move a manufacturing order once it is cancelled or done.'))
                 if production.is_planned:
                     production.button_unplan()
+                    move_vals = self._get_move_finished_values(self.product_id, self.product_uom_qty, self.product_uom_id)
+                    production.move_finished_ids.write({'date': move_vals['date']})
             if vals.get('date_planned_start'):
                 production.move_raw_ids.write({'date': production.date_planned_start, 'date_deadline': production.date_planned_start})
             if vals.get('date_planned_finished'):
@@ -1403,6 +1407,7 @@ class MrpProduction(models.Model):
                 for move in production.move_raw_ids | production.move_finished_ids:
                     if not move.additional:
                         qty_to_split = move.product_uom_qty - move.unit_factor * production.qty_producing
+                        qty_to_split = move.product_uom._compute_quantity(qty_to_split, move.product_id.uom_id, rounding_method='HALF-UP')
                         move_vals = move._split(qty_to_split)
                         if not move_vals:
                             continue
@@ -1413,12 +1418,14 @@ class MrpProduction(models.Model):
                         new_moves_vals.append(move_vals[0])
                 new_moves = self.env['stock.move'].create(new_moves_vals)
             backorders |= backorder_mo
-            for wo in backorder_mo.workorder_ids:
-                wo.qty_produced = 0
+            for old_wo, wo in zip(production.workorder_ids, backorder_mo.workorder_ids):
+                wo.qty_produced = max(old_wo.qty_produced - old_wo.qty_producing, 0)
                 if wo.product_tracking == 'serial':
                     wo.qty_producing = 1
                 else:
                     wo.qty_producing = wo.qty_remaining
+                if wo.qty_producing == 0:
+                    wo.action_cancel()
 
             production.name = self._get_name_backorder(production.name, production.backorder_sequence)
 
@@ -1548,8 +1555,7 @@ class MrpProduction(models.Model):
             order._check_sn_uniqueness()
 
     def do_unreserve(self):
-        for production in self:
-            production.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel'))._do_unreserve()
+        self.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel'))._do_unreserve()
         return True
 
     def button_unreserve(self):

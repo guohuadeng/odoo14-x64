@@ -3,21 +3,10 @@
 # 	* fleet
 # 
 # Translators:
-# Cristóbal Martí Oliver <info@moblesmarti.com>, 2020
-# VivianMontana23 <vivianpvm@gmail.com>, 2020
-# alexander oliva <artemio.org@gmail.com>, 2020
-# Oscar Soto <oscar.soto.ochoa@gmail.com>, 2020
-# Osiris Román <osiris.roman@yachaytech.edu.ec>, 2020
-# ES T2 <e2f48ds4f2ds1@outlook.com>, 2020
-# Pedro M. Baeza <pedro.baeza@gmail.com>, 2020
-# Luis M. Ontalba <luis.martinez@tecnativa.com>, 2020
-# Cristopher Cravioto <ccr@odoo.com>, 2020
-# Jon Perez <jop@odoo.com>, 2020
-# Mariana Santos Romo <msn@odoo.com>, 2020
-# Martin Trigaux, 2020
 # gabriumaa <gabriel.umana@delfixcr.com>, 2020
 # José Matias Zuazo <jose.zuazo@tpsistemas.com.ar>, 2020
 # Nicolás Broggi <rnbroggi@gmail.com>, 2020
+# Martin Trigaux, 2020
 # Jesús Alan Ramos Rodríguez <alan.ramos@jarsa.com.mx>, 2020
 # 
 msgid ""
@@ -198,7 +187,7 @@ msgstr "Archivado"
 #. module: fleet
 #: model:ir.model.fields,field_description:fleet.field_fleet_vehicle__next_assignation_date
 msgid "Assignment Date"
-msgstr ""
+msgstr "Fecha de asignación"
 
 #. module: fleet
 #: model:ir.model.fields,field_description:fleet.field_fleet_vehicle__log_drivers

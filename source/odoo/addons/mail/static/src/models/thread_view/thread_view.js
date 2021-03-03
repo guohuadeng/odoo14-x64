@@ -45,17 +45,8 @@ function factory(dependencies) {
          * @param {Object} hint
          */
         markComponentHintProcessed(hint) {
-            let filterFun;
-            switch (hint.type) {
-                case 'message-received':
-                    filterFun = h => h.type !== hint.type && h.message !== hint.data.message;
-                    break;
-                default:
-                    filterFun = h => h.type !== hint.type;
-                    break;
-            }
             this.update({
-                componentHintList: this.componentHintList.filter(filterFun),
+                componentHintList: this.componentHintList.filter(h => h !== hint),
             });
             this.env.messagingBus.trigger('o-thread-view-hint-processed', {
                 hint,
@@ -114,28 +105,45 @@ function factory(dependencies) {
          * @returns {boolean}
          */
         _computeThreadShouldBeSetAsSeen() {
-            // FIXME condition should not be on "composer is focused" but "threadView is active"
-            // See task-2277543
-            const lastMessageIsVisible = this.lastVisibleMessage &&
-                this.lastVisibleMessage === this.lastMessage;
-            if (lastMessageIsVisible && this.hasComposerFocus && this.thread) {
-                this.thread.markAsSeen(this.lastMessage.id).catch(e => {
-                    // prevent crash when executing compute during destroy
-                    if (!(e instanceof RecordDeletedError)) {
-                        throw e;
-                    }
-                });
+            if (!this.thread) {
+                return;
             }
+            if (!this.thread.lastNonTransientMessage) {
+                return;
+            }
+            if (!this.lastVisibleMessage) {
+                return;
+            }
+            if (this.lastVisibleMessage !== this.lastMessage) {
+                return;
+            }
+            if (!this.hasComposerFocus) {
+                // FIXME condition should not be on "composer is focused" but "threadView is active"
+                // See task-2277543
+                return;
+            }
+            this.thread.markAsSeen(this.thread.lastNonTransientMessage).catch(e => {
+                // prevent crash when executing compute during destroy
+                if (!(e instanceof RecordDeletedError)) {
+                    throw e;
+                }
+            });
         }
 
         /**
          * @private
          */
         _onThreadCacheChanged() {
+            // clear obsolete hints
+            this.update({ componentHintList: clear() });
             this.addComponentHint('change-of-thread-cache');
             if (this.threadCache) {
-                this.threadCache.update({ isCacheRefreshRequested: true });
+                this.threadCache.update({
+                    isCacheRefreshRequested: true,
+                    isMarkAllAsReadRequested: true,
+                });
             }
+            this.update({ lastVisibleMessage: [['unlink']] });
         }
 
         /**
@@ -224,17 +232,31 @@ function factory(dependencies) {
          * a new message. Detection of new message is done through the component
          * hint `message-received`.
          */
-        hasAutoScrollOnMessageReceived: attr(),
+        hasAutoScrollOnMessageReceived: attr({
+            default: true,
+        }),
+        /**
+         * Last message in the context of the currently displayed thread cache.
+         */
         lastMessage: many2one('mail.message', {
             related: 'thread.lastMessage',
         }),
         /**
+         * Serves as compute dependency.
+         */
+        lastNonTransientMessage: many2one('mail.message', {
+            related: 'thread.lastNonTransientMessage',
+        }),
+        /**
          * Most recent message in this ThreadView that has been shown to the
-         * current partner.
+         * current partner in the currently displayed thread cache.
          */
         lastVisibleMessage: many2one('mail.message'),
         messages: many2many('mail.message', {
             related: 'threadCache.messages',
+        }),
+        nonEmptyMessages: many2many('mail.message', {
+            related: 'threadCache.nonEmptyMessages',
         }),
         /**
          * Not a real field, used to trigger `_onThreadCacheChanged` when one of
@@ -322,6 +344,7 @@ function factory(dependencies) {
             dependencies: [
                 'hasComposerFocus',
                 'lastMessage',
+                'lastNonTransientMessage',
                 'lastVisibleMessage',
                 'threadCache',
             ],

@@ -5,7 +5,7 @@
 # Translators:
 # Shark McGnark <peculiarcheese@gmail.com>, 2020
 # Fernanda Marques <fem@odoo.com>, 2020
-# Florian Laboureix <fll@odoo.com>, 2020
+# Florian <fll@odoo.com>, 2020
 # 6534c450c77b2549e41c52e2051f5839, 2020
 # Florian Hatat, 2020
 # Jérôme Tanché <jerome.tanche@ouest-dsi.fr>, 2020
@@ -14,7 +14,6 @@
 # Xavier Belmere <Info@cartmeleon.com>, 2020
 # Aurélien Pillevesse <aurelienpillevesse@hotmail.fr>, 2020
 # Eloïse Stilmant <est@odoo.com>, 2020
-# Cécile Collart <cco@odoo.com>, 2020
 # Léonie Bouchat <lbo@odoo.com>, 2020
 # Nathan Grognet <ngr@odoo.com>, 2020
 # Olivier ANDRE <frsw194@gmail.com>, 2020
@@ -26,14 +25,19 @@
 # Martin Trigaux, 2020
 # Frédéric LIETART <stuff@tifred.fr>, 2020
 # Clo <clo@odoo.com>, 2020
+# Arnaud Willem <contact@arnaud-willem.eu>, 2020
+# Cécile Collart <cco@odoo.com>, 2020
+# khalid chamakh <elbissat@gmail.com>, 2021
+# Sébastien BÜHL <buhlsebastien@gmail.com>, 2021
+# Cécile Perrez <cpe@odoo.com>, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-11-27 11:23+0000\n"
 "PO-Revision-Date: 2020-09-07 08:17+0000\n"
-"Last-Translator: Clo <clo@odoo.com>, 2020\n"
+"Last-Translator: Cécile Perrez <cpe@odoo.com>, 2021\n"
 "Language-Team: French (https://www.transifex.com/odoo/teams/41243/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -67,7 +71,7 @@ msgstr ""
 #: code:addons/project/static/src/js/project_task_kanban_examples.js:0
 #, python-format
 msgid "\"Today\""
-msgstr ""
+msgstr "\"Aujourd'hui\""
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_report_project_task_user__delay_endings_days
@@ -124,7 +128,7 @@ msgstr "10"
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_day__11
 #: model:ir.model.fields.selection,name:project.selection__project_task_recurrence__repeat_day__11
 msgid "11"
-msgstr ""
+msgstr "11"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_day__12
@@ -136,13 +140,13 @@ msgstr "12"
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_day__13
 #: model:ir.model.fields.selection,name:project.selection__project_task_recurrence__repeat_day__13
 msgid "13"
-msgstr ""
+msgstr "13"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_day__14
 #: model:ir.model.fields.selection,name:project.selection__project_task_recurrence__repeat_day__14
 msgid "14"
-msgstr ""
+msgstr "14"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_day__15
@@ -154,7 +158,7 @@ msgstr "15"
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_day__16
 #: model:ir.model.fields.selection,name:project.selection__project_task_recurrence__repeat_day__16
 msgid "16"
-msgstr ""
+msgstr "16"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_day__17
@@ -531,7 +535,7 @@ msgstr "État de l'Activité"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__activity_type_icon
 msgid "Activity Type Icon"
-msgstr ""
+msgstr "Icône de type d'activité"
 
 #. module: project
 #: model:ir.actions.act_window,name:project.mail_activity_type_action_config_project_types
@@ -612,6 +616,11 @@ msgstr ""
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__recurrence_update__all
 msgid "All tasks"
+msgstr ""
+
+#. module: project
+#: model:ir.model.fields,field_description:project.field_project_task__allow_subtasks
+msgid "Allow Sub-tasks"
 msgstr ""
 
 #. module: project
@@ -732,7 +741,7 @@ msgstr "Date d'attribution"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_report_project_task_user__date_assign
 msgid "Assignment Date"
-msgstr ""
+msgstr "Date d'affectation"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.task_type_edit
@@ -840,6 +849,8 @@ msgid ""
 "By saving this change, the customer email and phone number will also be "
 "updated."
 msgstr ""
+"En enregistrant cette modification, l'adresse E-mail et le numéro de "
+"téléphone du client seront également mis à jour."
 
 #. module: project
 #: code:addons/project/models/project.py:0
@@ -1066,7 +1077,7 @@ msgstr "Statut actuel de la tâche"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__alias_bounced_content
 msgid "Custom Bounced Message"
-msgstr ""
+msgstr "Message personnalisé"
 
 #. module: project
 #: code:addons/project/models/project.py:0
@@ -1215,15 +1226,11 @@ msgstr ""
 #: model:ir.model.fields,help:project.field_project_task__project_privacy_visibility
 msgid ""
 "Defines the visibility of the tasks of the project:\n"
-"- Invited employees: employees may only see the followed project and tasks.\n"
-"- All employees: employees may see all project and tasks.\n"
-"- Portal users and all employees: employees may see everything.   Portal users may see project and tasks followed by.\n"
+"- Invited internal users: employees may only see the followed project and tasks.\n"
+"- All internal users: employees may see all project and tasks.\n"
+"- Invited portal and all internal users: employees may see everything.   Portal users may see project and tasks followed by\n"
 "   them or by someone of their company."
 msgstr ""
-"Définie la visibilité des tâches du projet:\n"
-"- Employés invités: les employés peuvent seulement voir les projets et tâches auxquels ils sont abonnés.\n"
-"- Tous les employés: les employés peuvent voir tous les projets et tâches.\n"
-"- Utilisateurs portail et tous les employés: les employés peuvent tout voir. Les utilisateurs portail peuvent voir les projets et tâches auxquels ils (ou quelqu'un de leur société) sont abonnés.  "
 
 #. module: project
 #: model:ir.actions.server,name:project.unlink_project_action
@@ -2086,8 +2093,8 @@ msgstr "Pièces jointes principales"
 #, python-format
 msgid ""
 "Manage the lifecycle of your project using the kanban view. Add newly "
-"acquired project, assign them and use the %s and %s to define if the project"
-" is ready for the next step. %s"
+"acquired projects, assign them and use the %s and %s to define if the "
+"project is ready for the next step. %s"
 msgstr ""
 
 #. module: project
@@ -2530,9 +2537,11 @@ msgstr "Téléphone"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.res_config_settings_view_form
 msgid ""
-"Plan resource allocation accross projets and tasks, and estimate deadlines "
+"Plan resource allocation across projets and tasks, and estimate deadlines "
 "more accurately"
 msgstr ""
+"Planifiez l'allocation des ressources entre les projets et les tâches, et "
+"estimez les délais avec plus de précision"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_res_config_settings__module_project_forecast
@@ -4095,11 +4104,6 @@ msgstr "pour le projet:"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.portal_my_tasks
 msgid "in stage:"
-msgstr ""
-
-#. module: project
-#: model:ir.model.fields,field_description:project.field_project_task__allow_subtasks
-msgid "project.project"
 msgstr ""
 
 #. module: project

@@ -3,20 +3,11 @@
 # 	* maintenance
 # 
 # Translators:
-# Emilio Silva <efsilvay@gmail.com>, 2020
-# iaranburu <iaranburu@binovo.es>, 2020
-# Jon Perez <jop@odoo.com>, 2020
-# Mariana Santos Romo <msn@odoo.com>, 2020
-# VivianMontana23 <vivianpvm@gmail.com>, 2020
-# Jesse Garza <jga@odoo.com>, 2020
-# Osiris Román <osiris.roman@yachaytech.edu.ec>, 2020
-# Pedro M. Baeza <pedro.baeza@gmail.com>, 2020
-# Cristopher Cravioto <ccr@odoo.com>, 2020
 # e2f <projects@e2f.com>, 2020
-# Martin Trigaux, 2020
 # Antonio Trueba, 2020
 # RGB Consulting <odoo@rgbconsulting.com>, 2020
 # Nicolás Broggi <rnbroggi@gmail.com>, 2020
+# Martin Trigaux, 2020
 # Jesús Alan Ramos Rodríguez <alan.ramos@jarsa.com.mx>, 2020
 # 
 msgid ""
@@ -364,7 +355,7 @@ msgstr "Mantenimiento actual"
 #. module: maintenance
 #: model:ir.model.fields,field_description:maintenance.field_maintenance_equipment_category__alias_bounced_content
 msgid "Custom Bounced Message"
-msgstr ""
+msgstr "Mensaje rebotado personalizado"
 
 #. module: maintenance
 #: model:ir.ui.menu,name:maintenance.menu_m_dashboard
@@ -667,6 +658,8 @@ msgid ""
 "If set, this content will automatically be sent out to unauthorized users "
 "instead of the default message."
 msgstr ""
+"Si se configura, este contenido se enviará automáticamente a usuarios no "
+"autorizados en lugar del mensaje predeterminado."
 
 #. module: maintenance
 #: model:ir.model.fields.selection,name:maintenance.selection__maintenance_request__kanban_state__normal

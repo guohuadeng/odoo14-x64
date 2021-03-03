@@ -26,14 +26,15 @@
 # Keli Brugalli <kbr@odoo.com>, 2020
 # Rodrigo de Almeida Sottomaior Macedo <rmsolucoeseminformatica@protonmail.com>, 2020
 # grazziano <gra.negocia@gmail.com>, 2020
+# Éder Brito <britoederr@gmail.com>, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-11-27 15:41+0000\n"
 "PO-Revision-Date: 2020-09-07 08:20+0000\n"
-"Last-Translator: grazziano <gra.negocia@gmail.com>, 2020\n"
+"Last-Translator: Éder Brito <britoederr@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/odoo/teams/41243/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -60,12 +61,12 @@ msgstr "&lt;?xml version=\"1.0\" encoding=\"utf-8\"?&gt;"
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.blog_post_short
 msgid "' page header."
-msgstr ""
+msgstr "' cabeçalho da página."
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.date_selector
 msgid "-- All dates"
-msgstr ""
+msgstr "-- Todas as datas"
 
 #. module: website_blog
 #: model_terms:blog.post,content:website_blog.blog_post_6
@@ -76,6 +77,11 @@ msgid ""
 "they are more lightweight to carry to the country and use while you are "
 "there than a cumbersome telescope set up kit."
 msgstr ""
+"<b>Os binóculos são leves e portáteis</b> A menos que você tenha o luxo de "
+"montar e operar um observatório em seu deck, provavelmente irá viajar para "
+"realizar suas visualizações. Binóculos vão com você muito mais facilmente e "
+"são mais leves para transportar para o país e usar enquanto você estiver lá "
+"do que um kit de montagem de telescópio pesado"
 
 #. module: website_blog
 #. openerp-web
@@ -197,7 +203,7 @@ msgstr ""
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_sidebar_blog_index_follow_us
 msgid "<i class=\"fa fa-github text-github\" aria-label=\"Github\" title=\"Github\"/>"
-msgstr ""
+msgstr "<i class=\"fa fa-github text-github\" aria-label=\"Github\" title=\"Github\"/>"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_sidebar_blog_index_follow_us
@@ -205,6 +211,8 @@ msgid ""
 "<i class=\"fa fa-instagram text-instagram\" aria-label=\"Instagram\" "
 "title=\"Instagram\"/>"
 msgstr ""
+"<i class=\"fa fa-instagram text-instagram\" aria-label=\"Instagram\" "
+"title=\"Instagram\"/>"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_blog_post_share_links_display
@@ -213,6 +221,8 @@ msgid ""
 "<i class=\"fa fa-linkedin text-linkedin\" aria-label=\"LinkedIn\" "
 "title=\"LinkedIn\"/>"
 msgstr ""
+"<i class=\"fa fa-linkedin text-linkedin\" aria-label=\"LinkedIn\" "
+"title=\"LinkedIn\"/>"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_sidebar_blog_index_follow_us
@@ -224,6 +234,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_sidebar_blog_index_follow_us
 msgid "<i class=\"fa fa-twitter text-twitter\" aria-label=\"Twitter\" title=\"Twitter\"/>"
 msgstr ""
+"<i class=\"fa fa-twitter text-twitter\" aria-label=\"Twitter\" "
+"title=\"Twitter\"/>"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_sidebar_blog_index_follow_us
@@ -231,6 +243,8 @@ msgid ""
 "<i class=\"fa fa-youtube-play text-youtube\" aria-label=\"Youtube\" "
 "title=\"Youtube\"/>"
 msgstr ""
+"<i class=\"fa fa-youtube-play text-youtube\" aria-label=\"Youtube\" "
+"title=\"Youtube\"/>"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_blog_post_read_next
@@ -340,6 +354,22 @@ msgstr ""
 #. module: website_blog
 #: model_terms:blog.post,content:website_blog.blog_post_6
 msgid "Along those lines, how difficult is the set up and break down?"
+msgstr ""
+
+#. module: website_blog
+#. openerp-web
+#: code:addons/website_blog/static/src/js/website_blog.js:0
+#, python-format
+msgid "Amazing blog article: %s! Check it live: %s"
+msgstr ""
+
+#. module: website_blog
+#. openerp-web
+#: code:addons/website_blog/static/src/snippets/s_latest_posts/000.js:0
+#, python-format
+msgid ""
+"An error occured with this latest posts block. If the problem persists, "
+"please consider deleting it and adding a new one"
 msgstr ""
 
 #. module: website_blog
@@ -623,7 +653,7 @@ msgstr ""
 #. module: website_blog
 #: model:ir.model.fields,field_description:website_blog.field_blog_post__can_publish
 msgid "Can Publish"
-msgstr ""
+msgstr "Pode Publicar"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.s_latest_posts_options
@@ -651,6 +681,13 @@ msgstr ""
 #, python-format
 msgid "Choose an image from the library."
 msgstr "Escolha uma Imagem, da biblioteca."
+
+#. module: website_blog
+#. openerp-web
+#: code:addons/website_blog/static/src/js/tours/website_blog.js:0
+#, python-format
+msgid "Click here to add new content to your website."
+msgstr "Clique aqui para adicionar novo conteúdo ao seu site."
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.posts_loop
@@ -710,7 +747,7 @@ msgstr "Propriedades da Capa"
 #. module: website_blog
 #: model_terms:ir.actions.act_window,help:website_blog.action_blog_post
 msgid "Create a new blog post"
-msgstr ""
+msgstr "Crie uma nova postagem no blog"
 
 #. module: website_blog
 #: model:ir.model.fields,field_description:website_blog.field_blog_blog__create_uid
@@ -816,7 +853,7 @@ msgstr ""
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_sidebar_blog_index_follow_us
 msgid "Follow Us"
-msgstr ""
+msgstr "Siga-nos"
 
 #. module: website_blog
 #: model:ir.model.fields,field_description:website_blog.field_blog_blog__message_follower_ids
@@ -899,7 +936,7 @@ msgstr ""
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.s_latest_posts_options
 msgid "Horizontal"
-msgstr ""
+msgstr "Horizontal"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.s_latest_posts_options
@@ -996,7 +1033,7 @@ msgstr "É um seguidor"
 #: model:ir.model.fields,field_description:website_blog.field_blog_post__is_published
 #: model_terms:ir.ui.view,arch_db:website_blog.view_blog_post_list
 msgid "Is Published"
-msgstr ""
+msgstr "Está publicado"
 
 #. module: website_blog
 #: model_terms:blog.post,content:website_blog.blog_post_5
@@ -1259,6 +1296,13 @@ msgid "New tag"
 msgstr ""
 
 #. module: website_blog
+#. openerp-web
+#: code:addons/website_blog/static/src/snippets/s_latest_posts/000.js:0
+#, python-format
+msgid "No blog post was found. Make sure your posts are published."
+msgstr ""
+
+#. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.posts_loop
 msgid "No blog post yet."
 msgstr "Nenhum post de blog."
@@ -1429,7 +1473,7 @@ msgstr ""
 #. module: website_blog
 #: model:ir.model.fields,field_description:website_blog.field_blog_post__published_date
 msgid "Published Date"
-msgstr ""
+msgstr "Data Publicada"
 
 #. module: website_blog
 #: model:mail.message.subtype,description:website_blog.mt_blog_blog_published
@@ -1471,7 +1515,7 @@ msgstr "Restringir publicação a este site."
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.view_blog_post_form
 msgid "SEO"
-msgstr ""
+msgstr "SEO"
 
 #. module: website_blog
 #: model:ir.model.fields,field_description:website_blog.field_blog_blog__is_seo_optimized
@@ -1517,14 +1561,14 @@ msgstr ""
 #: code:addons/website_blog/static/src/js/tours/website_blog.js:0
 #, python-format
 msgid "Select this menu item to create a new blog post."
-msgstr "Selecione este item de menu para criar um novo post de blog."
+msgstr "Selecione este item de menu para criar uma nova postagem no blog."
 
 #. module: website_blog
 #: model:ir.model.fields,field_description:website_blog.field_blog_blog__seo_name
 #: model:ir.model.fields,field_description:website_blog.field_blog_post__seo_name
 #: model:ir.model.fields,field_description:website_blog.field_blog_tag__seo_name
 msgid "Seo name"
-msgstr ""
+msgstr "Nome Seo"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.view_blog_post_form
@@ -1549,17 +1593,17 @@ msgstr ""
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_blog_post_share_links_display
 msgid "Share on Facebook"
-msgstr ""
+msgstr "Compartilhar no Facebook"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_blog_post_share_links_display
 msgid "Share on LinkedIn"
-msgstr ""
+msgstr "Compartilhar no Linkedin"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_blog_post_share_links_display
 msgid "Share on Twitter"
-msgstr ""
+msgstr "Compartilhar no Twitter"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_blog_post_share_links_display
@@ -1792,6 +1836,12 @@ msgid ""
 "of your hobby. But how to buy a good telescope can be downright confusing "
 "and intimidating."
 msgstr ""
+"A próxima coisa que naturalmente queremos é um bom telescópio. Você pode ter"
+" visto um aquarista que está bem adiantado em seu estudo instalando aqueles "
+"telescópios de aparência muito legal em uma colina em algum lugar. Isso "
+"excita o astrônomo amador que existe em você, porque esse deve ser o próximo"
+" passo lógico no crescimento do seu hobby. Mas como comprar um bom "
+"telescópio pode ser totalmente confuso e intimidante."
 
 #. module: website_blog
 #: model_terms:blog.post,content:website_blog.blog_post_3
@@ -1925,6 +1975,15 @@ msgid ""
 "you can affix the binoculars to so you can study the moon in comfort and "
 "with a stable viewing platform."
 msgstr ""
+"Para aumentar ainda mais o nível, um bom par de binóculos pode fazer "
+"maravilhas pelos detalhes que você verá na superfície lunar. Para obter os "
+"melhores resultados, obtenha um bom campo amplo nas definições dos binóculos"
+" para que possa contemplar a paisagem lunar em toda a sua beleza. E porque é"
+" quase impossível manter os binóculos parados por muito tempo que você "
+"deseje contemplar este magnífico corpo no espaço, você pode querer adicionar"
+" ao seu arsenal de equipamentos um bom tripé onde você pode fixar os "
+"binóculos para que possa estude a lua com conforto e com uma plataforma de "
+"observação estável."
 
 #. module: website_blog
 #: model_terms:blog.post,content:website_blog.blog_post_7

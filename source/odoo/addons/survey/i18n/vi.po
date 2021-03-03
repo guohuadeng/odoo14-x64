@@ -10,15 +10,15 @@
 # Trinh Tran Thi Phuong <trinhttp@trobz.com>, 2020
 # Dung Nguyen Thi <dungnt@trobz.com>, 2020
 # Duy BQ <duybq86@gmail.com>, 2020
-# Nancy Momoland <thanhnguyen.icsc@gmail.com>, 2020
+# Nancy Momoland <thanhnguyen.icsc@gmail.com>, 2021
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:45+0000\n"
+"POT-Creation-Date: 2020-11-27 15:34+0000\n"
 "PO-Revision-Date: 2020-09-07 08:19+0000\n"
-"Last-Translator: Nancy Momoland <thanhnguyen.icsc@gmail.com>, 2020\n"
+"Last-Translator: Nancy Momoland <thanhnguyen.icsc@gmail.com>, 2021\n"
 "Language-Team: Vietnamese (https://www.transifex.com/odoo/teams/41243/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -78,11 +78,6 @@ msgstr ""
 #, python-format
 msgid "%s challenge certification"
 msgstr ""
-
-#. module: survey
-#: model_terms:ir.ui.view,arch_db:survey.survey_fill_form
-msgid "&amp;times;"
-msgstr "&amp;times;"
 
 #. module: survey
 #: model:ir.actions.report,print_report_name:survey.certification_report
@@ -405,7 +400,7 @@ msgstr ""
 
 #. module: survey
 #: model:survey.question,description:survey.survey_demo_quiz_p2
-msgid "<p>Some questions on our Company. Do you really know us ?</p>"
+msgid "<p>Some questions about our company. Do you really know us?</p>"
 msgstr ""
 
 #. module: survey
@@ -431,8 +426,8 @@ msgstr ""
 #. module: survey
 #: model:survey.question,description:survey.survey_feedback_p1
 msgid ""
-"<p>This section is about general informations about you. Answering them "
-"helps qualifying your answers.</p>"
+"<p>This section is about general information about you. Answering them helps"
+" qualifying your answers.</p>"
 msgstr ""
 
 #. module: survey
@@ -667,7 +662,7 @@ msgstr "Có vấn đề xảy ra"
 #. module: survey
 #: code:addons/survey/models/survey_user.py:0
 #, python-format
-msgid "A question is either skipped, either answered. Not both."
+msgid "A question can either be skipped or answered, not both."
 msgstr ""
 
 #. module: survey
@@ -849,7 +844,7 @@ msgstr ""
 
 #. module: survey
 #: model:ir.model.fields,help:survey.field_survey_question__triggering_answer_id
-msgid "Answer that will trigger the display the current question."
+msgid "Answer that will trigger the display of the current question."
 msgstr ""
 
 #. module: survey
@@ -1268,7 +1263,7 @@ msgstr ""
 
 #. module: survey
 #: model:gamification.badge,description:survey.vendor_certification_badge
-msgid "Congratulation, you are now official vendor of MyCompany"
+msgid "Congratulations, you are now official vendor of MyCompany"
 msgstr ""
 
 #. module: survey
@@ -1300,6 +1295,11 @@ msgstr "Nội dung"
 #: model_terms:ir.ui.view,arch_db:survey.survey_fill_form_in_progress
 msgid "Continue"
 msgstr "Tiếp tục"
+
+#. module: survey
+#: model_terms:ir.ui.view,arch_db:survey.survey_fill_form
+msgid "Continue here"
+msgstr ""
 
 #. module: survey
 #: model:survey.question.answer,value:survey.survey_demo_quiz_p3_q3_sug4
@@ -2150,7 +2150,7 @@ msgstr "Đang thực hiện"
 
 #. module: survey
 #: model:survey.question,title:survey.survey_demo_quiz_p4_q5
-msgid "In the list below, select all the corniferous."
+msgid "In the list below, select all the coniferous."
 msgstr ""
 
 #. module: survey
@@ -2337,7 +2337,7 @@ msgstr "Bố cục"
 #: model_terms:ir.ui.view,arch_db:survey.survey_page_statistics_inner
 #: model_terms:ir.ui.view,arch_db:survey.user_input_session_manage_content
 msgid "Leaderboard"
-msgstr ""
+msgstr "Bảng thành tích"
 
 #. module: survey
 #: model:survey.question.answer,value:survey.vendor_certification_page_1_question_3_choice_4
@@ -2481,7 +2481,7 @@ msgstr "Giá trị tối thiểu"
 #: code:addons/survey/models/survey_survey.py:0
 #, python-format
 msgid "Missed"
-msgstr ""
+msgstr "Bỏ lỡ"
 
 #. module: survey
 #: model:ir.model.fields.selection,name:survey.selection__survey_survey__certification_report_layout__modern_blue
@@ -2715,8 +2715,8 @@ msgstr "Câu trả lời kiểu số"
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.question_result_number_or_date
-msgid "Occurence"
-msgstr "Xuất hiện"
+msgid "Occurrence"
+msgstr ""
 
 #. module: survey
 #: model:survey.question.answer,value:survey.vendor_certification_page_2_question_2_choice_5
@@ -2895,7 +2895,7 @@ msgstr ""
 
 #. module: survey
 #: model:survey.question.answer,value:survey.survey_demo_quiz_p4_q1_sug1
-msgid "Pincaceae"
+msgid "Pinaceae"
 msgstr ""
 
 #. module: survey
@@ -3349,17 +3349,6 @@ msgstr ""
 #, python-format
 msgid "Some emails you just entered are incorrect: %s"
 msgstr ""
-
-#. module: survey
-#: model_terms:ir.ui.view,arch_db:survey.survey_fill_form
-msgid ""
-"Something went wrong while contacting survey server. <strong class=\"text-"
-"danger\">Your answers have probably not been recorded.</strong> Try "
-"refreshing."
-msgstr ""
-"Có lỗi gì đó khi giao tiếp với máy chủ khảo sát. <strong class=\"text-"
-"danger\">Các câu trả lời của bạn có thể chưa được ghi nhận.</strong> Hãy thử"
-" nạp lại trang."
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_page_statistics_header
@@ -4032,6 +4021,13 @@ msgid "Title"
 msgstr "Tiêu đề"
 
 #. module: survey
+#: model_terms:ir.ui.view,arch_db:survey.survey_fill_form
+msgid ""
+"To take this survey, please close all other tabs on <strong class=\"text-"
+"danger\"/>."
+msgstr ""
+
+#. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.survey_survey_view_search
 msgid "Today Activities"
 msgstr "Các oạt động hôm nay"
@@ -4278,11 +4274,6 @@ msgid "What is the biggest city in the world ?"
 msgstr ""
 
 #. module: survey
-#: model:survey.question,title:survey.survey_demo_burger_quiz_p2_q3
-msgid "What is the highest volcano in Europe ?"
-msgstr ""
-
-#. module: survey
 #: model:survey.question,title:survey.survey_demo_quiz_p1_q1
 msgid "What is your email ?"
 msgstr ""
@@ -4346,6 +4337,11 @@ msgstr ""
 #. module: survey
 #: model:survey.question,title:survey.survey_demo_quiz_p3_q1
 msgid "Which category does a tomato belong to"
+msgstr ""
+
+#. module: survey
+#: model:survey.question,title:survey.survey_demo_burger_quiz_p2_q3
+msgid "Which is the highest volcano in Europe ?"
 msgstr ""
 
 #. module: survey
@@ -4489,12 +4485,8 @@ msgstr ""
 
 #. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_classic
-msgid "for graduating from"
-msgstr ""
-
-#. module: survey
 #: model_terms:ir.ui.view,arch_db:survey.certification_report_view_modern
-msgid "for gratuating from"
+msgid "for graduating"
 msgstr ""
 
 #. module: survey

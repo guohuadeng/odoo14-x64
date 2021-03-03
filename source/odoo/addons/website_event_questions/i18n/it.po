@@ -3,18 +3,17 @@
 # 	* website_event_questions
 # 
 # Translators:
-# Lorenzo Battistini <lb@takobi.online>, 2020
-# Sergio Zanchetta <primes2h@gmail.com>, 2020
 # Léonie Bouchat <lbo@odoo.com>, 2020
 # Petra <bop@odoo.com>, 2020
+# Sergio Zanchetta <primes2h@gmail.com>, 2020
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-29 13:46+0000\n"
+"POT-Creation-Date: 2020-11-27 15:27+0000\n"
 "PO-Revision-Date: 2020-09-07 08:20+0000\n"
-"Last-Translator: Petra <bop@odoo.com>, 2020\n"
+"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2020\n"
 "Language-Team: Italian (https://www.transifex.com/odoo/teams/41243/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +34,7 @@ msgstr ""
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_question_answer__name
 msgid "Answer"
-msgstr "risposta"
+msgstr "Risposta"
 
 #. module: website_event_questions
 #: model:ir.actions.act_window,name:website_event_questions.action_event_registration_report
@@ -66,7 +65,7 @@ msgstr ""
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_registration_answer__partner_id
 msgid "Booked by"
-msgstr ""
+msgstr "Prenotato da"
 
 #. module: website_event_questions
 #: model:event.question.answer,name:website_event_questions.event_0_question_2_answer_1
@@ -76,7 +75,7 @@ msgstr ""
 #. module: website_event_questions
 #: model:event.question.answer,name:website_event_questions.event_7_question_0_answer_0
 msgid "Consumers"
-msgstr ""
+msgstr "Consumatori"
 
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_question__create_uid
@@ -218,7 +217,7 @@ msgstr ""
 
 #. module: website_event_questions
 #: model:event.question,title:website_event_questions.event_type_data_conference_question_0
-msgid "Participate to Social Event"
+msgid "Participate in Social Event"
 msgstr ""
 
 #. module: website_event_questions
@@ -238,7 +237,7 @@ msgstr "Domanda"
 #: model:ir.model.fields,field_description:website_event_questions.field_event_question__question_type
 #: model:ir.model.fields,field_description:website_event_questions.field_event_registration_answer__question_type
 msgid "Question Type"
-msgstr "Tipologia domanda"
+msgstr "Tipo di domanda"
 
 #. module: website_event_questions
 #: code:addons/website_event_questions/models/event_question.py:0
@@ -278,7 +277,7 @@ msgstr "Vendite"
 #. module: website_event_questions
 #: model_terms:ir.ui.view,arch_db:website_event_questions.event_registration_answer_view_tree
 msgid "Selected answer"
-msgstr ""
+msgstr "Risposta selezionata"
 
 #. module: website_event_questions
 #: model:ir.model.fields.selection,name:website_event_questions.selection__event_question__question_type__simple_choice
@@ -299,7 +298,7 @@ msgstr "Domande specifiche"
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_registration_answer__value_answer_id
 msgid "Suggested answer"
-msgstr "Risposta proposta"
+msgstr "Risposta suggerita"
 
 #. module: website_event_questions
 #: model:ir.model.fields.selection,name:website_event_questions.selection__event_question__question_type__text_box
@@ -309,7 +308,7 @@ msgstr ""
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_registration_answer__value_text_box
 msgid "Text answer"
-msgstr "Risposta con testo"
+msgstr "Risposta testuale"
 
 #. module: website_event_questions
 #: model:ir.model.constraint,message:website_event_questions.constraint_event_registration_answer_value_check
@@ -325,12 +324,12 @@ msgstr "Titolo"
 #: model_terms:ir.ui.view,arch_db:website_event_questions.event_event_view_form
 #: model_terms:ir.ui.view,arch_db:website_event_questions.event_registration_view_form_inherit_question
 msgid "Type"
-msgstr "Tipo"
+msgstr "Tipologia"
 
 #. module: website_event_questions
 #: model:event.question.answer,name:website_event_questions.event_0_question_0_answer_1
 msgid "Vegetarian"
-msgstr ""
+msgstr "Pizza vegetariana"
 
 #. module: website_event_questions
 #: model:event.question,title:website_event_questions.event_7_question_0

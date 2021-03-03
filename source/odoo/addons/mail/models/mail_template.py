@@ -61,7 +61,7 @@ class MailTemplate(models.Model):
     scheduled_date = fields.Char('Scheduled Date', help="If set, the queue manager will send the email after the date. If not set, the email will be send as soon as possible. Jinja2 placeholders may be used.")
     auto_delete = fields.Boolean(
         'Auto Delete', default=True,
-        help="This option permanently removes any track of email after send, including from the Technical menu in the Settings, in order to preserve storage space of your Odoo database.")
+        help="This option permanently removes any track of email after it's been sent, including from the Technical menu in the Settings, in order to preserve storage space of your Odoo database.")
     # contextual action
     ref_ir_act_window = fields.Many2one('ir.actions.act_window', 'Sidebar action', readonly=True, copy=False,
                                         help="Sidebar action to make this template available on records "
@@ -191,7 +191,7 @@ class MailTemplate(models.Model):
             if template.report_template:
                 for res_id in template_res_ids:
                     attachments = []
-                    report_name = self._render_field('report_name', [res_id])[res_id]
+                    report_name = template._render_field('report_name', [res_id])[res_id]
                     report = template.report_template
                     report_service = report.report_name
 

@@ -34,6 +34,8 @@ msgid ""
 "<i class=\"fa fa-fw mr-2 fa-calendar text-primary\"/>\n"
 "                    <b>Founded</b>"
 msgstr ""
+"<i class=\"fa fa-fw mr-2 fa-calendar text-primary\"/>\n"
+"                    <b>Fondazione</b>"
 
 #. module: iap_mail
 #: model_terms:ir.ui.view,arch_db:iap_mail.enrich_company
@@ -78,7 +80,7 @@ msgid ""
 "                    <b>Estimated revenue</b>"
 msgstr ""
 "<i class=\"fa fa-fw mr-2 fa-money text-primary\"/>\n"
-"                    <b>Ricavo stimato</b>"
+"                    <b>Entrata stimata</b>"
 
 #. module: iap_mail
 #: model_terms:ir.ui.view,arch_db:iap_mail.enrich_company

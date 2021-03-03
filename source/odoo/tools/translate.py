@@ -87,8 +87,8 @@ _LOCALE2WIN32 = {
     'sr_CS': 'Serbian (Cyrillic)_Serbia and Montenegro',
     'sk_SK': 'Slovak_Slovakia',
     'sl_SI': 'Slovenian_Slovenia',
-    # should find more specific locales for Spanish countries,
-    # but better than nothing
+    #should find more specific locales for Spanish countries,
+    #but better than nothing
     'es_AR': 'Spanish_Spain',
     'es_BO': 'Spanish_Spain',
     'es_CL': 'Spanish_Spain',
@@ -121,13 +121,11 @@ _LOCALE2WIN32 = {
 # These are not all English small words, just those that could potentially be isolated within views
 ENGLISH_SMALL_WORDS = set("as at by do go if in me no of ok on or to up us we".split())
 
+
 # these direct uses of CSV are ok.
-import csv  # pylint: disable=deprecated-module
-
-
+import csv # pylint: disable=deprecated-module
 class UNIX_LINE_TERMINATOR(csv.excel):
     lineterminator = '\n'
-
 
 csv.register_dialect("UNIX", UNIX_LINE_TERMINATOR)
 
@@ -136,7 +134,6 @@ csv.register_dialect("UNIX", UNIX_LINE_TERMINATOR)
 def encode(s):
     assert isinstance(s, str)
     return s
-
 
 # which elements are translated inline
 TRANSLATED_ELEMENTS = {
@@ -292,17 +289,13 @@ def translate_xml_node(node, callback, parse, serialize):
 def parse_xml(text):
     return etree.fromstring(text)
 
-
 def serialize_xml(node):
     return etree.tostring(node, method='xml', encoding='unicode')
 
-
 _HTML_PARSER = etree.HTMLParser(encoding='utf8')
-
 
 def parse_html(text):
     return html.fragment_fromstring(text, parser=_HTML_PARSER)
-
 
 def serialize_html(node):
     return etree.tostring(node, method='html', encoding='unicode')
@@ -325,7 +318,6 @@ def xml_translate(callback, value):
         result = translate_xml_node(root, callback, parse_xml, serialize_xml)
         # remove tags <div> and </div> from result
         return serialize_xml(result)[5:-6]
-
 
 def html_translate(callback, value):
     """ Translate an HTML value (string), using `callback` for translating text
@@ -351,8 +343,7 @@ def html_translate(callback, value):
 #
 def translate(cr, name, source_type, lang, source=None):
     if source and name:
-        cr.execute('select value from ir_translation where lang=%s and type=%s and name=%s and src=%s and md5(src)=md5(%s)',
-                   (lang, source_type, str(name), source, source))
+        cr.execute('select value from ir_translation where lang=%s and type=%s and name=%s and src=%s and md5(src)=md5(%s)', (lang, source_type, str(name), source, source))
     elif name:
         cr.execute('select value from ir_translation where lang=%s and type=%s and name=%s', (lang, source_type, str(name)))
     elif source:
@@ -360,7 +351,6 @@ def translate(cr, name, source_type, lang, source=None):
     res_trans = cr.fetchone()
     res = res_trans and res_trans[0] or False
     return res
-
 
 def translate_sql_constraint(cr, key, lang):
     cr.execute("""
@@ -376,7 +366,6 @@ def translate_sql_constraint(cr, key, lang):
         WHERE name=%s and type='u'
         """, (lang, key))
     return cr.fetchone()[0]
-
 
 class GettextAlias(object):
 
@@ -415,7 +404,7 @@ class GettextAlias(object):
         if 'uid' in frame.f_locals:
             return frame.f_locals['uid']
         if 'user' in frame.f_locals:
-            return int(frame.f_locals['user'])  # user may be a record
+            return int(frame.f_locals['user'])      # user may be a record
         s = frame.f_locals.get('self')
         return s.env.uid
 
@@ -494,7 +483,7 @@ class GettextAlias(object):
                 _logger.debug('no translation language detected, skipping translation for "%r" ', source)
         except Exception:
             _logger.debug('translation went wrong for "%r", skipped', source)
-            # if so, double-check the root/base translations filenames
+                # if so, double-check the root/base translations filenames
         finally:
             if cr and is_new_cr:
                 cr.close()
@@ -520,7 +509,6 @@ class _lt:
     """
 
     __slots__ = ['_source', '_args']
-
     def __init__(self, source, *args, **kwargs):
         self._source = source
         assert not (args and kwargs)
@@ -551,6 +539,21 @@ class _lt:
     def __lt__(self, other):
         raise NotImplementedError()
 
+    def __add__(self, other):
+        # Call _._get_translation() like _() does, so that we have the same number
+        # of stack frames calling _get_translation()
+        if isinstance(other, str):
+            return _._get_translation(self._source) + other
+        elif isinstance(other, _lt):
+            return _._get_translation(self._source) + _._get_translation(other._source)
+        return NotImplemented
+
+    def __radd__(self, other):
+        # Call _._get_translation() like _() does, so that we have the same number
+        # of stack frames calling _get_translation()
+        if isinstance(other, str):
+            return other + _._get_translation(self._source)
+        return NotImplemented
 
 _ = GettextAlias()
 
@@ -558,23 +561,19 @@ _ = GettextAlias()
 def quote(s):
     """Returns quoted PO term string, with special PO characters escaped"""
     assert r"\n" not in s, "Translation terms may not include escaped newlines ('\\n'), please use only literal newlines! (in '%s')" % s
-    return '"%s"' % s.replace('\\', '\\\\') \
-        .replace('"', '\\"') \
-        .replace('\n', '\\n"\n"')
-
+    return '"%s"' % s.replace('\\','\\\\') \
+                     .replace('"','\\"') \
+                     .replace('\n', '\\n"\n"')
 
 re_escaped_char = re.compile(r"(\\.)")
-re_escaped_replacements = {'n': '\n', 't': '\t', }
-
+re_escaped_replacements = {'n': '\n', 't': '\t',}
 
 def _sub_replacement(match_obj):
     return re_escaped_replacements.get(match_obj.group(1)[1], match_obj.group(1)[1])
 
-
 def unquote(str):
     """Returns unquoted PO term string, with special PO characters unescaped"""
     return re_escaped_char.sub(_sub_replacement, str[1:-1])
-
 
 def TranslationFileReader(source, fileformat='po'):
     """ Iterate over translation file to return Odoo translation entries """
@@ -584,7 +583,6 @@ def TranslationFileReader(source, fileformat='po'):
         return PoFileReader(source)
     _logger.info('Bad file format: %s', fileformat)
     raise Exception(_('Bad file format: %s', fileformat))
-
 
 class CSVFileReader:
     def __init__(self, source):
@@ -613,10 +611,8 @@ class CSVFileReader:
 
             yield entry
 
-
 class PoFileReader:
     """ Iterate over po file to return Odoo translation entries """
-
     def __init__(self, source):
 
         def get_pot_path(source_name):
@@ -660,13 +656,13 @@ class PoFileReader:
             translation = entry.msgstr
             found_code_occurrence = False
             for occurrence, line_number in entry.occurrences:
-                match = re.match(r'(model|model_terms):([\w.]+),([\w]+):(\w+)\.([\w-]+)', occurrence)
+                match = re.match(r'(model|model_terms):([\w.]+),([\w]+):(\w+)\.([^ ]+)', occurrence)
                 if match:
                     type, model_name, field_name, module, xmlid = match.groups()
                     yield {
                         'type': type,
                         'imd_model': model_name,
-                        'name': model_name + ',' + field_name,
+                        'name': model_name+','+field_name,
                         'imd_name': xmlid,
                         'res_id': None,
                         'src': source,
@@ -705,7 +701,6 @@ class PoFileReader:
                     continue
                 _logger.error("malformed po file: unknown occurrence: %s", occurrence)
 
-
 def TranslationFileWriter(target, fileformat='po', lang=None):
     """ Iterate over translation file to return Odoo translation entries """
     if fileformat == 'csv':
@@ -725,7 +720,8 @@ class CSVFileWriter:
     def __init__(self, target):
         self.writer = pycompat.csv_writer(target, dialect='UNIX')
         # write header first
-        self.writer.writerow(("module", "type", "name", "res_id", "src", "value", "comments"))
+        self.writer.writerow(("module","type","name","res_id","src","value","comments"))
+
 
     def write_rows(self, rows):
         for module, type, name, res_id, src, trad, comments in rows:
@@ -735,7 +731,6 @@ class CSVFileWriter:
 
 class PoFileWriter:
     """ Iterate over po file to return Odoo translation entries """
-
     def __init__(self, target, lang):
 
         self.buffer = target
@@ -765,8 +760,8 @@ class PoFileWriter:
 
         import odoo.release as release
         self.po.header = "Translation of %s.\n" \
-                         "This file contains the translation of the following modules:\n" \
-                         "%s" % (release.description, ''.join("\t* %s\n" % m for m in modules))
+                    "This file contains the translation of the following modules:\n" \
+                    "%s" % (release.description, ''.join("\t* %s\n" % m for m in modules))
         now = datetime.utcnow().strftime('%Y-%m-%d %H:%M+0000')
         self.po.metadata = {
             'Project-Id-Version': "%s %s" % (release.description, release.version),
@@ -841,7 +836,6 @@ class TarFileWriter:
 
         self.tar.close()
 
-
 # Methods to export the translation file
 def trans_export(lang, modules, buffer, format, cr):
     reader = TranslationModuleReader(cr, modules=modules, lang=lang)
@@ -899,9 +893,9 @@ def _extract_translatable_qweb_terms(element, callback):
     for el in element:
         if isinstance(el, SKIPPED_ELEMENT_TYPES): continue
         if (el.tag.lower() not in SKIPPED_ELEMENTS
-            and "t-js" not in el.attrib
-            and not ("t-jquery" in el.attrib and "t-operation" not in el.attrib)
-            and el.get("t-translation", '').strip() != "off"):
+                and "t-js" not in el.attrib
+                and not ("t-jquery" in el.attrib and "t-operation" not in el.attrib)
+                and el.get("t-translation", '').strip() != "off"):
 
             _push(callback, el.text, el.sourceline)
             # Do not export terms contained on the Component directive of OWL
@@ -934,14 +928,11 @@ def babel_extract_qweb(fileobj, keywords, comment_tags, options):
     :rtype: Iterable
     """
     result = []
-
     def handle_text(text, lineno):
         result.append((lineno, None, text, []))
-
     tree = etree.parse(fileobj)
     _extract_translatable_qweb_terms(tree.getroot(), handle_text)
     return result
-
 
 ImdInfo = namedtuple('ExternalId', ['name', 'model', 'res_id', 'module'])
 
@@ -970,6 +961,7 @@ class TranslationModuleReader:
 
         self._export_translatable_records()
         self._export_translatable_resources()
+
 
     def __iter__(self):
         """ Export ir.translation values for all retrieved records """
@@ -1035,7 +1027,7 @@ class TranslationModuleReader:
                 field_name = field.name
                 field_model = self.env.get(field.model)
                 if (field_model is None or not field_model._translate or
-                    field_name not in field_model._fields):
+                        field_name not in field_model._fields):
                     # the selection is linked to a model with _translate=False, remove it
                     records -= selection
         elif model == 'ir.model.fields':
@@ -1043,11 +1035,12 @@ class TranslationModuleReader:
                 field_name = field.name
                 field_model = self.env.get(field.model)
                 if (field_model is None or not field_model._translate or
-                    field_name not in field_model._fields):
+                        field_name not in field_model._fields):
                     # the field is linked to a model with _translate=False, remove it
                     records -= field
 
         return records
+
 
     def _export_translatable_records(self):
         """ Export translations of all translated records having an external id """
@@ -1094,7 +1087,7 @@ class TranslationModuleReader:
             if rec and path.startswith(mp) and dirname != mp:
                 path = path[len(mp):]
                 return path.split(os.path.sep)[0]
-        return 'base'  # files that are not in a module are considered as being in 'base' module
+        return 'base' # files that are not in a module are considered as being in 'base' module
 
     def _verified_module_filepaths(self, fname, path, root):
         fabsolutepath = join(root, fname)
@@ -1108,7 +1101,7 @@ class TranslationModuleReader:
         return None, None, None, None
 
     def _babel_extract_terms(self, fname, path, root, extract_method="python", trans_type='code',
-                             extra_comments=None, extract_keywords={'_': None}):
+                               extra_comments=None, extract_keywords={'_': None}):
 
         module, fabsolutepath, _, display_path = self._verified_module_filepaths(fname, path, root)
         if not module:
@@ -1124,7 +1117,7 @@ class TranslationModuleReader:
                 # Babel 1.3 yields lineno, message, comments, context
                 lineno, message, comments = extracted[:3]
                 self._push_translation(module, trans_type, display_path, lineno,
-                                       encode(message), comments + extra_comments)
+                                 encode(message), comments + extra_comments)
         except Exception:
             _logger.exception("Failed to extract terms from %s", fabsolutepath)
         finally:
@@ -1132,7 +1125,7 @@ class TranslationModuleReader:
 
     def _export_translatable_resources(self):
         """ Export translations for static terms
-
+        
         This will include:
         - the python strings marked with _() or _lt()
         - the javascript strings marked with _t() or _lt() inside static/src/js/
@@ -1153,17 +1146,17 @@ class TranslationModuleReader:
                 for fname in fnmatch.filter(files, '*.py'):
                     self._babel_extract_terms(fname, path, root,
                                               extract_keywords={'_': None, '_lt': None})
-                # Javascript source files in the static/src/js directory, rest is ignored (libs)
-                if fnmatch.fnmatch(root, '*/static/src/js*'):
+                if fnmatch.fnmatch(root, '*/static/src*'):
+                    # Javascript source files
                     for fname in fnmatch.filter(files, '*.js'):
                         self._babel_extract_terms(fname, path, root, 'javascript',
                                                   extra_comments=[WEB_TRANSLATION_COMMENT],
                                                   extract_keywords={'_t': None, '_lt': None})
-                # QWeb template files
-                if fnmatch.fnmatch(root, '*/static/src/xml*'):
+                    # QWeb template files
                     for fname in fnmatch.filter(files, '*.xml'):
                         self._babel_extract_terms(fname, path, root, 'odoo.tools.translate:babel_extract_qweb',
                                                   extra_comments=[WEB_TRANSLATION_COMMENT])
+
                 if not recursive:
                     # due to topdown, first iteration is in first level
                     break
@@ -1283,7 +1276,6 @@ def resetlocale():
     # locale.resetlocale is bugged with some locales.
     for ln in get_locales():
         try:
-            ln = ln[0:ln.index('.')]
             return locale.setlocale(locale.LC_ALL, ln)
         except locale.Error:
             continue

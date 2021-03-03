@@ -10,9 +10,9 @@ const components = {
     NotificationPopover: require('mail/static/src/components/notification_popover/notification_popover.js'),
     PartnerImStatusIcon: require('mail/static/src/components/partner_im_status_icon/partner_im_status_icon.js'),
 };
+const useShouldUpdateBasedOnProps = require('mail/static/src/component_hooks/use_should_update_based_on_props/use_should_update_based_on_props.js');
 const useStore = require('mail/static/src/component_hooks/use_store/use_store.js');
-const { markEventHandled } = require('mail/static/src/utils/utils.js');
-const { timeFromNow } = require('mail.utils');
+const useUpdate = require('mail/static/src/component_hooks/use_update/use_update.js');
 
 const { _lt } = require('web.core');
 const { getLangDatetimeFormat } = require('web.time');
@@ -22,6 +22,7 @@ const { useRef } = owl.hooks;
 
 const READ_MORE = _lt("read more");
 const READ_LESS = _lt("read less");
+const { isEventHandled, markEventHandled } = require('mail/static/src/utils/utils.js');
 
 class Message extends Component {
 
@@ -42,11 +43,8 @@ class Message extends Component {
              * clicked state, it keeps displaying the commands.
              */
             isClicked: false,
-            /**
-             * Time elapsed from message datetime to current datetime.
-             */
-            timeElapsed: null,
         });
+        useShouldUpdateBasedOnProps();
         useStore(props => {
             const message = this.env.models['mail.message'].get(props.messageLocalId);
             const author = message ? message.author : undefined;
@@ -54,35 +52,52 @@ class Message extends Component {
             const originThread = message ? message.originThread : undefined;
             const threadView = this.env.models['mail.thread_view'].get(props.threadViewLocalId);
             const thread = threadView ? threadView.thread : undefined;
-            const threadStringifiedDomain = threadView
-                ? threadView.stringifiedDomain
-                : undefined;
             return {
                 attachments: message
                     ? message.attachments.map(attachment => attachment.__state)
-                    : undefined,
-                author: author ? author.__state : undefined,
+                    : [],
+                author,
+                authorAvatarUrl: author && author.avatarUrl,
+                authorImStatus: author && author.im_status,
+                authorNameOrDisplayName: author && author.nameOrDisplayName,
+                correspondent: thread && thread.correspondent,
                 hasMessageCheckbox: message ? message.hasCheckbox : false,
                 isDeviceMobile: this.env.messaging.device.isMobile,
                 isMessageChecked: message && threadView
-                    ? message.isChecked(thread, threadStringifiedDomain)
+                    ? message.isChecked(thread, threadView.stringifiedDomain)
                     : false,
                 message: message ? message.__state : undefined,
                 notifications: message ? message.notifications.map(notif => notif.__state) : [],
-                originThread: originThread ? originThread.__state : undefined,
-                partnerRoot: partnerRoot ? partnerRoot.__state : undefined,
-                thread: thread ? thread.__state : undefined,
-                threadView: threadView ? threadView.__state : undefined,
+                originThread,
+                originThreadModel: originThread && originThread.model,
+                originThreadName: originThread && originThread.name,
+                originThreadUrl: originThread && originThread.url,
+                partnerRoot,
+                thread,
+                threadHasSeenIndicators: thread && thread.hasSeenIndicators,
+                threadMassMailing: thread && thread.mass_mailing,
             };
         }, {
             compareDepth: {
+                attachments: 1,
                 notifications: 1,
             },
         });
+        useUpdate({ func: () => this._update() });
         /**
          * The intent of the reply button depends on the last rendered state.
          */
         this._wasSelected;
+        /**
+         * Value of the last rendered prettyBody. Useful to compare to new value
+         * to decide if it has to be updated.
+         */
+        this._lastPrettyBody;
+        /**
+         * Reference to element containing the prettyBody. Useful to be able to
+         * replace prettyBody with new value in JS (which is faster than t-raw).
+         */
+        this._prettyBodyRef = useRef('prettyBody');
         /**
          * Reference to the content of the message.
          */
@@ -103,14 +118,6 @@ class Message extends Component {
      * Allows patching constructor.
      */
     _constructor() {}
-
-    mounted() {
-        this._update();
-    }
-
-    patched() {
-        this._update();
-    }
 
     willUnmount() {
         clearInterval(this._intervalId);
@@ -169,13 +176,6 @@ class Message extends Component {
     }
 
     /**
-     * @returns {mail.attachment[]}
-     */
-    get imageAttachments() {
-        return this.message.attachments.filter(attachment => attachment.fileType === 'image');
-    }
-
-    /**
      * Tell whether the bottom of this message is visible or not.
      *
      * @param {Object} param0
@@ -222,14 +222,6 @@ class Message extends Component {
     get message() {
         return this.env.models['mail.message'].get(this.props.messageLocalId);
     }
-
-    /**
-     * @returns {mail.attachment[]}
-     */
-    get nonImageAttachments() {
-        return this.message.attachments.filter(attachment => attachment.fileType !== 'image');
-    }
-
     /**
      * @returns {string}
      */
@@ -394,6 +386,13 @@ class Message extends Component {
      * @private
      */
     _update() {
+        if (!this.message) {
+            return;
+        }
+        if (this._prettyBodyRef.el && this.message.prettyBody !== this._lastPrettyBody) {
+            this._prettyBodyRef.el.innerHTML = this.message.prettyBody;
+            this._lastPrettyBody = this.message.prettyBody;
+        }
         // Remove all readmore before if any before reinsert them with _insertReadMoreLess.
         // This is needed because _insertReadMoreLess is working with direct DOM mutations
         // which are not sync with Owl.
@@ -402,14 +401,15 @@ class Message extends Component {
                 el.remove();
             }
             this._insertReadMoreLess($(this._contentRef.el));
+            this.env.messagingBus.trigger('o-component-message-read-more-less-inserted', {
+                message: this.message,
+            });
         }
         this._wasSelected = this.props.isSelected;
-        if (!this.state.timeElapsed) {
-            this.state.timeElapsed = timeFromNow(this.message.date);
-        }
+        this.message.refreshDateFromNow();
         clearInterval(this._intervalId);
         this._intervalId = setInterval(() => {
-            this.state.timeElapsed = timeFromNow(this.message.date);
+            this.message.refreshDateFromNow();
         }, 60 * 1000);
     }
 
@@ -449,7 +449,13 @@ class Message extends Component {
             }
             return;
         }
-        this.state.isClicked = !this.state.isClicked;
+        if (
+            !isEventHandled(ev, 'Message.ClickAuthorAvatar') &&
+            !isEventHandled(ev, 'Message.ClickAuthorName') &&
+            !isEventHandled(ev, 'Message.ClickFailure')
+        ) {
+            this.state.isClicked = !this.state.isClicked;
+        }
     }
 
     /**
@@ -457,10 +463,10 @@ class Message extends Component {
      * @param {MouseEvent} ev
      */
     _onClickAuthorAvatar(ev) {
+        markEventHandled(ev, 'Message.ClickAuthorAvatar');
         if (!this.hasAuthorOpenChat) {
             return;
         }
-        markEventHandled(ev, 'Message.authorOpenChat');
         this.message.author.openChat();
     }
 
@@ -469,10 +475,10 @@ class Message extends Component {
      * @param {MouseEvent} ev
      */
     _onClickAuthorName(ev) {
+        markEventHandled(ev, 'Message.ClickAuthorName');
         if (!this.message.author) {
             return;
         }
-        markEventHandled(ev, 'Message.authorOpenProfile');
         this.message.author.openProfile();
     }
 
@@ -481,6 +487,7 @@ class Message extends Component {
      * @param {MouseEvent} ev
      */
     _onClickFailure(ev) {
+        markEventHandled(ev, 'Message.ClickFailure');
         this.message.openResendAction();
     }
 
