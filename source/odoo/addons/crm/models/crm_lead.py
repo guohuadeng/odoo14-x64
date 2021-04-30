@@ -354,7 +354,15 @@ class Lead(models.Model):
     def _inverse_email_from(self):
         for lead in self:
             if lead.partner_id and lead.email_from != lead.partner_id.email:
-                lead.partner_id.email = lead.email_from
+                # force reset
+                if not lead.email_from or not lead.partner_id.email:
+                    lead.partner_id.email = lead.email_from
+                # compare formatted values as we may have formatting differences between equivalent email
+                else:
+                    lead_email_normalized = tools.email_normalize(lead.email_from)
+                    partner_email_normalized = tools.email_normalize(lead.partner_id.email)
+                    if lead_email_normalized != partner_email_normalized:
+                        lead.partner_id.email = lead.email_from
 
     @api.depends('partner_id.phone')
     def _compute_phone(self):
@@ -446,7 +454,10 @@ class Lead(models.Model):
     @api.depends('email_from', 'phone', 'partner_id')
     def _compute_ribbon_message(self):
         for lead in self:
-            will_write_email = lead.partner_id and lead.email_from != lead.partner_id.email
+            # beware: void user input gives '' which is different from False
+            lead_email_normalized = tools.email_normalize(lead.email_from) or (lead.email_from if lead.email_from else False)
+            partner_email_normalized = tools.email_normalize(lead.partner_id.email) or lead.partner_id.email
+            will_write_email = lead_email_normalized != partner_email_normalized if lead.partner_id else False
             will_write_phone = False
             if lead.partner_id and lead.phone != lead.partner_id.phone:
                 # if reset -> obviously new value will be propagated
@@ -482,7 +493,8 @@ class Lead(models.Model):
         # searching on +32485112233 should also finds 00485112233 (00 / + prefix are both valid)
         # we therefore remove it from input value and search for both of them in db
         if value.startswith('+') or value.startswith('00'):
-            value = value.replace('+', '').replace('00', '', 1)
+            if value.startswith('00'):
+                value = value[2:]
             starts_with = '00|\+'
         else:
             starts_with = '%'
@@ -1034,13 +1046,13 @@ class Lead(models.Model):
         self.ensure_one()
         for opportunity in opportunities:
             for message in opportunity.message_ids:
+                if message.subject:
+                    subject = _("From %(source_name)s : %(source_subject)s", source_name=opportunity.name, source_subject=message.subject)
+                else:
+                    subject = _("From %(source_name)s", source_name=opportunity.name)
                 message.write({
                     'res_id': self.id,
-                    'subject': _(
-                        "From %(source_name)s : %(source_subject)s",
-                        source_name=opportunity.name,
-                        source_subject=message.subject
-                    )
+                    'subject': subject,
                 })
         return True
 
@@ -1390,21 +1402,21 @@ class Lead(models.Model):
         """ Handle salesman recipients that can convert leads into opportunities
         and set opportunities as won / lost. """
         groups = super(Lead, self)._notify_get_groups(msg_vals=msg_vals)
-        msg_vals = msg_vals or {}
+        local_msg_vals = dict(msg_vals or {})
 
         self.ensure_one()
         if self.type == 'lead':
-            convert_action = self._notify_get_action_link('controller', controller='/lead/convert', **msg_vals)
+            convert_action = self._notify_get_action_link('controller', controller='/lead/convert', **local_msg_vals)
             salesman_actions = [{'url': convert_action, 'title': _('Convert to opportunity')}]
         else:
-            won_action = self._notify_get_action_link('controller', controller='/lead/case_mark_won', **msg_vals)
-            lost_action = self._notify_get_action_link('controller', controller='/lead/case_mark_lost', **msg_vals)
+            won_action = self._notify_get_action_link('controller', controller='/lead/case_mark_won', **local_msg_vals)
+            lost_action = self._notify_get_action_link('controller', controller='/lead/case_mark_lost', **local_msg_vals)
             salesman_actions = [
                 {'url': won_action, 'title': _('Won')},
                 {'url': lost_action, 'title': _('Lost')}]
 
         if self.team_id:
-            custom_params = dict(msg_vals, res_id=self.team_id.id, model=self.team_id._name)
+            custom_params = dict(local_msg_vals, res_id=self.team_id.id, model=self.team_id._name)
             salesman_actions.append({
                 'url': self._notify_get_action_link('view', **custom_params),
                 'title': _('Sales Team Settings')

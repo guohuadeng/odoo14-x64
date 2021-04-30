@@ -953,7 +953,7 @@ class TestStockValuation(SavepointCase):
         stock_return_picking_action = stock_return_picking.create_returns()
         return_pick = self.env['stock.picking'].browse(stock_return_picking_action['res_id'])
         return_pick.move_lines[0].move_line_ids[0].qty_done = 1.0
-        return_pick._action_done()
+        return_pick.with_user(self.inventory_user)._action_done()
 
         self.assertEqual(self.product1.standard_price, 16)
 
@@ -2486,6 +2486,37 @@ class TestStockValuation(SavepointCase):
 
         # increase the receipt to 15
         move1.move_line_ids.qty_done = 15
+
+    def test_average_stock_user(self):
+        """ deliver an average product as a stock user. """
+        self.product1.categ_id.property_cost_method = 'average'
+        # receive 10
+        move1 = self.env['stock.move'].create({
+            'name': 'IN 5@10',
+            'location_id': self.supplier_location.id,
+            'location_dest_id': self.stock_location.id,
+            'product_id': self.product1.id,
+            'product_uom': self.uom_unit.id,
+            'product_uom_qty': 10,
+            'price_unit': 10,
+        })
+        move1._action_confirm()
+        move1.quantity_done = 10
+        move1._action_done()
+
+        # sell 15
+        move2 = self.env['stock.move'].create({
+            'name': 'Deliver 10 units',
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'product_id': self.product1.id,
+            'product_uom': self.uom_unit.id,
+            'product_uom_qty': 15.0,
+        })
+        move2._action_confirm()
+        move2._action_assign()
+        move2.move_line_ids.qty_done = 15.0
+        move2.with_user(self.inventory_user)._action_done()
 
     def test_average_negative_1(self):
         """ Test edit in the past. Receive 10, send 20, edit the second move to only send 10.

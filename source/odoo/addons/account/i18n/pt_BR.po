@@ -6148,8 +6148,8 @@ msgid ""
 "If set, the amount computed by this tax will be assigned to the same "
 "analytic account as the invoice line (if any)"
 msgstr ""
-"Se definido, o montante calculado por este imposto será atribuído para a "
-"mesma conta analítica como a linha da fatura (se houver)"
+"Se definido, o montante calculado por este imposto será atribuído para o "
+"mesmo centro de custo como na linha da fatura (se houver)"
 
 #. module: account
 #: code:addons/account/models/account_tax_report.py:0
@@ -8721,6 +8721,12 @@ msgid "Original Bills"
 msgstr "Contas Originais"
 
 #. module: account
+#: model_terms:ir.ui.view,arch_db:account.view_move_line_tree
+#: model_terms:ir.ui.view,arch_db:account.view_move_line_tree_grouped
+msgid "Original Currency"
+msgstr "Moeda Original"
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__payment_id
 msgid "Originator Payment"
 msgstr "Pagamento Originador"
@@ -10651,7 +10657,7 @@ msgid ""
 "analytic default (e.g. create new customer invoice or Sales order if we "
 "select this account, it will automatically take this as an analytic account)"
 msgstr ""
-"Selecione uma conta contábil que usará a conta analítica especificada no "
+"Selecione uma conta contábil que usará o centro de custo especificada no "
 "padrão analítico (por exemplo, criar uma nova fatura do cliente ou pedido de"
 " venda se selecionarmos esta conta, será considerada automaticamente como "
 "uma conta analítica)"
@@ -12202,6 +12208,12 @@ msgstr ""
 " é para contas de fornecedor/cliente."
 
 #. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid "The Bill/Refund date is required to validate this document."
+msgstr "A data da Conta/Reembolso é obrigatória para validar este documento."
+
+#. module: account
 #: model:ir.model.fields,help:account.field_account_bank_statement__country_code
 #: model:ir.model.fields,help:account.field_account_bank_statement_line__country_code
 #: model:ir.model.fields,help:account.field_account_journal__country_code
@@ -12243,6 +12255,18 @@ msgstr ""
 #, python-format
 msgid "The account %s (%s) is deprecated."
 msgstr "A conta %s (%s) esta depreciada."
+
+#. module: account
+#: code:addons/account/models/account_account.py:0
+#, python-format
+msgid ""
+"This account is configured in %(journal_names)s journal(s) (ids "
+"%(journal_ids)s) as payment debit or credit account. This means that this "
+"account's type should be reconcilable."
+msgstr ""
+"A conta está configurada no diário %(journal_names)s (ids %(journal_ids)s) "
+"como débito de pagamento ou conta de crédito. Isto significa que este tipo "
+"de conta deve ser reconciliável."
 
 #. module: account
 #: code:addons/account/models/account_account.py:0
@@ -12557,6 +12581,15 @@ msgid ""
 msgstr ""
 "A(s) seguinte(s) fatura(s) não serão enviadas por email, porque os clientes "
 "não têm endereço de email."
+
+#. module: account
+#: code:addons/account/models/account_reconcile_model.py:0
+#, python-format
+msgid ""
+"The following regular expression is invalid to create a partner mapping: %s"
+msgstr ""
+"A seguinte expressão regular é inválida para criar um mapeamento de "
+"parceiro: %s"
 
 #. module: account
 #: code:addons/account/models/chart_template.py:0
@@ -14892,6 +14925,12 @@ msgstr ""
 #. module: account
 #: code:addons/account/models/account_move.py:0
 #, python-format
+msgid "The entry %s (id %s) is already posted."
+msgstr "A entrada %s (id %s) já foi lançada."
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
 msgid "You need to add a line before posting."
 msgstr "Você precisa adicionar uma linha antes de postar."
 
@@ -15089,6 +15128,18 @@ msgstr "campo técnico para o widget tax-group-custom-field"
 #: model:ir.model.fields,help:account.field_account_bank_statement__previous_statement_id
 msgid "technical field to compute starting balance correctly"
 msgstr "campo técnico para calcular o saldo inicial corretamente"
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid ""
+"The chosen journal has a type that is not compatible with your invoice type."
+" Sales operations should go to 'sale' journals, and purchase operations to "
+"'purchase' ones."
+msgstr ""
+"O diário escolhido possui um tipo que não é compatível com o seu tipo de "
+"fatura. As operações de vendas devem ir para os diários de 'venda' e as "
+"operações de compra, para os diários de 'compra'."
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_partner_property_form

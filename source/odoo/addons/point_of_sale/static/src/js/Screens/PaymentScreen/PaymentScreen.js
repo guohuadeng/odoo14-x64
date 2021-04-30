@@ -140,6 +140,15 @@ odoo.define('point_of_sale.PaymentScreen', function (require) {
             this.render();
         }
         async validateOrder(isForceValidate) {
+            if(this.env.pos.config.cash_rounding) {
+                if(!this.env.pos.get_order().check_paymentlines_rounding()) {
+                    this.showPopup('ErrorPopup', {
+                        title: this.env._t('Rounding error in payment lines'),
+                        body: this.env._t("The amount of your payment lines must be rounded to validate the transaction."),
+                    });
+                    return;
+                }
+            }
             if (await this._isOrderValid(isForceValidate)) {
                 // remove pending payments before finalizing the validation
                 for (let line of this.paymentLines) {
@@ -318,10 +327,11 @@ odoo.define('point_of_sale.PaymentScreen', function (require) {
         async _sendPaymentCancel({ detail: line }) {
             const payment_terminal = line.payment_method.payment_terminal;
             line.set_payment_status('waitingCancel');
-            try {
-                payment_terminal.send_payment_cancel(this.currentOrder, line.cid);
-            } finally {
+            const isCancelSuccessful = await payment_terminal.send_payment_cancel(this.currentOrder, line.cid);
+            if (isCancelSuccessful) {
                 line.set_payment_status('retry');
+            } else {
+                line.set_payment_status('waitingCard');
             }
         }
         async _sendPaymentReverse({ detail: line }) {

@@ -30,7 +30,7 @@ class Contract(models.Model):
         help="End date of the trial period (if there is one).")
     resource_calendar_id = fields.Many2one(
         'resource.calendar', 'Working Schedule', compute='_compute_employee_contract', store=True, readonly=False,
-        default=lambda self: self.env.company.resource_calendar_id.id, copy=False,
+        default=lambda self: self.env.company.resource_calendar_id.id, copy=False, index=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     wage = fields.Monetary('Wage', required=True, tracking=True, help="Employee's monthly gross wage.")
     notes = fields.Text('Notes')
@@ -200,7 +200,7 @@ class Contract(models.Model):
         if vals.get('state') == 'open':
             self._assign_open_contract()
         if vals.get('state') == 'close':
-            for contract in self:
+            for contract in self.filtered(lambda c: not c.date_end):
                 contract.date_end = max(date.today(), contract.date_start)
 
         calendar = vals.get('resource_calendar_id')

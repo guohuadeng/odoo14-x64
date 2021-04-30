@@ -11,9 +11,9 @@
 # Eric Geens <ericgeens@yahoo.com>, 2020
 # Cas Vissers <casvissers@brahoo.nl>, 2020
 # Martin Trigaux, 2020
-# Yenthe Van Ginneken <yenthespam@gmail.com>, 2020
 # Odoo Experts Consultants <consultants@odooexperts.nl>, 2020
-# Erwin van der Ploeg (Odoo Experts) <erwin@odooexperts.nl>, 2021
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2021
+# Yenthe Van Ginneken <yenthespam@gmail.com>, 2021
 # 
 msgid ""
 msgstr ""
@@ -21,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-04 15:13+0000\n"
 "PO-Revision-Date: 2020-09-07 08:20+0000\n"
-"Last-Translator: Erwin van der Ploeg (Odoo Experts) <erwin@odooexperts.nl>, 2021\n"
+"Last-Translator: Yenthe Van Ginneken <yenthespam@gmail.com>, 2021\n"
 "Language-Team: Dutch (https://www.transifex.com/odoo/teams/41243/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -409,12 +409,8 @@ msgstr "<b>Klik</b> op deze header om deze te configureren."
 #. openerp-web
 #: code:addons/website/static/src/js/tours/tour_utils.js:0
 #, python-format
-msgid ""
-"<b>Click</b> on this option to change the ${optionTooltipLabel} of the "
-"block."
-msgstr ""
-"<b>Klik</b> op deze optie om de ${optionTooltipLabel} van het blok te "
-"wijzigen."
+msgid "<b>Click</b> on this option to change the %s of the block."
+msgstr "<b>Klik</b> op deze optie om het blok %s te wijzigen."
 
 #. module: website
 #. openerp-web
@@ -478,8 +474,8 @@ msgstr ""
 #. openerp-web
 #: code:addons/website/static/src/js/tours/tour_utils.js:0
 #, python-format
-msgid "<b>Select</b> a ${optionTooltipLabel}."
-msgstr "<b>Selecteer</b> een ${optionTooltipLabel}."
+msgid "<b>Select</b> a %s."
+msgstr "<b>Selecteer</b> een %s."
 
 #. module: website
 #. openerp-web
@@ -492,8 +488,8 @@ msgstr "<b>Selecteer</b> een kleurenpalet."
 #. openerp-web
 #: code:addons/website/static/src/js/tours/tour_utils.js:0
 #, python-format
-msgid "<b>Slide</b> this button to change the ${direction} padding"
-msgstr "<b>Schuif</b> deze knop 1 om de padding ${direction} te wijzigen"
+msgid "<b>Slide</b> this button to change the %s padding"
+msgstr "<b>Schuif</b> deze knop om de opvulling van %s te wijzigen"
 
 #. module: website
 #. openerp-web
@@ -522,9 +518,9 @@ msgid ""
 "                    <code class=\"ml-4\">Allow: *</code>"
 msgstr ""
 "<br/><br/>\n"
-"                    Voorbeeld van regel:<br/>\n"
-"                    <code class=\"ml-4\">Niet toestaan: /web/login</code><br/>\n"
-"                    <code class=\"ml-4\">Toestaan: *</code>"
+"                    Voorbeeld van een regel:<br/>\n"
+"                    <code class=\"ml-4\">Disallow: /web/login</code><br/>\n"
+"                    <code class=\"ml-4\">Allow: *</code>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_carousel
@@ -1798,6 +1794,13 @@ msgstr "Kruimelpad"
 #: model_terms:ir.ui.view,arch_db:website.s_table_of_content
 msgid "Building blocks system"
 msgstr "Bouwblokkensysteem"
+
+#. module: website
+#. openerp-web
+#: code:addons/website/static/src/js/menu/new_content.js:0
+#, python-format
+msgid "Building your %s"
+msgstr "Uw %s wordt gemaakt"
 
 #. module: website
 #. openerp-web
@@ -3097,9 +3100,8 @@ msgstr "Sleep nog een blok in uw pagina, onder de cover."
 #: code:addons/website/static/src/js/tours/tour_utils.js:0
 #, python-format
 msgid ""
-"Drag the <b>${snippet.name}</b> building block and drop it in your page."
-msgstr ""
-"Sleep de bouwsteen <b>${snippet.name}</b> en zet deze neer op uw pagina."
+"Drag the <b>%s</b> building block and drop it at the bottom of your page."
+msgstr "Versleep de bouwsteen <b>%s</b> en zet deze onder aan uw pagina neer."
 
 #. module: website
 #. openerp-web
@@ -6582,6 +6584,11 @@ msgstr ""
 "paar klikken de perfecte foto te krijgen."
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.website_search_box
+msgid "Search..."
+msgstr "Zoek..."
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_features
 msgid "Second Feature"
 msgstr "Tweede optie"
@@ -6594,7 +6601,7 @@ msgstr "Tweede menu"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_showcase
 msgid "Second feature"
-msgstr "Mogelijkheid twee"
+msgstr "Functie twee"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_features_grid
@@ -9079,7 +9086,7 @@ msgstr "dagen"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_countdown_options
 msgid "e.g. /my-awesome-page"
-msgstr "bijvoorbeeld /my-awesome-page"
+msgstr "Bijv. /my-awesome-page"
 
 #. module: website
 #. openerp-web
@@ -9091,7 +9098,7 @@ msgstr "Bijv. Over ons"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_google_map_options
 msgid "e.g. De Brouckere, Brussels, Belgium"
-msgstr "b.v. De Brouckere, Brussel, België"
+msgstr "Bijv. De Brouckere, Brussel, België"
 
 #. module: website
 #: model:ir.ui.menu,name:website.menu_website_dashboard

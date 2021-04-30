@@ -11701,7 +11701,7 @@ msgstr "Automatische installatie vereist"
 #. module: base
 #: model:ir.module.module,summary:base.module_partner_autocomplete
 msgid "Auto-complete partner companies' data"
-msgstr "Gegevens van partnerbedrijven automatisch aanvullen"
+msgstr "Bedrijfsgegevens automatisch aanvullen"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_base_automation
@@ -23893,6 +23893,20 @@ msgstr ""
 "Modulebewerkingen zijn momenteel niet mogelijk. Probeer het later opnieuw of neem contact op met uw systeembeheerder."
 
 #. module: base
+#: code:addons/base/models/ir_actions_report.py:0
+#, python-format
+msgid ""
+"Odoo is unable to merge the PDFs attached to the following records:\n"
+"%s\n"
+"\n"
+"Please exclude them from the selection to continue. It's possible to still retrieve those PDFs by selecting each of the affected records individually, which will avoid merging."
+msgstr ""
+"Odoo is niet in staat de PDF's samen te voegen die bij de volgende records zijn gevoegd:\n"
+"%s\n"
+"\n"
+"Sluit ze uit van de selectie om door te gaan. Het is mogelijk om die pdf's nog steeds op te halen door elk van de betrokken records afzonderlijk te selecteren, waardoor samenvoeging wordt voorkomen."
+
+#. module: base
 #: model:ir.module.module,shortdesc:base.module_odoo_referral
 msgid "Odoo referral program"
 msgstr "Odoo verwijzingsprogramma"
@@ -28832,6 +28846,12 @@ msgid "The internal user in charge of this contact."
 msgstr "De interne gebruiker verantwoordelijk voor dit contract."
 
 #. module: base
+#: code:addons/base/models/res_country.py:106
+#, python-format
+msgid "The layout contains an invalid format key"
+msgstr "De lay-out bevat een ongeldige indelingssleutel"
+
+#. module: base
 #: model:ir.model.fields,help:base.field_ir_model__inherited_model_ids
 msgid "The list of models that extends the current model."
 msgstr "De lijst met modellen welke het huidige module uitbreiden"
@@ -29618,7 +29638,7 @@ msgstr "Titel"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_sequence_date_range__date_to
 msgid "To"
-msgstr "Aan"
+msgstr "T/m"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_todo__state__open
@@ -31845,7 +31865,7 @@ msgstr "en"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.res_partner_kanban_view
 msgid "at"
-msgstr "op"
+msgstr "bij"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_model_fields__ttype__binary
@@ -31918,7 +31938,7 @@ msgstr "Bijv. Engels"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "e.g. Mister"
-msgstr "bijvoorbeeld De heer"
+msgstr "Bijv. De heer"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form

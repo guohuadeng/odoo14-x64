@@ -172,5 +172,89 @@ QUnit.module('section_and_note: purchase_product_matrix', {
 
         form.destroy();
     });
+
+    QUnit.test('_onTemplateChange is executed after product template quick create', async function (assert) {
+        assert.expect(1);
+
+        let created_product_template;
+
+        const form = await createView({
+            View: FormView,
+            model: 'purchase_order',
+            data: this.data,
+            arch: `<form>
+                    <field name="order_line_ids" widget="section_and_note_one2many">
+                        <tree editable="bottom">
+                            <field name="product_template_id" widget="matrix_configurator"/>
+                        </tree>
+                    </field>
+                </form>`,
+            async mockRPC(route, args) {
+                if (route === '/web/dataset/call_kw/product.template/get_single_product_variant') {
+                    assert.strictEqual(args.args[0], created_product_template[0]);
+                }
+
+                const result = await this._super(...arguments);
+                if (args.method === 'name_create') {
+                    created_product_template = result;
+                }
+                return result;
+            },
+        });
+
+        await testUtils.dom.click('.o_field_x2many_list_row_add a');
+        await testUtils.fields.many2one.searchAndClickItem("product_template_id", {search: 'new product'});
+
+        form.destroy();
+    });
+
+    QUnit.test('drag and drop rows containing matrix_configurator many2one', async function (assert) {
+        assert.expect(4);
+
+        this.data.order_line.fields.sequence = {string: "Sequence", type: 'number'};
+        this.data.order_line.fields.order_id.relation = 'purchase_order';
+        this.data.purchase_order.records = [
+            {id: 1, order_line_ids: [1, 2]}
+        ];
+        this.data.order_line.records = [
+            {id: 1, sequence: 4, product_template_id: 1, order_id: 1},
+            {id: 2, sequence: 14, product_template_id: 2, order_id: 1},
+        ];
+        this.data.product.records.push(
+            {id: 1, name: "Chair"},
+            {id: 2, name: "Table"}
+        );
+
+        const form = await createView({
+            View: FormView,
+            model: 'purchase_order',
+            data: this.data,
+            arch: `<form>
+                    <field name="order_line_ids" widget="section_and_note_one2many">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="product_template_id" widget="matrix_configurator"/>
+                        </tree>
+                    </field>
+                </form>`,
+            res_id: 1,
+            viewOptions: {
+                mode: 'edit',
+            },
+        });
+
+        assert.containsN(form, '.o_data_row', 2);
+        assert.strictEqual(form.$('.o_data_row').text(), 'ChairTable');
+        assert.containsN(form, '.o_data_row .o_row_handle', 2);
+
+        // move first row below second
+        const $firstHandle = form.$('.o_data_row:nth(0) .o_row_handle');
+        const $secondHandle = form.$('.o_data_row:nth(1) .o_row_handle');
+        await testUtils.dom.dragAndDrop($firstHandle, $secondHandle);
+
+        assert.strictEqual(form.$('.o_data_row').text(), 'TableChair');
+
+        form.destroy();
+    });
 });
 });

@@ -274,7 +274,7 @@ msgstr "Opozorilo ob dostopu"
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_layout
 msgid "Account Security"
-msgstr ""
+msgstr "Varnost računa"
 
 #. module: portal
 #: model_terms:ir.ui.view,arch_db:portal.portal_share_wizard
@@ -692,7 +692,7 @@ msgstr "Odoo logotip"
 #: code:addons/portal/static/src/xml/portal_chatter.xml:0
 #, python-format
 msgid "Oops! Something went wrong. Try to reload the page and log in."
-msgstr ""
+msgstr "Nekaj je šlo narobe. Poskusite znova naložiti stran in se prijaviti."
 
 #. module: portal
 #. openerp-web

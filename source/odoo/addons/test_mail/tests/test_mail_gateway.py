@@ -397,6 +397,33 @@ class TestMailgateway(TestMailCommon):
         # Check if default (hardcoded) value is in the mail content
         self.assertSentEmail('"MAILER-DAEMON" <bounce.test@test.com>', ['whatever-2a840@postmaster.twitter.com'], body_content='The following email sent to')
 
+    @mute_logger('odoo.addons.mail.models.mail_thread', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink')
+    def test_message_process_alias_config_bounced_to(self):
+        """ Check bounce message contains the bouncing alias, not a generic "to" """
+        self.alias.write({'alias_contact': 'partners'})
+        bounce_message_with_alias = "The following email sent to %s cannot be accepted because this is a private email address." % self.alias.display_name.lower()
+
+        # Bounce is To
+        with self.mock_mail_gateway():
+            self.format_and_process(
+                MAIL_TEMPLATE, self.email_from, 'groups@example.com',
+                cc='other@gmail.com', subject='Should Bounce')
+        self.assertIn(bounce_message_with_alias, self._mails[0].get('body'))
+
+        # Bounce is CC
+        with self.mock_mail_gateway():
+            self.format_and_process(
+                MAIL_TEMPLATE, self.email_from, 'other@gmail.com',
+                cc='groups@example.com', subject='Should Bounce')
+        self.assertIn(bounce_message_with_alias, self._mails[0].get('body'))
+
+        # Bounce is part of To
+        with self.mock_mail_gateway():
+            self.format_and_process(
+                MAIL_TEMPLATE, self.email_from, 'other@gmail.com, groups@example.com',
+                subject='Should Bounce')
+        self.assertIn(bounce_message_with_alias, self._mails[0].get('body'))
+
     @mute_logger('odoo.addons.mail.models.mail_thread', 'odoo.models')
     def test_message_process_alias_defaults(self):
         """ Test alias defaults and inner values """
@@ -927,6 +954,27 @@ class TestMailgateway(TestMailCommon):
         self.format_and_process(
             MAIL_TEMPLATE, self.email_from, 'erroneous@test.com',
             extra='References: <2233@a.com>\r\n\t<3edss_dsa@b.com> %s' % self.fake_email.message_id)
+
+        self.assertEqual(len(self.test_record.message_ids), init_msg_count + 1)
+        self.assertEqual(self.fake_email.child_ids, self.test_record.message_ids[0])
+
+    @mute_logger('odoo.addons.mail.models.mail_thread')
+    def test_message_process_references_external_buggy_message_id(self):
+        """
+        Incoming email being a reply to an external email processed by
+        odoo should update thread accordingly. Special case when the
+        external mail service wrongly folds the message_id on several
+        lines.
+        """
+        new_message_id = '<ThisIsTooMuchFake.MonsterEmail.789@agrolait.com>'
+        buggy_message_id = new_message_id.replace('MonsterEmail', 'Monster\r\n  Email')
+        self.fake_email.write({
+            'message_id': new_message_id
+        })
+        init_msg_count = len(self.test_record.message_ids)
+        self.format_and_process(
+            MAIL_TEMPLATE, self.email_from, 'erroneous@test.com',
+            extra='References: <2233@a.com>\r\n\t<3edss_dsa@b.com> %s' % buggy_message_id)
 
         self.assertEqual(len(self.test_record.message_ids), init_msg_count + 1)
         self.assertEqual(self.fake_email.child_ids, self.test_record.message_ids[0])

@@ -111,7 +111,7 @@ class AccountMove(models.Model):
 
         # <2.2.1>
         for invoice_line in self.invoice_line_ids:
-            if len(invoice_line.tax_ids) != 1:
+            if not invoice_line.display_type and len(invoice_line.tax_ids) != 1:
                 raise UserError(_("You must select one and only one tax by line."))
 
         for tax_line in self.line_ids.filtered(lambda line: line.tax_line_id):
@@ -154,7 +154,7 @@ class AccountMove(models.Model):
         )
         return {'attachment': attachment}
 
-    def _export_as_xml(self):
+    def _prepare_fatturapa_export_values(self):
         ''' Create the xml file content.
         :return: The XML content as str.
         '''
@@ -228,11 +228,7 @@ class AccountMove(models.Model):
         for line in self.line_ids:
             for tax in line.tax_ids:
                 if tax.amount == 0.0:
-                    tax_amount = tax.compute_all(line.price_unit, currency=line.currency_id, quantity=line.quantity, product=line.product_id, partner=line.partner_id)
-                    if tax in tax_map:
-                        tax_map[tax] += tax_amount['total_excluded']
-                    else:
-                        tax_map[tax] = tax_amount['total_excluded']
+                    tax_map[tax] = tax_map.get(tax, 0.0) + line.price_subtotal
 
         # Create file content.
         template_values = {
@@ -253,6 +249,10 @@ class AccountMove(models.Model):
             'pdf_name': pdf_name,
             'tax_map': tax_map,
         }
+        return template_values
+
+    def _export_as_xml(self):
+        template_values = self._prepare_fatturapa_export_values()
         content = self.env.ref('l10n_it_edi.account_invoice_it_FatturaPA_export')._render(template_values)
         return content
 
@@ -260,7 +260,7 @@ class AccountMove(models.Model):
         # OVERRIDE
         posted = super()._post(soft=soft)
 
-        for move in posted.filtered(lambda m: m.l10n_it_send_state == 'to_send'):
+        for move in posted.filtered(lambda m: m.l10n_it_send_state == 'to_send' and m.move_type == 'out_invoice' and m.company_id.country_id.code == 'IT'):
             move.send_pec_mail()
 
         return posted

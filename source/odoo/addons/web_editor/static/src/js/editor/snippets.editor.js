@@ -833,18 +833,32 @@ var SnippetEditor = Widget.extend({
      * @param {OdooEvent} ev
      */
     _onSnippetOptionUpdate: async function (ev) {
-        const proms1 = Object.keys(this.styles).map(key => {
-            return this.styles[key].updateUI({
-                noVisibility: true,
+        if (ev.target === this) {
+            return;
+        }
+        ev.stopPropagation();
+        const updateOptionsUI = async () => {
+            const proms1 = Object.keys(this.styles).map(key => {
+                return this.styles[key].updateUI({
+                    noVisibility: true,
+                });
             });
-        });
-        await Promise.all(proms1);
+            await Promise.all(proms1);
 
-        const proms2 = Object.keys(this.styles).map(key => {
-            return this.styles[key].updateUIVisibility();
-        });
-        await Promise.all(proms2);
-
+            const proms2 = Object.keys(this.styles).map(key => {
+                return this.styles[key].updateUIVisibility();
+            });
+            await Promise.all(proms2);
+        };
+        // Wait for the current editor's option UI updates and the parent ones
+        await Promise.all([
+            updateOptionsUI(),
+            new Promise(resolve => {
+                this.trigger_up('snippet_option_update', Object.assign({}, ev.data, {
+                    onSuccess: () => resolve(),
+                }));
+            }),
+        ]);
         ev.data.onSuccess();
     },
     /**
@@ -917,6 +931,7 @@ var SnippetsMenu = Widget.extend({
         'snippet_editor_destroyed': '_onSnippetEditorDestroyed',
         'snippet_removed': '_onSnippetRemoved',
         'snippet_cloned': '_onSnippetCloned',
+        'snippet_option_update': '_onSnippetOptionUpdate',
         'snippet_option_visibility_update': '_onSnippetOptionVisibilityUpdate',
         'snippet_thumbnail_url_request': '_onSnippetThumbnailURLRequest',
         'reload_snippet_dropzones': '_disableUndroppableSnippets',
@@ -1477,18 +1492,20 @@ var SnippetsMenu = Widget.extend({
         if ($snippet && !$snippet.is(':visible')) {
             return;
         }
+        // Take the first parent of the provided DOM (or itself) which
+        // should have an associated snippet editor.
+        // It is important to do that before the mutex exec call to compute it
+        // before potential ancestor removal.
+        if ($snippet && $snippet.length) {
+            $snippet = globalSelector.closest($snippet);
+        }
         const exec = previewMode
             ? action => this._mutex.exec(action)
             : action => this._execWithLoadingEffect(action, false);
         return exec(() => {
             return new Promise(resolve => {
-                // Take the first parent of the provided DOM (or itself) which
-                // should have an associated snippet editor and create + enable it.
                 if ($snippet && $snippet.length) {
-                    $snippet = globalSelector.closest($snippet);
-                    if ($snippet.length) {
-                        return this._createSnippetEditor($snippet).then(resolve);
-                    }
+                    return this._createSnippetEditor($snippet).then(resolve);
                 }
                 resolve(null);
             }).then(editorToEnable => {
@@ -2444,7 +2461,7 @@ var SnippetsMenu = Widget.extend({
         new Dialog(this, {
             size: 'medium',
             title: _t('Confirmation'),
-            $content: $('<div><p>' + _t(`Are you sure you want to delete the snippet: ${$snippet.attr('name')} ?`) + '</p></div>'),
+            $content: $('<div><p>' + _.str.sprintf(_t("Are you sure you want to delete the snippet: %s ?"), $snippet.attr('name')) + '</p></div>'),
             buttons: [{
                 text: _t("Yes"),
                 close: true,
@@ -2604,6 +2621,14 @@ var SnippetsMenu = Widget.extend({
     _onSnippetRemoved: function () {
         this._disableUndroppableSnippets();
         this._updateInvisibleDOM();
+    },
+    /**
+     * @private
+     * @param {OdooEvent} ev
+     */
+    _onSnippetOptionUpdate: function (ev) {
+        ev.stopPropagation();
+        ev.data.onSuccess();
     },
     /**
      * @private

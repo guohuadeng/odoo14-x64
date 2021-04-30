@@ -21,7 +21,7 @@
 # 高木正勝 <masakatsu.takagi@pro-spire.co.jp>, 2020
 # Kohji Katayama <kohji.katayama@dreamyard.co.jp>, 2020
 # Norimichi Sugimoto <norimichi.sugimoto@tls-ltd.co.jp>, 2020
-# Yoshi Tashiro <tashiro@roomsfor.hk>, 2020
+# Yoshi Tashiro (Quartile) <tashiro@roomsfor.hk>, 2020
 # Ryoko Tsuda <ryoko@quartile.co>, 2020
 # Noma Yuki, 2020
 # Tsuda Ryoko <ryoko04nov@gmail.com>, 2021
@@ -8393,6 +8393,12 @@ msgid "Original Bills"
 msgstr "オリジナル手形"
 
 #. module: account
+#: model_terms:ir.ui.view,arch_db:account.view_move_line_tree
+#: model_terms:ir.ui.view,arch_db:account.view_move_line_tree_grouped
+msgid "Original Currency"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__payment_id
 msgid "Originator Payment"
 msgstr "オリジネーター支払い"
@@ -11714,6 +11720,12 @@ msgstr ""
 "Type'は、さまざまなタイプのアカウントで利用可能な機能に使用されます。流動性タイプは現金または銀行口座用であり、買掛金/売掛金はベンダー/顧客アカウント用です。"
 
 #. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid "The Bill/Refund date is required to validate this document."
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,help:account.field_account_bank_statement__country_code
 #: model:ir.model.fields,help:account.field_account_bank_statement_line__country_code
 #: model:ir.model.fields,help:account.field_account_journal__country_code
@@ -11751,6 +11763,15 @@ msgstr "アカウント%(account_name)s は複数のジャーナルの間で共�
 #, python-format
 msgid "The account %s (%s) is deprecated."
 msgstr "アカウント%s (%s) が廃止されました。"
+
+#. module: account
+#: code:addons/account/models/account_account.py:0
+#, python-format
+msgid ""
+"This account is configured in %(journal_names)s journal(s) (ids "
+"%(journal_ids)s) as payment debit or credit account. This means that this "
+"account's type should be reconcilable."
+msgstr ""
 
 #. module: account
 #: code:addons/account/models/account_account.py:0
@@ -12027,6 +12048,13 @@ msgid ""
 "The following invoice(s) will not be sent by email, because the customers "
 "don't have email address."
 msgstr "顧客が電子メールアドレスを持っていないので、次の請求書(複数可)は、電子メールで送信されません。"
+
+#. module: account
+#: code:addons/account/models/account_reconcile_model.py:0
+#, python-format
+msgid ""
+"The following regular expression is invalid to create a partner mapping: %s"
+msgstr ""
 
 #. module: account
 #: code:addons/account/models/chart_template.py:0
@@ -14121,6 +14149,12 @@ msgstr "キャッシュレジスターの仕訳に'内部振替口座'を定義�
 #. module: account
 #: code:addons/account/models/account_move.py:0
 #, python-format
+msgid "The entry %s (id %s) is already posted."
+msgstr ""
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
 msgid "You need to add a line before posting."
 msgstr "投稿前に行を追加する必要があります。"
 
@@ -14307,6 +14341,15 @@ msgstr "ウィジェットtax-group-custom-fieldのテクニカルフィール�
 #: model:ir.model.fields,help:account.field_account_bank_statement__previous_statement_id
 msgid "technical field to compute starting balance correctly"
 msgstr "開始残高を正しく計算するためのテクニカルフィールド"
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid ""
+"The chosen journal has a type that is not compatible with your invoice type."
+" Sales operations should go to 'sale' journals, and purchase operations to "
+"'purchase' ones."
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_partner_property_form

@@ -295,7 +295,7 @@ var FileWidget = SearchableMediaWidget.extend({
             domain.push(['name', 'ilike', needle]);
         }
         if (!this.options.useMediaLibrary) {
-            domain.push('!', ['url', '=ilike', '/web_editor/shape/%']);
+            domain.push('|', ['url', '=', false], '!', ['url', '=ilike', '/web_editor/shape/%']);
         }
         domain.push('!', ['name', '=like', '%.crop']);
         domain.push('|', ['type', '=', 'binary'], '!', ['url', '=like', '/%/static/%']);
@@ -444,7 +444,7 @@ var FileWidget = SearchableMediaWidget.extend({
             }
             href += 'unique=' + img.checksum + '&download=true';
             this.$media.attr('href', href);
-            this.$media.addClass('o_image').attr('title', img.name).attr('data-mimetype', img.mimetype);
+            this.$media.addClass('o_image').attr('title', img.name);
         }
 
         this.$media.attr('alt', img.alt || img.description || '');
@@ -457,6 +457,10 @@ var FileWidget = SearchableMediaWidget.extend({
         removeOnImageChangeAttrs.forEach(attr => {
             delete this.media.dataset[attr];
         });
+        // Add mimetype for documents
+        if (!img.image_src) {
+            this.media.dataset.mimetype = img.mimetype;
+        }
         this.media.classList.remove('o_modified_image_to_save');
         this.$media.trigger('image_changed');
         return this.media;
@@ -551,13 +555,18 @@ var FileWidget = SearchableMediaWidget.extend({
      * @private
      * @returns {Promise}
      */
-    _addData: function () {
+    async _addData() {
+        let files = this.$fileInput[0].files;
+        if (!files.length) {
+            // Case if the input is emptied, return resolved promise
+            return;
+        }
+
         var self = this;
         var uploadMutex = new concurrency.Mutex();
 
         // Upload the smallest file first to block the user the least possible.
-        var files = _.sortBy(this.$fileInput[0].files, 'size');
-
+        files = _.sortBy(files, 'size');
         _.each(files, function (file) {
             // Upload one file at a time: no need to parallel as upload is
             // limited by bandwidth.

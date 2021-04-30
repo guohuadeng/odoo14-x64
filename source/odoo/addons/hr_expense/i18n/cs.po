@@ -94,7 +94,7 @@ msgid ""
 "<p>The accountant receive approved expense reports.</p><p>He can post "
 "journal entries in one click if taxes and accounts are right.</p>"
 msgstr ""
-"<p>Účtovník dostáva schválené výkazy výdavkov.</p><p>Môže správne zaúčtovať "
+"<p>Účtovník dostáva schválené výkazy výdavkov.</p><p>Muže správne zaúčtovať "
 "vnitřní účetní doklady na jeden klik, ak sú dane a účty správne.</p>"
 
 #. module: hr_expense
@@ -258,7 +258,7 @@ msgstr "Analytický účet"
 #. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense__analytic_tag_ids
 msgid "Analytic Tags"
-msgstr "Analytické značky"
+msgstr "Střediska"
 
 #. module: hr_expense
 #: model_terms:ir.actions.act_window,help:hr_expense.hr_expense_actions_my_all
@@ -330,7 +330,7 @@ msgstr "Bankovní deník"
 #. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense__reference
 msgid "Bill Reference"
-msgstr "Referenčné číslo účtu"
+msgstr "Referenčné číslo faktury"
 
 #. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense_sheet__can_reset
@@ -1189,7 +1189,7 @@ msgstr ""
 #: code:addons/hr_expense/models/hr_expense.py:0
 #, python-format
 msgid "Only HR Officers or the concerned employee can reset to draft."
-msgstr "Pouze pracovníci HR nebo dotyčný zaměstnanec mohou obnovit koncept."
+msgstr "Pouze pracovníci HR nebo dotyčný zaměstnanec mohou obnovit návrh."
 
 #. module: hr_expense
 #: code:addons/hr_expense/models/hr_expense.py:0
@@ -1416,7 +1416,7 @@ msgstr "Měna společnosti"
 #. module: hr_expense
 #: model:ir.ui.menu,name:hr_expense.menu_hr_expense_reports
 msgid "Reporting"
-msgstr "Sestavy"
+msgstr "Přehledy"
 
 #. module: hr_expense
 #: model:ir.ui.menu,name:hr_expense.menu_hr_expense_sheet_all_to_approve
@@ -1436,7 +1436,7 @@ msgstr "Zprávy o výdajích za zveřejnění"
 #. module: hr_expense
 #: model_terms:ir.ui.view,arch_db:hr_expense.view_hr_expense_sheet_form
 msgid "Reset to Draft"
-msgstr "Nastavit na návrh"
+msgstr "Obnovit návrh"
 
 #. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_user_id

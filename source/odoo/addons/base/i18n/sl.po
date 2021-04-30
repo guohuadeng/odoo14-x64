@@ -943,6 +943,9 @@ msgid ""
 "       Auto-complete partner companies' data\n"
 "    "
 msgstr ""
+"\n"
+"       Samodejno dopolni podatke partnerskih podjetij\n"
+"    "
 
 #. module: base
 #: model:ir.module.module,summary:base.module_product_matrix
@@ -5719,6 +5722,8 @@ msgid ""
 "\n"
 "Time off documents will be automatically integrated to the Document app.\n"
 msgstr ""
+"\n"
+"Dokumenti odsotnosti bodo avtomatsko integrirani v dokumentarnem sistemu.\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_product_expiry
@@ -6573,6 +6578,14 @@ msgid ""
 "                                <b attrs=\"{'invisible': [('type', '!=', False)]}\">Address</b>\n"
 "                            </span>"
 msgstr ""
+"<span class=\"o_form_label o_td_label\" name=\"address_name\">\n"
+"                                <b attrs=\"{'invisible': [('type', '!=', 'contact')]}\">Naslov podjetja</b>\n"
+"                                <b attrs=\"{'invisible': [('type', '!=', 'invoice')]}\">Naslov za računI</b>\n"
+"                                <b attrs=\"{'invisible': [('type', '!=', 'delivery')]}\">Naslov za dostavo</b>\n"
+"                                <b attrs=\"{'invisible': [('type', '!=', 'other')]}\">Drugi naslov</b>\n"
+"                                <b attrs=\"{'invisible': [('type', '!=', 'private')]}\">Privatni naslov</b>\n"
+"                                <b attrs=\"{'invisible': [('type', '!=', False)]}\">Naslov</b>\n"
+"                            </span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_module_update
@@ -6779,6 +6792,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:base.view_users_form
 msgid "<strong>The contact linked to this user is still active</strong>"
 msgstr ""
+"<strong>Kontakt, ki je vezan na uporabnika, je še vedno aktiven</strong>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_module_upgrade
@@ -7259,7 +7273,7 @@ msgstr "Številka računa mora biti unikatna."
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_users_form_simple_modif
 msgid "Account Security"
-msgstr ""
+msgstr "Varnost računa"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_taxcloud
@@ -7973,7 +7987,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_hr_holidays
 msgid "Allocate time off and follow time off requests"
-msgstr ""
+msgstr "Dodelite odsotonosti in sledite zahtevam za odsotnost"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_helpdesk_fsm
@@ -8538,7 +8552,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_users_form_simple_modif
 msgid "Authentication"
-msgstr ""
+msgstr "Avtentikacija"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_auth_ldap
@@ -8570,7 +8584,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_partner_autocomplete
 msgid "Auto-complete partner companies' data"
-msgstr ""
+msgstr "Samodejno dopolni podatke partnerskih podjetij"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_base_automation
@@ -10233,7 +10247,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_sale_product_configurator
 msgid "Configure your products"
-msgstr ""
+msgstr "Konfigurirajte svoje izdelke"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_module_uninstall
@@ -10702,7 +10716,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "Create company"
-msgstr ""
+msgstr "Ustvari podjetje"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_crm_livechat
@@ -11970,7 +11984,7 @@ msgstr "Dokumenti - podpisi"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_documents_hr_holidays
 msgid "Documents - Time Off"
-msgstr ""
+msgstr "Dokumenti - Odsotnost"
 
 #. module: base
 #: model:ir.module.module,description:base.module_documents_spreadsheet
@@ -13023,7 +13037,7 @@ msgstr "Naziv polja"
 #: model:ir.module.category,name:base.module_category_services_field_service
 #: model:ir.module.module,shortdesc:base.module_industry_fsm
 msgid "Field Service"
-msgstr ""
+msgstr "Storitve na terenu"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_industry_fsm_forecast
@@ -14232,7 +14246,7 @@ msgstr "Pomaga pri upravljanju časovnic."
 #. module: base
 #: model:ir.module.category,description:base.module_category_user_type
 msgid "Helps you manage users."
-msgstr ""
+msgstr "Pomaga pri upravljanju uporabnikov."
 
 #. module: base
 #: model:ir.module.category,description:base.module_category_marketing_events
@@ -15090,7 +15104,7 @@ msgstr ""
 #. module: base
 #: model:ir.actions.act_window,name:base.res_partner_industry_action
 msgid "Industries"
-msgstr ""
+msgstr "Industrije"
 
 #. module: base
 #: model:ir.model,name:base.model_res_partner_industry
@@ -16183,7 +16197,7 @@ msgstr "Zadnja različica"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_users__login_date
 msgid "Latest authentication"
-msgstr ""
+msgstr "Zadnja avtentikacija"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__res_company__font__lato
@@ -16995,7 +17009,7 @@ msgstr "ManyToMany razmerja"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_web_map
 msgid "Map View"
-msgstr ""
+msgstr "Pogled zemljevida"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_product_margin
@@ -17667,7 +17681,7 @@ msgstr "Montserrat"
 #: model_terms:ir.ui.view,arch_db:base.view_users_form
 #: model_terms:ir.ui.view,arch_db:base.view_users_form_simple_modif
 msgid "More languages"
-msgstr ""
+msgstr "Več jezikov"
 
 #. module: base
 #: model:res.country,name:base.ma
@@ -19325,6 +19339,16 @@ msgid ""
 msgstr ""
 
 #. module: base
+#: code:addons/base/models/ir_actions_report.py:0
+#, python-format
+msgid ""
+"Odoo is unable to merge the PDFs attached to the following records:\n"
+"%s\n"
+"\n"
+"Please exclude them from the selection to continue. It's possible to still retrieve those PDFs by selecting each of the affected records individually, which will avoid merging."
+msgstr ""
+
+#. module: base
 #: model:ir.module.module,shortdesc:base.module_odoo_referral
 msgid "Odoo referral program"
 msgstr ""
@@ -20794,7 +20818,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_project_forecast
 msgid "Project Planning"
-msgstr ""
+msgstr "Projektno načrtovanje"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_documents_project
@@ -20829,7 +20853,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_helpdesk_stock
 msgid "Project, Tasks, Stock"
-msgstr ""
+msgstr "Projekt, Opravila, Zaloga"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_helpdesk_timesheet
@@ -21557,7 +21581,7 @@ msgstr "Noga poročila"
 #. module: base
 #: model:ir.model,name:base.model_report_layout
 msgid "Report Layout"
-msgstr ""
+msgstr "Postavitev poročila"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.act_report_xml_search_view
@@ -22027,7 +22051,7 @@ msgstr "Prodaja"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "Sales & Purchase"
-msgstr ""
+msgstr "Prodaja in Nabava"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_sale_project
@@ -23375,7 +23399,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_language_install
 msgid "Switch to"
-msgstr ""
+msgstr "Preklopi na"
 
 #. module: base
 #: model:res.country,name:base.ch
@@ -23887,7 +23911,7 @@ msgstr ""
 #. module: base
 #: model:ir.model.fields,help:base.field_res_users__company_id
 msgid "The default company for this user."
-msgstr ""
+msgstr "Privzeto podjetje za tega uporabnika"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.demo_failures_dialog
@@ -23964,6 +23988,12 @@ msgstr "Polni naziv države"
 #: model:ir.model.fields,help:base.field_res_users__user_id
 msgid "The internal user in charge of this contact."
 msgstr "Sodelavec odgover za ta stik."
+
+#. module: base
+#: code:addons/base/models/res_country.py:106
+#, python-format
+msgid "The layout contains an invalid format key"
+msgstr ""
 
 #. module: base
 #: model:ir.model.fields,help:base.field_ir_model__inherited_model_ids
@@ -24570,7 +24600,7 @@ msgstr "Oblika zapisa časa"
 #: model:ir.module.category,name:base.module_category_human_resources_time_off
 #: model:ir.module.module,shortdesc:base.module_hr_holidays
 msgid "Time Off"
-msgstr "Dopust"
+msgstr "Odsotnost"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_hr_payroll_holidays
@@ -25600,7 +25630,7 @@ msgstr "Uporabniški filtri"
 #. module: base
 #: model:ir.module.module,summary:base.module_point_of_sale
 msgid "User-friendly PoS interface for shops and restaurants"
-msgstr ""
+msgstr "Uporabniku prijazen vmesnik PoS za trgovine in restavracije"
 
 #. module: base
 #: code:addons/models.py:0 code:addons/models.py:0
@@ -26880,7 +26910,7 @@ msgstr "eUčenje"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_users_simple_form
 msgid "email@yourcompany.com"
-msgstr "email@yourcompany.com"
+msgstr "email@podjetje.com"
 
 #. module: base
 #: code:addons/base/models/ir_fields.py:0

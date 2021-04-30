@@ -509,7 +509,7 @@ msgstr "Добавить пользовательский фильтр"
 #: code:addons/web/static/src/xml/base.xml:0
 #, python-format
 msgid "Add Custom Group"
-msgstr "Добавить специальную группу"
+msgstr "Добавить параметр группировки"
 
 #. module: web
 #. openerp-web
@@ -2631,7 +2631,7 @@ msgstr "Новый"
 #. openerp-web
 #: code:addons/web/static/src/js/fields/relational_fields.js:0
 #, python-format
-msgid "New ${this.name}"
+msgid "New %s"
 msgstr ""
 
 #. module: web
