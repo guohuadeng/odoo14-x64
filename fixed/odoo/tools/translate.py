@@ -1285,7 +1285,8 @@ def resetlocale():
     # locale.resetlocale is bugged with some locales.
     for ln in get_locales():
         try:
-            ln = ln[0:ln.index('.')]
+            if ln.find('.') >= 0:
+                ln = ln[0:ln.index('.')]
             return locale.setlocale(locale.LC_ALL, ln)
         except locale.Error:
             continue
