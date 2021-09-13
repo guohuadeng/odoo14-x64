@@ -4,6 +4,7 @@ odoo.define('web_editor.snippets.options', function (require) {
 var core = require('web.core');
 const {ColorpickerWidget} = require('web.Colorpicker');
 const Dialog = require('web.Dialog');
+const {scrollTo} = require('web.dom');
 const rpc = require('web.rpc');
 const time = require('web.time');
 var Widget = require('web.Widget');
@@ -936,6 +937,18 @@ const SelectUserValueWidget = BaseSelectionUserValueWidget.extend({
     },
 
     //--------------------------------------------------------------------------
+    // Private
+    //--------------------------------------------------------------------------
+
+    /**
+     * @private
+     * @param {Event} ev
+     */
+    _shouldIgnoreClick(ev) {
+        return !!ev.target.closest('[role="button"]');
+    },
+
+    //--------------------------------------------------------------------------
     // Handlers
     //--------------------------------------------------------------------------
 
@@ -945,7 +958,7 @@ const SelectUserValueWidget = BaseSelectionUserValueWidget.extend({
      * @private
      */
     _onClick: function (ev) {
-        if (ev.target.closest('[role="button"]')) {
+        if (this._shouldIgnoreClick(ev)) {
             return;
         }
 
@@ -1241,12 +1254,16 @@ const ColorpickerUserValueWidget = SelectUserValueWidget.extend({
         const _super = this._super.bind(this);
         const args = arguments;
 
-        // TODO review in master, this was done in stable to keep the speed fix
-        // as stable as possible (to have a reference to a widget even if not a
-        // colorPalette widget).
-        this.colorPalette = new Widget(this);
-        this.colorPalette.getColorNames = () => [];
-        await this.colorPalette.appendTo(document.createDocumentFragment());
+        if (this.options.dataAttributes.lazyPalette === 'true') {
+            // TODO review in master, this was done in stable to keep the speed
+            // fix as stable as possible (to have a reference to a widget even
+            // if not a colorPalette widget).
+            this.colorPalette = new Widget(this);
+            this.colorPalette.getColorNames = () => [];
+            await this.colorPalette.appendTo(document.createDocumentFragment());
+        } else {
+            await this._renderColorPalette();
+        }
 
         // Build the select element with a custom span to hold the color preview
         this.colorPreviewEl = document.createElement('span');
@@ -1385,6 +1402,12 @@ const ColorpickerUserValueWidget = SelectUserValueWidget.extend({
         }
         return this.colorPalette.appendTo(document.createDocumentFragment());
     },
+    /**
+     * @override
+     */
+    _shouldIgnoreClick(ev) {
+        return ev.originalEvent.__isColorpickerClick || this._super(...arguments);
+    },
 
     //--------------------------------------------------------------------------
     // Handlers
@@ -1437,16 +1460,6 @@ const ColorpickerUserValueWidget = SelectUserValueWidget.extend({
      */
     _onEnterKey: function () {
         this.close();
-    },
-    /**
-     * @override
-     */
-    _onClick: function (ev) {
-        // Do not close the colorpalette on colorpicker click
-        if (!ev.originalEvent.__isColorpickerClick) {
-            this._super(...arguments);
-        }
-        ev.stopPropagation();
     },
 });
 
@@ -1781,6 +1794,12 @@ const SelectPagerUserValueWidget = SelectUserValueWidget.extend({
     // Private
     //--------------------------------------------------------------------------
 
+    /**
+     * @override
+     */
+    _shouldIgnoreClick(ev) {
+        return !!ev.target.closest('.o_we_pager_header') || this._super(...arguments);
+    },
     /**
      * Updates the pager's page number display.
      *
@@ -4240,6 +4259,18 @@ registry.BackgroundPosition = SnippetOptionWidget.extend({
             left: position[0] / 100 * delta.x || 0,
             top: position[1] / 100 * delta.y || 0,
         };
+        // Make sure the element is in a visible area.
+        const rect = this.$target[0].getBoundingClientRect();
+        const viewportTop = $(window).scrollTop();
+        const viewportBottom = viewportTop + $(window).height();
+        const visibleHeight = rect.top < viewportTop
+            ? Math.max(0, Math.min(viewportBottom, rect.bottom) - viewportTop) // Starts above
+            : rect.top < viewportBottom
+                ? Math.min(viewportBottom, rect.bottom) - rect.top // Starts inside
+                : 0; // Starts after
+        if (visibleHeight < 200) {
+            await scrollTo(this.$target[0], {extraOffset: 50});
+        }
         this._toggleBgOverlay(true);
     },
     /**
@@ -4321,7 +4352,7 @@ registry.BackgroundPosition = SnippetOptionWidget.extend({
             height: `${this.$target.innerHeight()}px`,
         });
 
-        const topPos = (parseInt(this.$overlay.css('top')) - parseInt(this.$overlayContent.css('top')));
+        const topPos = Math.max(0, $(window).scrollTop() - this.$target.offset().top);
         this.$overlayContent.find('.o_we_overlay_buttons').css('top', `${topPos}px`);
     },
     /**

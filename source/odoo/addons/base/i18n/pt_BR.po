@@ -4166,7 +4166,7 @@ msgstr ""
 "-----\n"
 "     - Módulo de integração com os feriados de dedução e subsídio\n"
 "     - Integração com hr_payroll_account para o account_move_line automática\n"
-"       criação do contracheque\n"
+"       criação de Folha de Pagamento\n"
 "     - Continuar a integrar a contribuição. Apenas a contribuição principal são\n"
 "       implementado atualmente\n"
 "     - Refazer o relatório em webkit\n"
@@ -4901,8 +4901,8 @@ msgstr ""
 "============================\n"
 "\n"
 "-Configuração de hr_payroll para localização da Índia\n"
-"    - Todas as principais regras de contribuições para o contracheque da Índia.\n"
-"    * Novo relatório de contracheque\n"
+"    - Todas as principais regras de contribuições para a Folha de Pagamento da Índia.\n"
+"    * Novo relatório de Folhas de Pagamento\n"
 "    * Contratos de Empregados\n"
 "    * Permitir configurar salário básico / bruto / líquido\n"
 "    * Pagamento de funcionários\n"
@@ -5232,7 +5232,7 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"Gerenciar Folgas em Contra-cheques\n"
+"Gerenciar Folgas em Folhas de Pagamento\n"
 "==============================\n"
 "\n"
 "Este aplicativo permite que você integre folgas em holerites."
@@ -9572,7 +9572,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.onboarding_container
 msgid "<i class=\"fa fa-times\" title=\"Close the onboarding panel\"/>"
-msgstr "<i class=\"fa fa-times\" title=\"Close the onboarding panel\"/>"
+msgstr "<i class=\"fa fa-times\" title=\"Fechar o painel de integração\"/>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.onboarding_container
@@ -9594,21 +9594,21 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid ""
 "<span class=\"o_form_label o_td_label\" name=\"address_name\">\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'contact')]}\">Company Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'invoice')]}\">Invoice Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'delivery')]}\">Delivery Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'other')]}\">Other Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'private')]}\">Private Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', False)]}\">Address</b>\n"
+"                                <b attrs=\"{'invisible': [('company_type', '!=', 'company')]}\">Company Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'invoice'), ('company_type', '=', 'company')]}\">Invoice Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'delivery'), ('company_type', '=', 'company')]}\">Delivery Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'other'), ('company_type', '=', 'company')]}\">Other Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'private'), ('company_type', '=', 'company')]}\">Private Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', 'not in', (False, 'contact')), ('company_type', '=', 'company')]}\">Address</b>\n"
 "                            </span>"
 msgstr ""
 "<span class=\"o_form_label o_td_label\" name=\"address_name\">\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'contact')]}\">Endereço da Empresa</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'invoice')]}\">Endereço de Fatura</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'delivery')]}\">Endereço de Entrega</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'other')]}\">Outro Endereço</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'private')]}\">Endereço Particular</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', False)]}\">Endereço</b>\n"
+"                                <b attrs=\"{'invisible': [('company_type', '!=', 'company')]}\">Endereço da Empresa</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'invoice'), ('company_type', '=', 'company')]}\">Endereço da Fatura</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'delivery'), ('company_type', '=', 'company')]}\">Endereço de Entrega</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'other'), ('company_type', '=', 'company')]}\">Outro Endereço</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'private'), ('company_type', '=', 'company')]}\">Endereço Privado</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', 'not in', (False, 'contact')), ('company_type', '=', 'company')]}\">Endereço</b>\n"
 "                            </span>"
 
 #. module: base
@@ -11215,7 +11215,7 @@ msgstr "Permitir a geração de tarefas fsm a partir do tíquete"
 #. module: base
 #: model:ir.module.module,summary:base.module_hr_payroll_edit_lines
 msgid "Allow payslip edition"
-msgstr "Permitir edição de contra-cheque"
+msgstr "Permitir edição de Folhas de Pagamento"
 
 #. module: base
 #: model:ir.module.module,description:base.module_website_event_crm
@@ -12256,7 +12256,7 @@ msgstr "Belgian Payroll - Advantage Proration"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_be_hr_payroll_posted_employee
 msgid "Belgian Payroll - Posted Employee"
-msgstr "Belgian Payroll - Posted Employee"
+msgstr "Folha de Pagamento Belica - Funcionário Lançado"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_be_hr_payroll_variable_revenue
@@ -12843,7 +12843,7 @@ msgstr "República Centro-Africana"
 #. module: base
 #: model:ir.module.module,summary:base.module_hr
 msgid "Centralize employee information"
-msgstr "Centralize employee information"
+msgstr "Informação centralizada do Funcionário"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_contacts
@@ -13892,7 +13892,7 @@ msgstr "Criar Menu"
 #. module: base
 #: model:ir.model,name:base.model_wizard_ir_model_menu_create
 msgid "Create Menu Wizard"
-msgstr "Create Menu Wizard"
+msgstr "Assistente de Criação de Menu"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_industry_fsm_report
@@ -13964,7 +13964,7 @@ msgstr "Criar um novo fornecedor em seu livro de endereços"
 #. module: base
 #: model:ir.module.module,summary:base.module_web_studio
 msgid "Create and customize your Odoo apps"
-msgstr "Create and customize your Odoo apps"
+msgstr "Crie e personalize seus apps Odoo"
 
 #. module: base
 #: model_terms:ir.actions.act_window,help:base.action_res_company_form
@@ -14001,7 +14001,7 @@ msgstr "Criar companhia"
 #. module: base
 #: model:ir.module.module,summary:base.module_crm_livechat
 msgid "Create lead from livechat conversation"
-msgstr "Create lead from livechat conversation"
+msgstr "Crie prospectos a partir de conversas do livechat"
 
 #. module: base
 #: model:ir.module.module,description:base.module_event_crm
@@ -14016,7 +14016,7 @@ msgstr "Crie um novo lead usando o comando /lead no canal"
 #. module: base
 #: model:ir.module.module,summary:base.module_survey
 msgid "Create surveys and analyze answers"
-msgstr "Create surveys and analyze answers"
+msgstr "Crie pesquisas e analise as respostas"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.module_form
@@ -14853,7 +14853,7 @@ msgstr "Desenvolva, envie e acompanhe e-mails"
 #. module: base
 #: model:res.partner.category,name:base.res_partner_category_14
 msgid "Desk Manufacturers"
-msgstr "Desk Manufacturers"
+msgstr "Fabricantes de Mesa"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_base_partner_merge_automatic_wizard__dst_partner_id
@@ -15851,7 +15851,7 @@ msgstr ""
 #: code:addons/base/models/ir_ui_menu.py:0
 #, python-format
 msgid "Error! You cannot create recursive menus."
-msgstr "Error! You cannot create recursive menus."
+msgstr "Erro! Você não pode criar menus recursivos."
 
 #. module: base
 #: model:res.country,name:base.ee
@@ -16043,7 +16043,7 @@ msgstr "Despesas"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_hr_payroll_expense
 msgid "Expenses in Payslips"
-msgstr "Despesas em Contracheques"
+msgstr "Despesas em Folhas de Pagamento"
 
 #. module: base
 #: model:ir.model.fields,help:base.field_report_paperformat__report_ids
@@ -17759,7 +17759,7 @@ msgstr "Ajuda-o a gerenciar seus contratos."
 #. module: base
 #: model:ir.module.category,description:base.module_category_human_resources_employees
 msgid "Helps you manage your employees."
-msgstr "Helps you manage your employees."
+msgstr "Ajuda você a gerenciar seus funcionários."
 
 #. module: base
 #: model:ir.module.category,description:base.module_category_human_resources_expenses
@@ -18330,9 +18330,9 @@ msgid ""
 " (if you delete a native ACL, it will be re-created when you reload the "
 "module)."
 msgstr ""
-"If you uncheck the active field, it will disable the ACL without deleting it"
-" (if you delete a native ACL, it will be re-created when you reload the "
-"module)."
+"Se você desmarcar o campo ativo, ele desabilitará a ACL sem excluí-la (se "
+"você excluir uma ACL nativa, ela será recriada quando você recarregar o "
+"módulo)."
 
 #. module: base
 #: model:ir.model.fields,help:base.field_ir_rule__active
@@ -18840,7 +18840,7 @@ msgstr "Fonte Interna"
 #. module: base
 #: model:res.groups,name:base.group_user
 msgid "Internal User"
-msgstr "Internal User"
+msgstr "Usuário Interno"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_users_search
@@ -19858,12 +19858,12 @@ msgstr "Deixe seus funcionários compartilharem cargos e indicar seus amigos"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.onboarding_step
 msgid "Let's do it"
-msgstr "Let's do it"
+msgstr "Vamos lá"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.onboarding_company_step
 msgid "Let's start!"
-msgstr "Let's start!"
+msgstr "Vamos Começar!"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__report_paperformat__format__letter
@@ -20374,7 +20374,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,summary:base.module_hr_work_entry_holidays
 msgid "Manage Time Off in Payslips"
-msgstr "Gerencie Folgas em Contracheques"
+msgstr "Gerencie Folgas em Folhas de Pagamento"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_website_forum
@@ -20520,7 +20520,7 @@ msgstr "Gerencie seus documentos para assinar contratos"
 #. module: base
 #: model:ir.module.module,summary:base.module_hr_payroll
 msgid "Manage your employee payroll records"
-msgstr "Manage your employee payroll records"
+msgstr "Gerencie suas folhas de pagamento de funcionários"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_planning
@@ -20678,7 +20678,7 @@ msgstr "Mass mailing on track speakers"
 #: model:ir.module.module,shortdesc:base.module_mrp_mps
 #: model:ir.module.module,summary:base.module_mrp_mps
 msgid "Master Production Schedule"
-msgstr "Master Production Schedule"
+msgstr "Cronograma Mestre de Produção"
 
 #. module: base
 #: model:res.country,name:base.mr
@@ -25197,7 +25197,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
 msgid "Please set the Model to Create before choosing values"
-msgstr "Please set the Model to Create before choosing values"
+msgstr "Defina o Modelo para Criar antes de escolher os valores"
 
 #. module: base
 #: code:addons/base/models/ir_model.py:0
@@ -27046,7 +27046,7 @@ msgstr "Escopo"
 #: model:ir.model.fields.selection,name:base.selection__ir_ui_view__type__search
 #: model_terms:ir.ui.view,arch_db:base.view_view_search
 msgid "Search"
-msgstr "Pesquisar"
+msgstr "Pesquisa"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.config_wizard_step_view_search
@@ -28457,7 +28457,7 @@ msgstr "Nome Técnico"
 #: code:addons/base/models/ir_translation.py:0
 #, python-format
 msgid "Technical Translations"
-msgstr "Technical Translations"
+msgstr "Traduções Técnicas"
 
 #. module: base
 #: model:ir.actions.report,name:base.ir_module_reference_print
@@ -29770,7 +29770,7 @@ msgstr "Rastreie a presença de funcionários"
 #: model:ir.module.module,summary:base.module_hr_timesheet
 #: model:ir.module.module,summary:base.module_timesheet_grid
 msgid "Track employee time on tasks"
-msgstr "Track employee time on tasks"
+msgstr "Rastreie as horas de tarefas de funcionários"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_maintenance
@@ -31600,7 +31600,7 @@ msgstr ""
 #: code:addons/base/models/res_partner.py:0
 #, python-format
 msgid "You can not create recursive tags."
-msgstr "You can not create recursive tags."
+msgstr "Você não pode criar marcadores recursivos."
 
 #. module: base
 #: model:ir.model.constraint,message:base.constraint_res_users_login_key
@@ -31645,8 +31645,10 @@ msgstr "You cannot activate the superuser."
 #. module: base
 #: code:addons/base/models/res_partner.py:0
 #, python-format
-msgid "You cannot archive a contact linked to an internal user."
-msgstr "Você não pode arquivar um contato vinculado a um usuário interno."
+msgid "You cannot archive a contact linked to a portal or internal user."
+msgstr ""
+"Você não pode arquivar um contato vinculado a um usuário interno ou de "
+"portal."
 
 #. module: base
 #: code:addons/base/models/res_partner.py:0
@@ -31658,7 +31660,7 @@ msgstr "Você não pode criar hierarquias Parceiros recursivas."
 #: code:addons/base/models/res_company.py:0
 #, python-format
 msgid "You cannot create recursive companies."
-msgstr "You cannot create recursive companies."
+msgstr "Você não pode criar empresas recursivas."
 
 #. module: base
 #: code:addons/base/models/ir_ui_view.py:0

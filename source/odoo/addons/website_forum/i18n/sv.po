@@ -12,8 +12,10 @@
 # Jakob Krabbe <jakob.krabbe@vertel.se>, 2021
 # Kristoffer Grundström <lovaren@gmail.com>, 2021
 # Martin Trigaux, 2021
-# Anders Wallenquist <anders.wallenquist@vertel.se>, 2021
 # Frida E, 2021
+# Anders Wallenquist <anders.wallenquist@vertel.se>, 2021
+# Simon Strömberg <simon.stromberg@vertel.se>, 2021
+# STefan Rundgren <stefanrundgren@cellglas.com>, 2021
 # 
 msgid ""
 msgstr ""
@@ -21,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-27 14:12+0000\n"
 "PO-Revision-Date: 2020-09-07 08:21+0000\n"
-"Last-Translator: Frida E, 2021\n"
+"Last-Translator: STefan Rundgren <stefanrundgren@cellglas.com>, 2021\n"
 "Language-Team: Swedish (https://www.transifex.com/odoo/teams/41243/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -47,7 +49,7 @@ msgstr ""
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__total_views
 msgid "# Views"
-msgstr ""
+msgstr "# Visningar"
 
 #. module: website_forum
 #: code:addons/website_forum/models/forum.py:0
@@ -399,7 +401,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_sidebar
 msgid "<i class=\"fa fa-bell fa-fw\"/> Followed Posts"
-msgstr ""
+msgstr "<i class=\"fa fa-bell fa-fw\"/> Följda inlägg"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.moderation_queue
@@ -427,7 +429,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_sidebar
 msgid "<i class=\"fa fa-check-square-o fa-fw\"/> To Validate"
-msgstr ""
+msgstr "<i class=\"fa fa-check-square-o fa-fw\"/> Att granska"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
@@ -437,7 +439,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.new_question
 msgid "<i class=\"fa fa-chevron-left mr-2\"/>Back to All Topics"
-msgstr ""
+msgstr "<i class=\"fa fa-chevron-left mr-2\"/>Tillbaka till alla ämnen"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_profile_sub_nav
@@ -447,7 +449,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_sidebar
 msgid "<i class=\"fa fa-flag fa-fw\"/> Flagged"
-msgstr ""
+msgstr "<i class=\"fa fa-flag fa-fw\"/> Flaggad"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.moderation_queue
@@ -455,6 +457,8 @@ msgid ""
 "<i class=\"fa fa-flag ml-4 mr4\"/>\n"
 "                                    Flagged"
 msgstr ""
+"<i class=\"fa fa-flag ml-4 mr4\"/>\n"
+"                                    Flaggad"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.moderation_queue
@@ -467,11 +471,13 @@ msgid ""
 "<i class=\"fa fa-pencil\"/>\n"
 "                                Edit<span class=\"d-none d-lg-inline\"> your answer</span>"
 msgstr ""
+"<i class=\"fa fa-pencil\"/>\n"
+"                                Ändra<span class=\"d-none d-lg-inline\"> ditt svar</span>"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_sidebar
 msgid "<i class=\"fa fa-question-circle-o fa-fw\"/> My Posts"
-msgstr ""
+msgstr "<i class=\"fa fa-question-circle-o fa-fw\"/> Mina inlägg"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.post_description_full
@@ -481,7 +487,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.post_description_full
 msgid "<i class=\"fa fa-share-alt text-muted mr-1\"/>Share"
-msgstr ""
+msgstr "<i class=\"fa fa-share-alt text-muted mr-1\"/>Dela"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.post_answers
@@ -489,16 +495,18 @@ msgid ""
 "<i class=\"fa fa-share-alt text-muted\"/>\n"
 "                                Share"
 msgstr ""
+"<i class=\"fa fa-share-alt text-muted\"/>\n"
+"                                Dela"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_sidebar
 msgid "<i class=\"fa fa-star fa-fw\"/> Favourites"
-msgstr ""
+msgstr "<i class=\"fa fa-star fa-fw\"/> Favoriter"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_sidebar
 msgid "<i class=\"fa fa-tags fa-fw\"/> Followed Tags"
-msgstr ""
+msgstr "<i class=\"fa fa-tags fa-fw\"/> Följda etiketter"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_profile_content
@@ -718,6 +726,7 @@ msgid ""
 msgstr ""
 
 #. module: website_forum
+#. openerp-web
 #: code:addons/website_forum/controllers/main.py:0
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 #, python-format
@@ -738,7 +747,7 @@ msgstr "Alla etiketter"
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
 #: model_terms:ir.ui.view,arch_db:website_forum.new_question
 msgid "All Topics"
-msgstr ""
+msgstr "Alla ämnen"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
@@ -1414,7 +1423,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_forum.post_comment
 #, python-format
 msgid "Discard"
-msgstr "Förkasta"
+msgstr "Avbryt"
 
 #. module: website_forum
 #: model:gamification.badge,name:website_forum.badge_6
@@ -1548,7 +1557,7 @@ msgstr ""
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__favourite_ids
 msgid "Favourite"
-msgstr ""
+msgstr "Favorit"
 
 #. module: website_forum
 #: model:gamification.challenge.line,name:website_forum.line_favorite_question_1
@@ -1571,12 +1580,12 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_profile_content
 msgid "Favourite Questions"
-msgstr ""
+msgstr "Favoritfrågor"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
 msgid "Favourites"
-msgstr ""
+msgstr "Favoriter"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.moderation_queue
@@ -1618,17 +1627,17 @@ msgstr ""
 #: model:ir.model.fields.selection,name:website_forum.selection__forum_post__state__flagged
 #: model_terms:ir.ui.view,arch_db:website_forum.header
 msgid "Flagged"
-msgstr ""
+msgstr "Flaggad"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__flag_user_id
 msgid "Flagged by"
-msgstr ""
+msgstr "Flaggad av"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.user_profile_content
 msgid "Followed Questions"
-msgstr ""
+msgstr "Följda frågor"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__message_follower_ids
@@ -1867,7 +1876,7 @@ msgstr ""
 #: model:ir.model.fields,help:website_forum.field_forum_tag__message_has_error
 #: model:ir.model.fields,help:website_forum.field_forum_tag__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
+msgstr "Om markerad så har det blivit ett leveransfel för några  meddelanden."
 
 #. module: website_forum
 #: model:ir.model.fields,help:website_forum.field_forum_forum__karma_dofollow
@@ -1954,7 +1963,7 @@ msgstr ""
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__user_favourite
 msgid "Is Favourite"
-msgstr ""
+msgstr "Är favorit"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__message_is_follower
@@ -2090,7 +2099,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__message_main_attachment_id
 #: model:ir.model.fields,field_description:website_forum.field_forum_tag__message_main_attachment_id
 msgid "Main Attachment"
-msgstr ""
+msgstr "Huvudbilaga"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.post_answers
@@ -2118,7 +2127,7 @@ msgstr "Meny"
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__message_has_error
 #: model:ir.model.fields,field_description:website_forum.field_forum_tag__message_has_error
 msgid "Message Delivery error"
-msgstr ""
+msgstr "Fel vid meddelandeleverans"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__message_ids
@@ -2161,7 +2170,7 @@ msgstr ""
 #. module: website_forum
 #: model:ir.model.fields.selection,name:website_forum.selection__forum_forum__default_order__vote_count_desc
 msgid "Most Voted"
-msgstr ""
+msgstr "Mest röstad"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
@@ -2184,22 +2193,22 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 msgid "My <b>Favourites</b>"
-msgstr ""
+msgstr "My <b>Favoriter</b>"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 msgid "My <b>Posts</b>"
-msgstr ""
+msgstr "Mina <b>inlägg</b>"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
 msgid "My Favourites"
-msgstr ""
+msgstr "Mina favoriter"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
 msgid "My Posts"
-msgstr ""
+msgstr "Mina inlägg"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__user_vote
@@ -2242,7 +2251,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 #: model_terms:ir.ui.view,arch_db:website_forum.header
 msgid "New Post"
-msgstr ""
+msgstr "Nytt inlägg"
 
 #. module: website_forum
 #: model:mail.message.subtype,description:website_forum.mt_question_new
@@ -2255,7 +2264,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:website_forum.selection__forum_forum__default_order__create_date_desc
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 msgid "Newest"
-msgstr ""
+msgstr "Senaste"
 
 #. module: website_forum
 #: model:gamification.badge,name:website_forum.badge_a_2
@@ -2348,7 +2357,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__message_has_error_counter
 #: model:ir.model.fields,field_description:website_forum.field_forum_tag__message_has_error_counter
 msgid "Number of errors"
-msgstr ""
+msgstr "Antal fel"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__count_flagged_posts
@@ -2367,7 +2376,7 @@ msgstr "Antal meddelanden som kräver en åtgärd"
 #: model:ir.model.fields,help:website_forum.field_forum_post__message_has_error_counter
 #: model:ir.model.fields,help:website_forum.field_forum_tag__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr ""
+msgstr "Antal meddelanden med leveransfel"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__count_posts_waiting_validation
@@ -2828,7 +2837,7 @@ msgstr ""
 #: model:ir.model.fields,help:website_forum.field_forum_forum__website_id
 #: model:ir.model.fields,help:website_forum.field_forum_post__website_id
 msgid "Restrict publishing to this website."
-msgstr ""
+msgstr "Begränsa publicering på denna webbplats."
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.private_profile
@@ -2857,7 +2866,7 @@ msgstr "SEO Optimerad"
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__message_has_sms_error
 #: model:ir.model.fields,field_description:website_forum.field_forum_tag__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr ""
+msgstr "SMS leveransfel"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.edit_post
@@ -2932,7 +2941,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__seo_name
 #: model:ir.model.fields,field_description:website_forum.field_forum_tag__seo_name
 msgid "Seo name"
-msgstr ""
+msgstr "Seo-namn"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__sequence
@@ -2980,7 +2989,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_forum.display_post_question_block
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 msgid "Solved"
-msgstr ""
+msgstr "Löst"
 
 #. module: website_forum
 #. openerp-web
@@ -3080,12 +3089,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_tag_view_form
 #: model_terms:ir.ui.view,arch_db:website_forum.view_forum_post_search
 msgid "Tag"
-msgstr "Tagg"
+msgstr "Etikett"
 
 #. module: website_forum
 #: model:ir.model.constraint,message:website_forum.constraint_forum_tag_name_uniq
 msgid "Tag name already exists !"
-msgstr "Namntaggen existerar redan !"
+msgstr "Etikettnamnet existerar redan !"
 
 #. module: website_forum
 #: model:ir.actions.act_window,name:website_forum.forum_tag_action
@@ -3096,7 +3105,7 @@ msgstr "Namntaggen existerar redan !"
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_tag_view_list
 #: model_terms:ir.ui.view,arch_db:website_forum.new_question
 msgid "Tags"
-msgstr "Taggar"
+msgstr "Etiketter"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
@@ -3260,7 +3269,7 @@ msgstr "Till"
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.header
 msgid "To Validate"
-msgstr ""
+msgstr "Att granska"
 
 #. module: website_forum
 #: model_terms:forum.forum,faq:website_forum.forum_help
@@ -3293,7 +3302,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
 msgid "Topics"
-msgstr ""
+msgstr "Ämnen"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.view_forum_post_list
@@ -3308,7 +3317,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.view_forum_post_list
 msgid "Total Views"
-msgstr ""
+msgstr "Totalt antal visningar"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__vote_count
@@ -3367,7 +3376,7 @@ msgstr "Räknare olästa meddelanden"
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 msgid "Unsolved"
-msgstr ""
+msgstr "Olösta"
 
 #. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__write_uid
@@ -3448,7 +3457,7 @@ msgstr "Visa"
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__views
 #: model_terms:ir.ui.view,arch_db:website_forum.display_post_question_block
 msgid "Views"
-msgstr "Vyer"
+msgstr "Visningar"
 
 #. module: website_forum
 #: model:forum.post.reason,name:website_forum.reason_12
@@ -3626,7 +3635,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.display_post_question_block
 msgid "Your favourite"
-msgstr ""
+msgstr "Dina favoriter"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.display_post_question_block
@@ -3844,7 +3853,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 msgid "solved"
-msgstr ""
+msgstr "löst"
 
 #. module: website_forum
 #: model_terms:forum.forum,faq:website_forum.forum_help
@@ -3883,7 +3892,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_index
 msgid "unsolved"
-msgstr ""
+msgstr "olöst"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.faq_karma
@@ -3931,7 +3940,7 @@ msgstr ""
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.display_post_question_block
 msgid "| Flagged"
-msgstr ""
+msgstr "| Flaggad"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.moderation_queue

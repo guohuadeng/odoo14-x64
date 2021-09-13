@@ -205,7 +205,7 @@
     let tokenizeString = function (expr) {
         let s = expr[0];
         let start = s;
-        if (s !== "'" && s !== '"') {
+        if (s !== "'" && s !== '"' && s !== "`") {
             return false;
         }
         let i = 1;
@@ -227,6 +227,17 @@
             throw new Error("Invalid expression");
         }
         s += start;
+        if (start === "`") {
+            return {
+                type: "TEMPLATE_STRING",
+                value: s,
+                replace(replacer) {
+                    return s.replace(/\$\{(.*?)\}/g, (match, group) => {
+                        return "${" + replacer(group) + "}";
+                    });
+                },
+            };
+        }
         return { type: "VALUE", value: s };
     };
     let tokenizeNumber = function (expr) {
@@ -320,6 +331,8 @@
     //------------------------------------------------------------------------------
     // Expression "evaluator"
     //------------------------------------------------------------------------------
+    const isLeftSeparator = (token) => token && (token.type === "LEFT_BRACE" || token.type === "COMMA");
+    const isRightSeparator = (token) => token && (token.type === "RIGHT_BRACE" || token.type === "COMMA");
     /**
      * This is the main function exported by this file. This is the code that will
      * process an expression (given as a string) and returns another expression with
@@ -348,13 +361,32 @@
     function compileExprToArray(expr, scope) {
         scope = Object.create(scope);
         const tokens = tokenize(expr);
-        for (let i = 0; i < tokens.length; i++) {
+        let i = 0;
+        let stack = []; // to track last opening [ or {
+        while (i < tokens.length) {
             let token = tokens[i];
             let prevToken = tokens[i - 1];
             let nextToken = tokens[i + 1];
+            let groupType = stack[stack.length - 1];
+            switch (token.type) {
+                case "LEFT_BRACE":
+                case "LEFT_BRACKET":
+                    stack.push(token.type);
+                    break;
+                case "RIGHT_BRACE":
+                case "RIGHT_BRACKET":
+                    stack.pop();
+            }
             let isVar = token.type === "SYMBOL" && !RESERVED_WORDS.includes(token.value);
             if (token.type === "SYMBOL" && !RESERVED_WORDS.includes(token.value)) {
                 if (prevToken) {
+                    // normalize missing tokens: {a} should be equivalent to {a:a}
+                    if (groupType === "LEFT_BRACE" &&
+                        isLeftSeparator(prevToken) &&
+                        isRightSeparator(nextToken)) {
+                        tokens.splice(i + 1, 0, { type: "COLON", value: ":" }, { ...token });
+                        nextToken = tokens[i + 1];
+                    }
                     if (prevToken.type === "OPERATOR" && prevToken.value === ".") {
                         isVar = false;
                     }
@@ -364,6 +396,9 @@
                         }
                     }
                 }
+            }
+            if (token.type === "TEMPLATE_STRING") {
+                token.value = token.replace((expr) => compileExpr(expr, scope));
             }
             if (nextToken && nextToken.type === "OPERATOR" && nextToken.value === "=>") {
                 if (token.type === "RIGHT_PAREN") {
@@ -390,6 +425,7 @@
                     token.value = `scope['${token.value}']`;
                 }
             }
+            i++;
         }
         return tokens;
     }
@@ -793,7 +829,8 @@
         klass = klass || {};
         elm = vnode.elm;
         for (name in oldClass) {
-            if (name && !klass[name]) {
+            if (name && !klass[name] && !Object.prototype.hasOwnProperty.call(klass, name)) {
+                // was `true` and now not provided
                 elm.classList.remove(name);
             }
         }
@@ -1401,20 +1438,53 @@
     }
     const UTILS = {
         zero: Symbol("zero"),
-        toObj(expr) {
+        toClassObj(expr) {
+            const result = {};
             if (typeof expr === "string") {
+                // we transform here a list of classes into an object:
+                //  'hey you' becomes {hey: true, you: true}
                 expr = expr.trim();
                 if (!expr) {
                     return {};
                 }
                 let words = expr.split(/\s+/);
-                let result = {};
                 for (let i = 0; i < words.length; i++) {
                     result[words[i]] = true;
                 }
                 return result;
             }
-            return expr;
+            // this is already an object, but we may need to split keys:
+            // {'a b': true, 'a c': false} should become {a: true, b: true, c: false}
+            for (let key in expr) {
+                const value = expr[key];
+                const words = key.split(/\s+/);
+                for (let word of words) {
+                    result[word] = result[word] || value;
+                }
+            }
+            return result;
+        },
+        /**
+         * This method combines the current context with the variables defined in a
+         * scope for use in a slot.
+         *
+         * The implementation is kind of tricky because we want to preserve the
+         * prototype chain structure of the cloned result. So we need to traverse the
+         * prototype chain, cloning each level respectively.
+         */
+        combine(context, scope) {
+            let clone = context;
+            const scopeStack = [];
+            while (!isComponent(scope)) {
+                scopeStack.push(scope);
+                scope = scope.__proto__;
+            }
+            while (scopeStack.length) {
+                let scope = scopeStack.pop();
+                clone = Object.create(clone);
+                Object.assign(clone, scope);
+            }
+            return clone;
         },
         shallowEqual,
         addNameSpace(vnode) {
@@ -1667,6 +1737,7 @@
                 ctx.variables = Object.create(null);
                 ctx.parentNode = ctx.generateID();
                 ctx.allowMultipleRoots = true;
+                ctx.shouldDefineParent = true;
                 ctx.hasParentWidget = true;
                 ctx.shouldDefineResult = false;
                 ctx.addLine(`let c${ctx.parentNode} = extra.parentNode;`);
@@ -1830,14 +1901,22 @@
                     }
                 }
             }
-            if (node.nodeName !== "t") {
-                let nodeID = this._compileGenericNode(node, ctx, withHandlers);
-                ctx = ctx.withParent(nodeID);
+            if (node.nodeName !== "t" || node.hasAttribute("t-tag")) {
                 let nodeHooks = {};
                 let addNodeHook = function (hook, handler) {
                     nodeHooks[hook] = nodeHooks[hook] || [];
                     nodeHooks[hook].push(handler);
                 };
+                if (node.tagName === "select" && node.hasAttribute("t-att-value")) {
+                    const value = node.getAttribute("t-att-value");
+                    let exprId = ctx.generateID();
+                    ctx.addLine(`let expr${exprId} = ${ctx.formatExpression(value)};`);
+                    let expr = `expr${exprId}`;
+                    node.setAttribute("t-att-value", expr);
+                    addNodeHook("create", `n.elm.value=${expr};`);
+                }
+                let nodeID = this._compileGenericNode(node, ctx, withHandlers);
+                ctx = ctx.withParent(nodeID);
                 for (let { directive, value, fullName } of validDirectives) {
                     if (directive.atNodeCreation) {
                         directive.atNodeCreation({
@@ -1908,16 +1987,18 @@
                         isProp = key === "selected" || key === "disabled";
                         break;
                     case "textarea":
-                        isProp = key === "readonly" || key === "disabled";
+                        isProp = key === "readonly" || key === "disabled" || key === "value";
+                        break;
+                    case "select":
+                        isProp = key === "disabled" || key === "value";
                         break;
                     case "button":
-                    case "select":
                     case "optgroup":
                         isProp = key === "disabled";
                         break;
                 }
                 if (isProp) {
-                    props.push(`${key}: _${val}`);
+                    props.push(`${key}: ${val}`);
                 }
             }
             let classObj = "";
@@ -1952,7 +2033,7 @@
                             name = '"' + name + '"';
                         }
                         attrs.push(`${name}: _${attID}`);
-                        handleProperties(name, attID);
+                        handleProperties(name, `_${attID}`);
                     }
                 }
                 // dynamic attributes
@@ -1962,7 +2043,7 @@
                     let formattedValue = typeof v === "string" ? ctx.formatExpression(v) : `scope.${v.id}`;
                     if (attName === "class") {
                         ctx.rootContext.shouldDefineUtils = true;
-                        formattedValue = `utils.toObj(${formattedValue})`;
+                        formattedValue = `utils.toClassObj(${formattedValue})`;
                         if (classObj) {
                             ctx.addLine(`Object.assign(${classObj}, ${formattedValue})`);
                         }
@@ -1987,9 +2068,15 @@
                             const attrIndex = attrs.findIndex((att) => att.startsWith(attName + ":"));
                             attrs.splice(attrIndex, 1);
                         }
-                        ctx.addLine(`let _${attID} = ${formattedValue};`);
-                        attrs.push(`${attName}: _${attID}`);
-                        handleProperties(attName, attID);
+                        if (node.nodeName === "select" && attName === "value") {
+                            attrs.push(`${attName}: ${v}`);
+                            handleProperties(attName, v);
+                        }
+                        else {
+                            ctx.addLine(`let _${attID} = ${formattedValue};`);
+                            attrs.push(`${attName}: _${attID}`);
+                            handleProperties(attName, "_" + attID);
+                        }
                     }
                 }
                 if (name.startsWith("t-attf-")) {
@@ -2043,7 +2130,14 @@
                 ctx.addLine(`}`);
                 ctx.closeIf();
             }
-            ctx.addLine(`let vn${nodeID} = h('${node.nodeName}', p${nodeID}, c${nodeID});`);
+            let nodeName = `'${node.nodeName}'`;
+            if (node.hasAttribute("t-tag")) {
+                const tagExpr = node.getAttribute("t-tag");
+                node.removeAttribute("t-tag");
+                nodeName = `tag${ctx.generateID()}`;
+                ctx.addLine(`let ${nodeName} = ${ctx.formatExpression(tagExpr)};`);
+            }
+            ctx.addLine(`let vn${nodeID} = h(${nodeName}, p${nodeID}, c${nodeID});`);
             if (ctx.parentNode) {
                 ctx.addLine(`c${ctx.parentNode}.push(vn${nodeID});`);
             }
@@ -2068,6 +2162,7 @@
         att: 1,
         attf: 1,
         translation: 1,
+        tag: 1,
     };
     QWeb.DIRECTIVES = [];
     QWeb.TEMPLATES = {};
@@ -2368,7 +2463,9 @@
             }
             // Step 4: add the appropriate function call to current component
             // ------------------------------------------------
-            const parentComponent = `utils.getComponent(context)`;
+            const parentComponent = ctx.rootContext.shouldDefineParent
+                ? `parent`
+                : `utils.getComponent(context)`;
             const key = ctx.generateTemplateKey();
             const parentNode = ctx.parentNode ? `c${ctx.parentNode}` : "result";
             const extra = `Object.assign({}, extra, {parentNode: ${parentNode}, parent: ${parentComponent}, key: ${key}})`;
@@ -2529,6 +2626,7 @@
             // we need to capture every variable in it
             putInCache = false;
             code = ctx.captureExpression(value);
+            code = `const res = (() => { return ${code} })(); if (typeof res === 'function') { res(e) }`;
         }
         const modCode = mods.map((mod) => modcodes[mod]).join("");
         let handler = `function (e) {if (context.__owl__.status === ${5 /* DESTROYED */}){return}${modCode}${code}}`;
@@ -2636,7 +2734,15 @@
         const durations = (styles.transitionDuration || "").split(", ");
         const timeout = getTimeout(delays, durations);
         if (timeout > 0) {
-            elm.addEventListener("transitionend", cb, { once: true });
+            const transitionEndCB = () => {
+                if (!elm.parentNode)
+                    return;
+                cb();
+                browser.clearTimeout(fallbackTimeout);
+                elm.removeEventListener("transitionend", transitionEndCB);
+            };
+            elm.addEventListener("transitionend", transitionEndCB, { once: true });
+            const fallbackTimeout = browser.setTimeout(transitionEndCB, timeout + 1);
         }
         else {
             cb();
@@ -2807,8 +2913,10 @@
         set(mode) {
             QWeb.dev = mode === "dev";
             if (QWeb.dev) {
-                const url = `https://github.com/odoo/owl/blob/master/doc/reference/config.md#mode`;
-                console.warn(`Owl is running in 'dev' mode.  This is not suitable for production use. See ${url} for more information.`);
+                console.info(`Owl is running in 'dev' mode.
+
+This is not suitable for production use.
+See https://github.com/odoo/owl/blob/master/doc/reference/config.md#mode for more information.`);
             }
             else {
                 console.log(`Owl is now running in 'prod' mode.`);
@@ -3074,7 +3182,19 @@
                 .map((k) => k + ":" + props[k])
                 .join(",");
             let componentID = ctx.generateID();
-            const templateKey = ctx.generateTemplateKey();
+            let hasDefinedKey = false;
+            let templateKey;
+            if (node.tagName === "t" && !node.hasAttribute("t-key") && value.match(INTERP_REGEXP)) {
+                defineComponentKey();
+                const id = ctx.generateID();
+                // the ___ is to make sure we have no possible conflict with normal
+                // template keys
+                ctx.addLine(`let k${id} = '___' + componentKey${componentID}`);
+                templateKey = `k${id}`;
+            }
+            else {
+                templateKey = ctx.generateTemplateKey();
+            }
             let ref = node.getAttribute("t-ref");
             let refExpr = "";
             let refKey = "";
@@ -3119,7 +3239,7 @@
                 if (tattClass) {
                     let tattExpr = ctx.formatExpression(tattClass);
                     if (tattExpr[0] !== "{" || tattExpr[tattExpr.length - 1] !== "}") {
-                        tattExpr = `utils.toObj(${tattExpr})`;
+                        tattExpr = `utils.toClassObj(${tattExpr})`;
                     }
                     if (classAttr) {
                         ctx.addLine(`Object.assign(${classObj}, ${tattExpr})`);
@@ -3156,7 +3276,7 @@
             }
             if (hasDynamicProps) {
                 const dynamicProp = ctx.formatExpression(node.getAttribute("t-props"));
-                ctx.addLine(`let props${componentID} = Object.assign({${propStr}}, ${dynamicProp});`);
+                ctx.addLine(`let props${componentID} = Object.assign({}, ${dynamicProp}, {${propStr}});`);
             }
             else {
                 ctx.addLine(`let props${componentID} = {${propStr}};`);
@@ -3171,7 +3291,7 @@
             }
             // SLOTS
             const hasSlots = node.childNodes.length;
-            let scope = hasSlots ? `Object.assign(Object.create(context), scope)` : "undefined";
+            let scope = hasSlots ? `utils.combine(context, scope)` : "undefined";
             ctx.addIf(`w${componentID}`);
             // need to update component
             let styleCode = "";
@@ -3188,13 +3308,16 @@
             }
             ctx.addElse();
             // new component
-            let dynamicFallback = "";
-            if (!value.match(INTERP_REGEXP)) {
-                dynamicFallback = `|| ${ctx.formatExpression(value)}`;
+            function defineComponentKey() {
+                if (!hasDefinedKey) {
+                    const interpValue = ctx.interpolate(value);
+                    ctx.addLine(`let componentKey${componentID} = ${interpValue};`);
+                    hasDefinedKey = true;
+                }
             }
-            const interpValue = ctx.interpolate(value);
-            ctx.addLine(`let componentKey${componentID} = ${interpValue};`);
-            ctx.addLine(`let W${componentID} = context.constructor.components[componentKey${componentID}] || QWeb.components[componentKey${componentID}]${dynamicFallback};`);
+            defineComponentKey();
+            const contextualValue = value.match(INTERP_REGEXP) ? "false" : ctx.formatExpression(value);
+            ctx.addLine(`let W${componentID} = ${contextualValue} || context.constructor.components[componentKey${componentID}] || QWeb.components[componentKey${componentID}];`);
             // maybe only do this in dev mode...
             ctx.addLine(`if (!W${componentID}) {throw new Error('Cannot find the definition of component "' + componentKey${componentID} + '"')}`);
             ctx.addLine(`w${componentID} = new W${componentID}(parent, props${componentID});`);
@@ -3253,12 +3376,17 @@
                     }
                 }
                 if (clone.childNodes.length) {
+                    let hasContent = false;
                     const t = clone.ownerDocument.createElement("t");
                     for (let child of Object.values(clone.childNodes)) {
+                        hasContent =
+                            hasContent || (child instanceof Text ? Boolean(child.textContent.trim().length) : true);
                         t.appendChild(child);
                     }
-                    const slotFn = qweb._compile(`slot_default_template`, { elem: t, hasParent: true });
-                    QWeb.slots[`${slotId}_default`] = slotFn;
+                    if (hasContent) {
+                        const slotFn = qweb._compile(`slot_default_template`, { elem: t, hasParent: true });
+                        QWeb.slots[`${slotId}_default`] = slotFn;
+                    }
                 }
             }
             ctx.addLine(`let fiber = w${componentID}.__prepare(extra.fiber, ${scope}, () => { const vnode = fiber.vnode; pvnode.sel = vnode.sel; ${createHook}});`);
@@ -3652,22 +3780,42 @@
             this.vnode = component.__owl__.vnode || h("div");
             const qweb = component.env.qweb;
             let root = component;
-            let canCatch = false;
-            while (component && !(canCatch = !!component.catchError)) {
-                root = component;
-                component = component.__owl__.parent;
+            function handle(error) {
+                let canCatch = false;
+                qweb.trigger("error", error);
+                while (component && !(canCatch = !!component.catchError)) {
+                    root = component;
+                    component = component.__owl__.parent;
+                }
+                if (canCatch) {
+                    try {
+                        component.catchError(error);
+                    }
+                    catch (e) {
+                        root = component;
+                        component = component.__owl__.parent;
+                        return handle(e);
+                    }
+                    return true;
+                }
+                return false;
             }
-            qweb.trigger("error", error);
-            if (canCatch) {
-                component.catchError(error);
-            }
-            else {
+            let isHandled = handle(error);
+            if (!isHandled) {
                 // the 3 next lines aim to mark the root fiber as being in error, and
                 // to force it to end, without waiting for its children
                 this.root.counter = 0;
                 this.root.error = error;
                 scheduler.flush();
-                root.destroy();
+                // at this point, the state of the application is corrupted and we could
+                // have a lot of issues or crashes. So we destroy the application in a try
+                // catch and swallow these errors because the fiber is already in error,
+                // and this is the actual issue that needs to be solved, not those followup
+                // errors.
+                try {
+                    root.destroy();
+                }
+                catch (e) { }
             }
         }
     }
@@ -5150,6 +5298,7 @@
   `;
 
     const paramRegexp = /\{\{(.*?)\}\}/;
+    const globalParamRegexp = new RegExp(paramRegexp.source, "g");
     class Router {
         constructor(env, routes, options = { mode: "history" }) {
             this.currentRoute = null;
@@ -5171,6 +5320,7 @@
                     this.validateDestination(partialRoute.redirect);
                 }
                 partialRoute.params = partialRoute.path ? findParams(partialRoute.path) : [];
+                partialRoute.extractionRegExp = makeExtractionRegExp(partialRoute.path);
                 this.routes[partialRoute.name] = partialRoute;
                 this.routeIds.push(partialRoute.name);
             }
@@ -5203,7 +5353,10 @@
             const initialParams = this.currentParams;
             const result = await this.matchAndApplyRules(path);
             if (result.type === "match") {
-                const finalPath = this.routeToPath(result.route, result.params);
+                let finalPath = this.routeToPath(result.route, result.params);
+                if (path.indexOf("?") > -1) {
+                    finalPath += "?" + path.split("?")[1];
+                }
                 const isPopStateEvent = ev && ev instanceof PopStateEvent;
                 if (!isPopStateEvent) {
                     this.setUrlFromPath(finalPath);
@@ -5245,19 +5398,12 @@
             }
         }
         routeToPath(route, params) {
-            const path = route.path;
-            const parts = path.split("/");
-            const l = parts.length;
-            for (let i = 0; i < l; i++) {
-                const part = parts[i];
-                const match = part.match(paramRegexp);
-                if (match) {
-                    const key = match[1].split(".")[0];
-                    parts[i] = params[key];
-                }
-            }
             const prefix = this.mode === "hash" ? "#" : "";
-            return prefix + parts.join("/");
+            return (prefix +
+                route.path.replace(globalParamRegexp, (match, param) => {
+                    const [key] = param.split(".");
+                    return params[key];
+                }));
         }
         currentPath() {
             let result = this.mode === "history" ? window.location.pathname : window.location.hash.slice(1);
@@ -5311,45 +5457,52 @@
             if (route.path === "*") {
                 return {};
             }
+            if (path.indexOf("?") > -1) {
+                path = path.split("?")[0];
+            }
             if (path.startsWith("#")) {
                 path = path.slice(1);
             }
-            const descrParts = route.path.split("/");
-            const targetParts = path.split("/");
-            const l = descrParts.length;
-            if (l !== targetParts.length) {
+            const paramsMatch = path.match(route.extractionRegExp);
+            if (!paramsMatch) {
                 return false;
             }
             const result = {};
-            for (let i = 0; i < l; i++) {
-                const descr = descrParts[i];
-                let target = targetParts[i];
-                const match = descr.match(paramRegexp);
-                if (match) {
-                    const [key, suffix] = match[1].split(".");
-                    if (suffix === "number") {
-                        target = parseInt(target, 10);
-                    }
-                    result[key] = target;
+            route.params.forEach((param, index) => {
+                const [key, suffix] = param.split(".");
+                const paramValue = paramsMatch[index + 1];
+                if (suffix === "number") {
+                    return (result[key] = parseInt(paramValue, 10));
                 }
-                else if (descr !== target) {
-                    return false;
-                }
-            }
+                return (result[key] = paramValue);
+            });
             return result;
         }
     }
     function findParams(str) {
-        const globalParamRegexp = /\{\{(.*?)\}\}/g;
         const result = [];
         let m;
         do {
             m = globalParamRegexp.exec(str);
             if (m) {
-                result.push(m[1].split(".")[0]);
+                result.push(m[1]);
             }
         } while (m);
         return result;
+    }
+    function escapeRegExp(str) {
+        return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    }
+    function makeExtractionRegExp(path) {
+        // replace param strings with capture groups so that we can build a regex to match over the path
+        const extractionString = path
+            .split(paramRegexp)
+            .map((part, index) => {
+            return index % 2 ? "(.*)" : escapeRegExp(part);
+        })
+            .join("");
+        // Example: /home/{{param1}}/{{param2}} => ^\/home\/(.*)\/(.*)$
+        return new RegExp(`^${extractionString}$`);
     }
 
     /**
@@ -5391,9 +5544,9 @@
     exports.utils = utils;
 
 
-    __info__.version = '1.2.4';
-    __info__.date = '2021-02-10T13:24:25.187Z';
-    __info__.hash = '985e985';
+    __info__.version = '1.4.4';
+    __info__.date = '2021-09-03T08:19:48.452Z';
+    __info__.hash = 'b3181f1';
     __info__.url = 'https://github.com/odoo/owl';
 
 

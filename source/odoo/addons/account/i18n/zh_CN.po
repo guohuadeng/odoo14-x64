@@ -26,23 +26,23 @@
 # Manga Tsang <mts@odoo.com>, 2020
 # as co02 <asco02@163.com>, 2020
 # 226408 台北 <226408@so8d.com>, 2020
-# mao luo <dooms21day@163.com>, 2020
+# GritLuo <dooms21day@163.com>, 2020
 # 山西清水欧度(QQ:54773801) <54773801@qq.com>, 2020
 # zilin wu <binggue@qq.com>, 2020
 # ChinaMaker <liuct@chinamaker.net>, 2020
 # 敬雲 林 <chingyun@yuanchih-consult.com>, 2020
-# Mandy Choy <mnc@odoo.com>, 2020
 # shan wang <wangshan0901@gmail.com>, 2020
 # 晋 宋 <56457576@qq.com>, 2020
-# Felix Yang - Elico Corp <felixyangsh@aliyun.com>, 2021
+# Felix Yang <felixyangsh@aliyun.com>, 2021
 # 稀饭~~ <wangwhai@qq.com>, 2021
-# Jeffery CHEN Fan <jeffery9@gmail.com>, 2021
+# Jeffery CHEN <jeffery9@gmail.com>, 2021
 # Martin Trigaux, 2021
 # Daniel Yang <daniel.yang.zhenyu@gmail.com>, 2021
 # Titan Li <lghbeta@gmail.com>, 2021
 # keecome <7017511@qq.com>, 2021
 # liAnGjiA <liangjia@qq.com>, 2021
 # JZH-Odoo <jzh@odoo.com>, 2021
+# Mandy Choy <mnc@odoo.com>, 2021
 # 
 msgid ""
 msgstr ""
@@ -50,7 +50,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-25 10:15+0000\n"
 "PO-Revision-Date: 2020-09-07 08:09+0000\n"
-"Last-Translator: JZH-Odoo <jzh@odoo.com>, 2021\n"
+"Last-Translator: Mandy Choy <mnc@odoo.com>, 2021\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/odoo/teams/41243/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -5256,10 +5256,8 @@ msgstr "联邦政府"
 #. openerp-web
 #: code:addons/account/static/src/js/tours/account.js:0
 #, python-format
-msgid ""
-"Fill in the details of the line.<br><i>Tip: all the details can be set "
-"automatically if you configure your <b>products</b>.</i>"
-msgstr "填写行的详细信息。<br><i>提示：如果您配置<b>产品</b>.</i>"
+msgid "Fill in the details of the line."
+msgstr "填写该行的详细信息。"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_analytic_line__general_account_id
@@ -6692,6 +6690,12 @@ msgid ""
 "It seems that the taxes have been modified since the creation of the journal"
 " entry. You should create the credit note manually instead."
 msgstr "自日记帐分录创建以来，税收似乎已经修改。应改为手动创建贷方记录。"
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid "It was previously '%(previous)s' and it is now '%(now)s'."
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
@@ -12476,6 +12480,12 @@ msgid ""
 msgstr "那些应用税行的序列用来定义顺序 ."
 
 #. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid "The sequence format has changed."
+msgstr ""
+
+#. module: account
 #: code:addons/account/models/sequence_mixin.py:0
 #, python-format
 msgid ""
@@ -12484,6 +12494,32 @@ msgid ""
 msgstr ""
 "序列正则表达式至少应包含 seq 分组键。例如：\n"
 "^(?P<prefix1>.*?)(?P<seq>\\d*)(?P<suffix>\\D*?)$"
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid ""
+"The sequence will never restart.\n"
+"The incrementing number in this case is '%(formatted_seq)s'."
+msgstr ""
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid ""
+"The sequence will restart at 1 at the start of every month.\n"
+"The year detected here is '%(year)s' and the month is '%(month)s'.\n"
+"The incrementing number in this case is '%(formatted_seq)s'."
+msgstr ""
+
+#. module: account
+#: code:addons/account/models/account_move.py:0
+#, python-format
+msgid ""
+"The sequence will restart at 1 at the start of every year.\n"
+"The year detected here is '%(year)s'.\n"
+"The incrementing number in this case is '%(formatted_seq)s'."
+msgstr ""
 
 #. module: account
 #: code:addons/account/wizard/account_resequence.py:0
@@ -13672,6 +13708,18 @@ msgid ""
 "You can choose different models for each type of reference. The default one "
 "is the Odoo reference."
 msgstr "您可以为每种参考类型选择不同的模型。默认值是Odoo引用。"
+
+#. module: account
+#: code:addons/account/models/account_journal.py:0
+#, python-format
+msgid ""
+"You can not archive a journal containing draft journal entries.\n"
+"\n"
+"To proceed:\n"
+"1/ click on the top-right button 'Journal Entries' from this journal form\n"
+"2/ then filter on 'Draft' entries\n"
+"3/ select them all and post or delete them through the action menu"
+msgstr ""
 
 #. module: account
 #: code:addons/account/models/account_payment_term.py:0

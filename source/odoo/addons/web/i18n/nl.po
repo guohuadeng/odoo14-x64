@@ -13,8 +13,8 @@
 # Maxim Vandenbroucke <mxv@odoo.com>, 2020
 # Antoine Gilard <ang@odoo.com>, 2020
 # Yip132 <yannick.renders@gmail.com>, 2020
-# Yenthe Van Ginneken <yenthespam@gmail.com>, 2020
 # Martin Trigaux, 2021
+# Yenthe Van Ginneken <yenthespam@gmail.com>, 2021
 # Erwin van der Ploeg <erwin@odooexperts.nl>, 2021
 # 
 msgid ""
@@ -2958,6 +2958,13 @@ msgstr "Alleen u"
 #. openerp-web
 #: code:addons/web/static/src/xml/debug.xml:0
 #, python-format
+msgid "Open Developer Tools"
+msgstr "Open ontwikkelaar tools"
+
+#. module: web
+#. openerp-web
+#: code:addons/web/static/src/xml/debug.xml:0
+#, python-format
 msgid "Open Developer Tools#{widget.debug_mode_help}"
 msgstr "Open Developer Tools#{widget.debug_mode_help}"
 
@@ -3006,6 +3013,13 @@ msgstr "Open de lijstweergave"
 #, python-format
 msgid "Open: "
 msgstr "Open: "
+
+#. module: web
+#. openerp-web
+#: code:addons/web/static/src/js/views/list/list_renderer.js:0
+#, python-format
+msgid "Optional columns"
+msgstr "Optionele kolommen"
 
 #. module: web
 #. openerp-web

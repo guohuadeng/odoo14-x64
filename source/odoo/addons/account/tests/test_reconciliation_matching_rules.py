@@ -350,7 +350,7 @@ class TestReconciliationMatchingRules(AccountTestInvoicingCommon):
     def test_matching_fields_match_total_amount(self):
         # Check match_total_amount: line amount >= total residual amount.
         self.rule_1.match_total_amount_param = 90.0
-        self.bank_line_1.amount += 5
+        self.bank_line_1.amount += 10
         self._check_statement_matching(self.rule_1, {
             self.bank_line_1.id: {'aml_ids': [self.invoice_line_1.id], 'model': self.rule_1, 'status': 'write_off', 'partner': self.bank_line_1.partner_id},
             self.bank_line_2.id: {'aml_ids': [
@@ -361,11 +361,11 @@ class TestReconciliationMatchingRules(AccountTestInvoicingCommon):
             self.cash_line_1.id: {'aml_ids': [self.invoice_line_4.id], 'model': self.rule_1, 'partner': self.cash_line_1.partner_id},
         })
         self.rule_1.match_total_amount_param = 100.0
-        self.bank_line_1.amount -= 5
+        self.bank_line_1.amount -= 10
 
         # Check match_total_amount: line amount <= total residual amount.
         self.rule_1.match_total_amount_param = 90.0
-        self.bank_line_1.amount -= 5
+        self.bank_line_1.amount -= 10
         self._check_statement_matching(self.rule_1, {
             self.bank_line_1.id: {'aml_ids': [self.invoice_line_1.id], 'model': self.rule_1, 'status': 'write_off', 'partner': self.bank_line_1.partner_id},
             self.bank_line_2.id: {'aml_ids': [
@@ -376,7 +376,37 @@ class TestReconciliationMatchingRules(AccountTestInvoicingCommon):
             self.cash_line_1.id: {'aml_ids': [self.invoice_line_4.id], 'model': self.rule_1, 'partner': self.cash_line_1.partner_id},
         })
         self.rule_1.match_total_amount_param = 100.0
-        self.bank_line_1.amount += 5
+        self.bank_line_1.amount += 10
+
+        # Check match_total_amount: line amount >= total residual amount, match_total_amount_param just not matched.
+        self.rule_1.match_total_amount_param = 90.0
+        self.bank_line_1.amount += 10.01
+        self._check_statement_matching(self.rule_1, {
+            self.bank_line_1.id: {'aml_ids': []},
+            self.bank_line_2.id: {'aml_ids': [
+                self.invoice_line_1.id,
+                self.invoice_line_2.id,
+                self.invoice_line_3.id,
+            ], 'model': self.rule_1, 'partner': self.bank_line_2.partner_id},
+            self.cash_line_1.id: {'aml_ids': [self.invoice_line_4.id], 'model': self.rule_1, 'partner': self.cash_line_1.partner_id},
+        })
+        self.rule_1.match_total_amount_param = 100.0
+        self.bank_line_1.amount -= 10.01
+
+        # Check match_total_amount: line amount <= total residual amount, match_total_amount_param just not matched.
+        self.rule_1.match_total_amount_param = 90.0
+        self.bank_line_1.amount -= 10.01
+        self._check_statement_matching(self.rule_1, {
+            self.bank_line_1.id: {'aml_ids': []},
+            self.bank_line_2.id: {'aml_ids': [
+                self.invoice_line_1.id,
+                self.invoice_line_2.id,
+                self.invoice_line_3.id,
+            ], 'model': self.rule_1, 'partner': self.bank_line_2.partner_id},
+            self.cash_line_1.id: {'aml_ids': [self.invoice_line_4.id], 'model': self.rule_1, 'partner': self.cash_line_1.partner_id},
+        })
+        self.rule_1.match_total_amount_param = 100.0
+        self.bank_line_1.amount += 10.01
 
     def test_matching_fields_match_partner_category_ids(self):
         test_category = self.env['res.partner.category'].create({'name': 'Consulting Services'})
@@ -919,3 +949,113 @@ class TestReconciliationMatchingRules(AccountTestInvoicingCommon):
             self.bank_line_1.id: {'aml_ids': [self.invoice_line_1.id], 'model': self.rule_1, 'status': 'write_off', 'partner': self.bank_line_1.partner_id},
             self.bank_line_2.id: {'aml_ids': [self.invoice_line_2.id], 'model': second_inv_matching_rule, 'partner': self.bank_line_2.partner_id}
         }, statements=self.bank_st)
+
+    def test_payment_similar_communications(self):
+        def create_payment_line(amount, memo, partner):
+            payment = self.env['account.payment'].create({
+                'amount': amount,
+                'payment_type': 'inbound',
+                'partner_type': 'customer',
+                'partner_id': partner.id,
+                'ref': memo,
+                'destination_account_id': self.company_data['default_account_receivable'].id,
+            })
+            payment.action_post()
+
+            return payment.line_ids.filtered(lambda x: x.account_id.user_type_id.type not in {'receivable', 'payable'})
+
+        payment_partner = self.env['res.partner'].create({
+            'name': "Bernard Gagnant",
+        })
+
+        self.rule_1.match_partner_ids = [(6, 0, payment_partner.ids)]
+
+        pmt_line_1 = create_payment_line(500, 'a1b2c3', payment_partner)
+        pmt_line_2 = create_payment_line(500, 'a1b2c3', payment_partner)
+        pmt_line_3 = create_payment_line(500, 'd1e2f3', payment_partner)
+
+        self.bank_line_1.write({
+            'amount': 1000,
+            'payment_ref': 'a1b2c3',
+            'partner_id': payment_partner.id,
+        })
+        self.bank_line_2.unlink()
+        self.rule_1.match_total_amount = False
+
+        self._check_statement_matching(self.rule_1, {
+            self.bank_line_1.id: {'aml_ids': (pmt_line_1 + pmt_line_2).ids, 'model': self.rule_1, 'partner': payment_partner},
+        }, statements=self.bank_line_1.statement_id)
+
+    def test_tax_tags_inversion_with_reconciliation_model(self):
+        country = self.env.ref('base.us')
+        tax_report = self.env['account.tax.report'].create({
+            'name': "Tax report",
+            'country_id': country.id,
+        })
+        tax_report_line = self.env['account.tax.report.line'].create({
+            'name': 'test_tax_report_line',
+            'tag_name': 'test_tax_report_line',
+            'report_id': tax_report.id,
+            'sequence': 10,
+        })
+        tax_tag_pos = tax_report_line.tag_ids.filtered(lambda x: not x.tax_negate)
+        tax_tag_neg = tax_report_line.tag_ids.filtered(lambda x: x.tax_negate)
+        tax = self.env['account.tax'].create({
+            'name': 'Test Tax',
+            'amount': 10,
+            'invoice_repartition_line_ids': [
+                (0, 0, {
+                    'factor_percent': 100,
+                    'repartition_type': 'base',
+                    'tag_ids': [(6, 0, tax_tag_pos.ids)],
+                }),
+                (0, 0, {
+                    'factor_percent': 100,
+                    'repartition_type': 'tax',
+                    'tag_ids': [(6, 0, tax_tag_neg.ids)],
+                }),
+            ],
+            'refund_repartition_line_ids': [
+                (0, 0, {
+                    'factor_percent': 100,
+                    'repartition_type': 'base',
+                    'tag_ids': [(6, 0, tax_tag_neg.ids)],
+                }),
+                (0, 0, {
+                    'factor_percent': 100,
+                    'repartition_type': 'tax',
+                    'tag_ids': [(6, 0, tax_tag_pos.ids)],
+                }),
+            ],
+        })
+        reconciliation_model = self.env['account.reconcile.model'].create({
+            'name': 'Charge with Tax',
+            'line_ids': [(0, 0, {
+                'account_id': self.company_data['default_account_expense'].id,
+                'amount_type': 'percentage',
+                'amount_string': '100',
+                'tax_ids': [(6, 0, tax.ids)]
+            })]
+        })
+        bank_stmt = self.env['account.bank.statement'].create({
+            'journal_id': self.bank_journal.id,
+            'date': '2020-07-15',
+            'name': 'test',
+            'line_ids': [(0, 0, {
+                'payment_ref': 'testLine',
+                'amount': 5,
+                'date': '2020-07-15',
+            })]
+        })
+        res = reconciliation_model._get_write_off_move_lines_dict(bank_stmt.line_ids, 5)
+        self.assertEqual(len(res), 2)
+        self.assertEqual(
+            res[0]['tax_tag_ids'],
+            [(6, 0, tax.refund_repartition_line_ids[0].tag_ids.ids)],
+            'The tags of the first repartition line are not inverted'
+        )
+        self.assertEqual(
+            res[1]['tax_tag_ids'],
+            [(6, 0, tax.refund_repartition_line_ids[1].tag_ids.ids)],
+            'The tags of the second repartition line are not inverted'
+        )

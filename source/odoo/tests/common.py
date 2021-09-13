@@ -2018,6 +2018,7 @@ class Form(object):
             for k, v in values.items()
             if k in self._view['fields']
         )
+        return result
 
     def _onchange_values(self):
         return self._onchange_values_(self._view['fields'], self._values)
@@ -2465,11 +2466,11 @@ def _get_node(view, f, *arg):
 
 def tagged(*tags):
     """
-    A decorator to tag BaseCase objects
-    Tags are stored in a set that can be accessed from a 'test_tags' attribute
-    A tag prefixed by '-' will remove the tag e.g. to remove the 'standard' tag
+    A decorator to tag BaseCase objects.
+    Tags are stored in a set that can be accessed from a 'test_tags' attribute.
+    A tag prefixed by '-' will remove the tag e.g. to remove the 'standard' tag.
     By default, all Test classes from odoo.tests.common have a test_tags
-    attribute that defaults to 'standard' and also the module technical name
+    attribute that defaults to 'standard' and 'at_install'.
     When using class inheritance, the tags are NOT inherited.
     """
     def tags_decorator(obj):

@@ -15,6 +15,7 @@
 # Cécile Collart <cco@odoo.com>, 2020
 # maiolif <maiolif@mgftools.com>, 2020
 # Léonie Bouchat <lbo@odoo.com>, 2020
+# Alessandro Fiorino <alessandro.fiorino@digitaldomus.it>, 2021
 # Sergio Zanchetta <primes2h@gmail.com>, 2021
 # 
 msgid ""
@@ -59,6 +60,12 @@ msgstr "N. di righe"
 #: model:mail.template,subject:purchase.email_template_edi_purchase_reminder
 msgid "${object.company_id.name} Order (Ref ${object.name or 'n/a' })"
 msgstr "Ordine ${object.company_id.name} (rif. ${object.name or 'n/d' })"
+
+#. module: purchase
+#: code:addons/purchase/models/purchase.py:0
+#, python-format
+msgid "%(name)s confirmed the receipt will take place on %(date)s."
+msgstr "%(name)s ha confermato che la ricezione avrà luogo il %(date)s."
 
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.mail_notification_confirm
@@ -157,7 +164,7 @@ msgstr ""
 "            (${object.partner_id.parent_id.name})\n"
 "        % endif\n"
 "        <br/><br/>\n"
-"        siamo ad inviarLe l'ordine di acquisto <strong>${object.name}</strong>\n"
+"        siamo ad inviarLe in allegato l'ordine di acquisto <strong>${object.name}</strong>\n"
 "        % if object.partner_ref:\n"
 "            con riferimento: ${object.partner_ref}\n"
 "        % endif\n"
@@ -201,7 +208,7 @@ msgstr ""
 "            (${object.partner_id.parent_id.name})\n"
 "        % endif\n"
 "        <br/><br/>\n"
-"        siamo ad inviarLe la richiesta di preventivo <strong>${object.name}</strong>\n"
+"        siamo ad inviarLe in allegato la richiesta di preventivo <strong>${object.name}</strong>\n"
 "        % if object.partner_ref:\n"
 "            con riferimento: ${object.partner_ref}\n"
 "        % endif\n"
@@ -832,7 +839,7 @@ msgstr "Fai clic qui per modificare o spostare la riga di preventivo."
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_report__commercial_partner_id
 msgid "Commercial Entity"
-msgstr "Ente commerciale"
+msgstr "Entità commerciale"
 
 #. module: purchase
 #: model:ir.model,name:purchase.model_res_company
@@ -967,7 +974,7 @@ msgstr "Creato da"
 #: model:ir.model.fields,field_description:purchase.field_purchase_order__create_date
 #: model:ir.model.fields,field_description:purchase.field_purchase_order_line__create_date
 msgid "Created on"
-msgstr "Creato il"
+msgstr "Data creazione"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_bill_union__currency_id
@@ -1026,7 +1033,7 @@ msgstr "Giorni per confermare"
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_report__delay_pass
 msgid "Days to Receive"
-msgstr ""
+msgstr "Giorni per la Ricezione"
 
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
@@ -1256,7 +1263,7 @@ msgstr "Icona"
 #. module: purchase
 #: model:ir.model.fields,help:purchase.field_purchase_order__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr "Icona per indicare una eccezione attività."
+msgstr "Icona per indicare un'attività eccezione."
 
 #. module: purchase
 #: model:ir.model.fields,help:purchase.field_purchase_order__message_needaction
@@ -1655,7 +1662,7 @@ msgstr "Normale"
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search
 msgid "Not Acknowledged"
-msgstr ""
+msgstr "Non Confermato"
 
 #. module: purchase
 #: model:ir.model.fields.selection,name:purchase.selection__purchase_order_line__display_type__line_note
@@ -1766,7 +1773,7 @@ msgstr "Data ordine"
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_order__date_order
 msgid "Order Deadline"
-msgstr "Scadenza ordine"
+msgstr "Scadenza per ordine"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_order__order_line
@@ -2615,6 +2622,12 @@ msgid "Terms and Conditions"
 msgstr "Termini e condizioni"
 
 #. module: purchase
+#: code:addons/purchase/models/purchase.py:0
+#, python-format
+msgid "The order receipt has been acknowledged by %(name)s."
+msgstr "La ricezione dell'ordine è stata confermata da %(name)s."
+
+#. module: purchase
 #: model_terms:ir.actions.act_window,help:purchase.act_res_partner_2_purchase_order
 msgid ""
 "The request for quotation is the first step of the purchases flow. Once\n"
@@ -2654,8 +2667,8 @@ msgid ""
 "This account will be used to value price difference between purchase price "
 "and accounting cost."
 msgstr ""
-"Questo account verrà utilizzato per valutare le differenze di prezzo tra "
-"prezzo d'acquisto e  il  costo contabile"
+"Conto utilizzato per valutare la differenza di prezzo tra prezzo di acquisto"
+" e costo contabile."
 
 #. module: purchase
 #: model:ir.model.fields,help:purchase.field_res_partner__property_purchase_currency_id
@@ -2664,8 +2677,8 @@ msgid ""
 "This currency will be used, instead of the default one, for purchases from "
 "the current partner"
 msgstr ""
-"Questa valuta verrà usata, al posto della predefinita, per acquisti dai "
-"partner correnti."
+"Valuta utilizzata, al posto di quella predefinita, per acquisti dal partner "
+"corrente."
 
 #. module: purchase
 #: model:ir.model.fields,help:purchase.field_res_config_settings__default_purchase_method
@@ -2680,7 +2693,7 @@ msgstr ""
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.view_product_supplier_inherit
 msgid "This note is added to purchase orders."
-msgstr "Questa nota viene aggiunta agli ordini di acquisto."
+msgstr "Nota aggiunta agli ordini di acquisto."
 
 #. module: purchase
 #: code:addons/purchase/models/account_invoice.py:0
@@ -2778,7 +2791,7 @@ msgstr "Vero se l'e-mail di promemoria viene confermata dal fornitore."
 #. module: purchase
 #: model:ir.model.fields,help:purchase.field_purchase_order__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "Tipo di eccezione attività sul record."
+msgstr "Tipo di attività eccezione sul record."
 
 #. module: purchase
 #: code:addons/purchase/models/purchase.py:0
@@ -2787,8 +2800,8 @@ msgid ""
 "Unable to cancel this purchase order. You must first cancel the related "
 "vendor bills."
 msgstr ""
-"Impossibile annullare questo ordine di acquisto. Annullare prima le relative"
-" fatture fornitore."
+"Impossibile annullare l'ordine di acquisto. Annullare prima le relative "
+"fatture fornitore."
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_order_line__price_unit

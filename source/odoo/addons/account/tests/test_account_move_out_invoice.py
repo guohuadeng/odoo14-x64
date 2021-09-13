@@ -141,6 +141,17 @@ class TestAccountMoveOutInvoiceOnchanges(AccountTestInvoicingCommon):
             self.term_line_vals_1,
         ], self.move_vals)
 
+    def test_out_invoice_onchange_invoice_date(self):
+        for tax_date, invoice_date, accounting_date in [
+            ('2019-03-31', '2019-05-12', '2019-05-12'),
+            ('2019-03-31', '2019-02-10', '2019-04-1'),
+            ('2019-05-31', '2019-06-15', '2019-06-15'),
+        ]:
+            self.invoice.company_id.tax_lock_date = tax_date
+            with Form(self.invoice) as move_form:
+                move_form.invoice_date = invoice_date
+            self.assertEqual(self.invoice.date, fields.Date.to_date(accounting_date))
+
     def test_out_invoice_line_onchange_product_1(self):
         move_form = Form(self.invoice)
         with move_form.invoice_line_ids.edit(0) as line_form:
@@ -830,7 +841,7 @@ class TestAccountMoveOutInvoiceOnchanges(AccountTestInvoicingCommon):
             'amount_total': 1730.0,
         })
 
-    def test_out_invoice_line_onchange_rounding_price_subtotal(self):
+    def test_out_invoice_line_onchange_rounding_price_subtotal_1(self):
         ''' Seek for rounding issue on the price_subtotal when dealing with a price_unit having more digits than the
         foreign currency one.
         '''
@@ -903,6 +914,108 @@ class TestAccountMoveOutInvoiceOnchanges(AccountTestInvoicingCommon):
         })
 
         check_invoice_values(invoice_2)
+
+    def test_out_invoice_line_onchange_rounding_price_subtotal_2(self):
+        """ Ensure the cyclic computations implemented using onchanges are not leading to rounding issues when using
+        price-included taxes.
+        For example:
+        100 / 1.21 ~= 82.64 but 82.64 * 1.21 ~= 99.99 != 100.0.
+        """
+
+        def check_invoice_values(invoice):
+            self.assertInvoiceValues(invoice, [
+                {
+                    'price_unit': 100.0,
+                    'price_subtotal': 82.64,
+                    'debit': 0.0,
+                    'credit': 82.64,
+                },
+                {
+                    'price_unit': 17.36,
+                    'price_subtotal': 17.36,
+                    'debit': 0.0,
+                    'credit': 17.36,
+                },
+                {
+                    'price_unit': -100.0,
+                    'price_subtotal': -100.0,
+                    'debit': 100.0,
+                    'credit': 0.0,
+                },
+            ], {
+                'amount_untaxed': 82.64,
+                'amount_tax': 17.36,
+                'amount_total': 100.0,
+            })
+
+        tax = self.env['account.tax'].create({
+            'name': '21%',
+            'amount': 21.0,
+            'price_include': True,
+            'include_base_amount': True,
+        })
+
+        # == Test assigning tax directly ==
+
+        invoice_create = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'invoice_date': '2017-01-01',
+            'date': '2017-01-01',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [(0, 0, {
+                'name': 'test line',
+                'price_unit': 100.0,
+                'account_id': self.company_data['default_account_revenue'].id,
+                'tax_ids': [(6, 0, tax.ids)],
+            })],
+        })
+
+        check_invoice_values(invoice_create)
+
+        move_form = Form(self.env['account.move'].with_context(default_move_type='out_invoice'))
+        move_form.invoice_date = fields.Date.from_string('2017-01-01')
+        move_form.partner_id = self.partner_a
+        with move_form.invoice_line_ids.new() as line_form:
+            line_form.name = 'test line'
+            line_form.price_unit = 100.0
+            line_form.account_id = self.company_data['default_account_revenue']
+            line_form.tax_ids.clear()
+            line_form.tax_ids.add(tax)
+        invoice_onchange = move_form.save()
+
+        check_invoice_values(invoice_onchange)
+
+        # == Test when the tax is set on a product ==
+
+        product = self.env['product.product'].create({
+            'name': 'product',
+            'lst_price': 100.0,
+            'property_account_income_id': self.company_data['default_account_revenue'].id,
+            'taxes_id': [(6, 0, tax.ids)],
+        })
+
+        move_form = Form(self.env['account.move'].with_context(default_move_type='out_invoice'))
+        move_form.invoice_date = fields.Date.from_string('2017-01-01')
+        move_form.partner_id = self.partner_a
+        with move_form.invoice_line_ids.new() as line_form:
+            line_form.product_id = product
+        invoice_onchange = move_form.save()
+
+        check_invoice_values(invoice_onchange)
+
+        # == Test with a fiscal position ==
+
+        fiscal_position = self.env['account.fiscal.position'].create({'name': 'fiscal_position'})
+
+        move_form = Form(self.env['account.move'].with_context(default_move_type='out_invoice'))
+        move_form.invoice_date = fields.Date.from_string('2017-01-01')
+        move_form.partner_id = self.partner_a
+        move_form.fiscal_position_id = fiscal_position
+        with move_form.invoice_line_ids.new() as line_form:
+            line_form.product_id = product
+        invoice_onchange = move_form.save()
+
+        check_invoice_values(invoice_onchange)
 
     def test_out_invoice_line_onchange_taxes_2_price_unit_tax_included(self):
         ''' Seek for rounding issue in the price unit. Suppose a price_unit of 2300 with a 5.5% price-included tax
@@ -2424,6 +2537,81 @@ class TestAccountMoveOutInvoiceOnchanges(AccountTestInvoicingCommon):
             'amount_untaxed' : self.move_vals['amount_untaxed'],
         })
 
+    def test_out_invoice_reverse_move_tags(self):
+        country = self.env.ref('base.us')
+        tags = self.env['account.account.tag'].create([{
+            'name': "Test tag %s" % i,
+            'applicability': 'taxes',
+            'country_id': country.id,
+        } for i in range(8)])
+
+        taxes = self.env['account.tax'].create([{
+            'name': "Test tax include_base_amount = %s" % include_base_amount,
+            'amount': 10.0,
+            'include_base_amount': include_base_amount,
+            'invoice_repartition_line_ids': [
+                (0, 0, {
+                    'factor_percent': 100,
+                    'repartition_type': 'base',
+                    'tag_ids': [(6, 0, tags[(i * 4)].ids)],
+                }),
+                (0, 0, {
+                    'factor_percent': 100,
+                    'repartition_type': 'tax',
+                    'tag_ids': [(6, 0, tags[(i * 4) + 1].ids)],
+                }),
+            ],
+            'refund_repartition_line_ids': [
+                (0, 0, {
+                    'factor_percent': 100,
+                    'repartition_type': 'base',
+                    'tag_ids': [(6, 0, tags[(i * 4) + 2].ids)],
+                }),
+                (0, 0, {
+                    'factor_percent': 100,
+                    'repartition_type': 'tax',
+                    'tag_ids': [(6, 0, tags[(i * 4) + 3].ids)],
+                }),
+            ],
+        } for i, include_base_amount in enumerate((True, False))])
+
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': fields.Date.from_string('2019-01-01'),
+            'invoice_payment_term_id': self.pay_terms_a.id,
+            'invoice_line_ids': [
+                (0, 0, {
+                    'product_id': self.product_a.id,
+                    'price_unit': 1000.0,
+                    'tax_ids': [(6, 0, taxes.ids)],
+                }),
+            ]
+        })
+        invoice.action_post()
+
+        self.assertRecordValues(invoice.line_ids.sorted('tax_line_id'), [
+            # Product line
+            {'tax_line_id': False,          'tax_ids': taxes.ids,       'tax_tag_ids': (tags[0] + tags[4]).ids},
+            # Receivable line
+            {'tax_line_id': False,          'tax_ids': [],              'tax_tag_ids': []},
+            # Tax lines
+            {'tax_line_id': taxes[0].id,    'tax_ids': taxes[1].ids,    'tax_tag_ids': (tags[1] + tags[4]).ids},
+            {'tax_line_id': taxes[1].id,    'tax_ids': [],              'tax_tag_ids': tags[5].ids},
+        ])
+
+        refund = invoice._reverse_moves(cancel=True)
+
+        self.assertRecordValues(refund.line_ids.sorted('tax_line_id'), [
+            # Product line
+            {'tax_line_id': False,          'tax_ids': taxes.ids,       'tax_tag_ids': (tags[2] + tags[6]).ids},
+            # Receivable line
+            {'tax_line_id': False,          'tax_ids': [],              'tax_tag_ids': []},
+            # Tax lines
+            {'tax_line_id': taxes[0].id,    'tax_ids': taxes[1].ids,    'tax_tag_ids': (tags[3] + tags[6]).ids},
+            {'tax_line_id': taxes[1].id,    'tax_ids': [],              'tax_tag_ids': tags[7].ids},
+        ])
+
     def test_out_invoice_change_period_accrual_1(self):
         move = self.env['account.move'].create({
             'move_type': 'out_invoice',
@@ -2743,3 +2931,33 @@ class TestAccountMoveOutInvoiceOnchanges(AccountTestInvoicingCommon):
         with Form(self.invoice) as move_form:
             move_form.invoice_payment_term_id = self.pay_terms_b    # Switch to 30% in advance payment terms
             move_form.invoice_payment_term_id = self.pay_terms_a    # Back to immediate payment term
+
+    def test_out_invoice_copy_custom_date(self):
+        """ When creating a refund for a given invoice, the invoice is copied first. This test ensures the payment
+        terms are well recomputed in order to take the new date into account.
+        """
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'invoice_date': '2017-01-01',
+            'invoice_date_due': '2017-01-01',
+            'date': '2017-01-01',
+            'partner_id': self.partner_a.id,
+            'currency_id': self.currency_data['currency'].id,
+            'invoice_line_ids': [
+                (0, None, {
+                    'product_id': self.product_a.id,
+                    'product_uom_id': self.product_a.uom_id.id,
+                    'quantity': 1.0,
+                    'price_unit': 1000.0,
+                    'tax_ids': [(6, 0, self.product_a.taxes_id.ids)],
+                }),
+            ]
+        })
+
+        copy_invoice = invoice.copy(default={'invoice_date_due': '2018-01-01'})
+        self.assertRecordValues(copy_invoice, [
+            {'invoice_date_due': fields.Date.from_string('2018-01-01')},
+        ])
+        self.assertRecordValues(copy_invoice.line_ids.filtered('date_maturity'), [
+            {'date_maturity': fields.Date.from_string('2018-01-01')},
+        ])

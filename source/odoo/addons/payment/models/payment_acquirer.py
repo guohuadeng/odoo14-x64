@@ -445,7 +445,7 @@ class PaymentAcquirer(models.Model):
                 'partner_zip': partner.zip,
                 'partner_city': partner.city,
                 'partner_address': _partner_format_address(partner.street, partner.street2),
-                'partner_country_id': partner.country_id.id or self.env['res.company']._company_default_get().country_id.id,
+                'partner_country_id': partner.country_id.id or self.env.company.country_id.id,
                 'partner_country': partner.country_id,
                 'partner_phone': partner.phone,
                 'partner_state': partner.state_id,
@@ -877,7 +877,7 @@ class PaymentTransaction(models.Model):
             'date': fields.Datetime.now(),
             'state_message': msg,
         })
-        self._log_payment_transaction_received()
+        tx_to_process._log_payment_transaction_received()
 
     def _post_process_after_done(self):
         self._reconcile_after_transaction_done()

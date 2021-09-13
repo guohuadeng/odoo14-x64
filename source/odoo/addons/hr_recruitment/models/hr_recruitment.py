@@ -341,6 +341,7 @@ class Applicant(models.Model):
         category = self.env.ref('hr_recruitment.categ_meet_interview')
         res = self.env['ir.actions.act_window']._for_xml_id('calendar.action_calendar_event')
         res['context'] = {
+            'default_applicant_id': self.id,
             'default_partner_ids': partners.ids,
             'default_user_id': self.env.uid,
             'default_name': self.name,
@@ -419,6 +420,9 @@ class Applicant(models.Model):
         # want the gateway user to be responsible if no other responsible is
         # found.
         self = self.with_context(default_user_id=False)
+        stage = False
+        if custom_values and 'job_id' in custom_values:
+            stage = self.env['hr.job'].browse(custom_values['job_id'])._get_first_stage()
         val = msg.get('from').split('<')[0]
         defaults = {
             'name': msg.get('subject') or _("No Subject"),
@@ -428,6 +432,8 @@ class Applicant(models.Model):
         }
         if msg.get('priority'):
             defaults['priority'] = msg.get('priority')
+        if stage and stage.id:
+            defaults['stage_id'] = stage.id
         if custom_values:
             defaults.update(custom_values)
         return super(Applicant, self).message_new(msg, custom_values=defaults)

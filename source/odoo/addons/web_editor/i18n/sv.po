@@ -104,7 +104,7 @@ msgstr ""
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippets
 msgid "<span>Blocks</span>"
-msgstr ""
+msgstr "<span>Block</span>"
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippets
@@ -569,7 +569,7 @@ msgstr "Beskrivning"
 #: model_terms:ir.ui.view,arch_db:web_editor.snippets
 #, python-format
 msgid "Discard"
-msgstr "Förkasta"
+msgstr "Avbryt"
 
 #. module: web_editor
 #: model:ir.model.fields,field_description:web_editor.field_ir_attachment__display_name
@@ -1493,12 +1493,12 @@ msgstr "Citat"
 #. module: web_editor
 #: model:ir.model,name:web_editor.model_ir_qweb
 msgid "Qweb"
-msgstr ""
+msgstr "Qweb"
 
 #. module: web_editor
 #: model:ir.model,name:web_editor.model_ir_qweb_field
 msgid "Qweb Field"
-msgstr ""
+msgstr "Qweb-fält"
 
 #. module: web_editor
 #: model:ir.model,name:web_editor.model_ir_qweb_field_contact
@@ -2183,7 +2183,7 @@ msgstr ""
 #: code:addons/web_editor/static/src/xml/wysiwyg.xml:0
 #, python-format
 msgid "Upload a document"
-msgstr ""
+msgstr "Ladda upp ett dokument"
 
 #. module: web_editor
 #. openerp-web

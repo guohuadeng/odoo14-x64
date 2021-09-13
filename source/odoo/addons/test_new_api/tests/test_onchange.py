@@ -536,6 +536,39 @@ class TestOnChange(SavepointCaseWithUserDemo):
 
         self.assertFalse(called[0], "discussion.messages has been read")
 
+    def test_onchange_inherited(self):
+        """ Setting an inherited field should assign the field on the parent record. """
+        foo, bar = self.env['test_new_api.multi.tag'].create([{'name': 'Foo'}, {'name': 'Bar'}])
+        view = self.env['ir.ui.view'].create({
+            'name': 'Payment form view',
+            'model': 'test_new_api.payment',
+            'arch': """
+                <form>
+                    <field name="move_id" readonly="1" required="0"/>
+                    <field name="tag_id"/>
+                    <field name="tag_name"/>
+                </form>
+            """,
+        })
+
+        # both fields 'tag_id' and 'tag_name' are inherited through 'move_id';
+        # assigning 'tag_id' should modify 'move_id.tag_id' accordingly, which
+        # should in turn recompute `move.tag_name` and `tag_name`
+        form = Form(self.env['test_new_api.payment'], view)
+        form.tag_id = foo
+        self.assertEqual(form.tag_name, 'Foo')
+
+        payment = form.save()
+        self.assertEqual(payment.tag_id, foo)
+        self.assertEqual(payment.tag_name, 'Foo')
+
+        with Form(payment, view) as form:
+            form.tag_id = bar
+            self.assertEqual(form.tag_name, 'Bar')
+
+        self.assertEqual(payment.tag_id, bar)
+        self.assertEqual(payment.tag_name, 'Bar')
+
 
 class TestComputeOnchange(common.TransactionCase):
 
@@ -823,3 +856,47 @@ class TestComputeOnchange(common.TransactionCase):
         ]
         result = record.onchange({'line_ids': line_ids}, 'line_ids', spec)
         self.assertEqual(result, expected)
+
+    def test_computed_editable_one2many_domain(self):
+        """ Test a computed, editable one2many field with a domain. """
+        record = self.env['test_new_api.one2many'].create({'name': 'foo'})
+        self.assertRecordValues(record.line_ids, [
+            {'name': 'foo', 'count': 1},
+        ])
+
+        # trigger recomputation by changing name
+        record.name = 'bar'
+        self.assertRecordValues(record.line_ids, [
+            {'name': 'foo', 'count': 1},
+            {'name': 'bar', 'count': 1},
+        ])
+
+        # manually adding a line should not trigger recomputation
+        record.line_ids.create({'name': 'baz', 'container_id': record.id})
+        self.assertRecordValues(record.line_ids, [
+            {'name': 'foo', 'count': 1},
+            {'name': 'bar', 'count': 1},
+            {'name': 'baz', 'count': 1},
+        ])
+
+        # changing the field in the domain should not trigger recomputation...
+        record.line_ids[-1].count = 2
+        self.assertRecordValues(record.line_ids, [
+            {'name': 'foo', 'count': 1},
+            {'name': 'bar', 'count': 1},
+            {'name': 'baz', 'count': 2},
+        ])
+
+        # ...and may show cache inconsistencies
+        record.line_ids[-1].count = 0
+        self.assertRecordValues(record.line_ids, [
+            {'name': 'foo', 'count': 1},
+            {'name': 'bar', 'count': 1},
+            {'name': 'baz', 'count': 0},
+        ])
+        record.flush()
+        record.invalidate_cache()
+        self.assertRecordValues(record.line_ids, [
+            {'name': 'foo', 'count': 1},
+            {'name': 'bar', 'count': 1},
+        ])

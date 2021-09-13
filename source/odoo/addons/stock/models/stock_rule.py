@@ -34,6 +34,13 @@ class StockRule(models.Model):
     _order = "sequence, id"
     _check_company_auto = True
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        if 'company_id' in fields_list and not res['company_id']:
+            res['company_id'] = self.env.company.id
+        return res
+
     name = fields.Char(
         'Name', required=True, translate=True,
         help="This field will fill the packing origin and the name of its moves")
@@ -325,7 +332,10 @@ class StockRule(models.Model):
         :rtype: tuple
         """
         delay = sum(self.filtered(lambda r: r.action in ['pull', 'pull_push']).mapped('delay'))
-        delay_description = ''.join(['<tr><td>%s %s</td><td class="text-right">+ %d %s</td></tr>' % (_('Delay on'), html_escape(rule.name), rule.delay, _('day(s)')) for rule in self if rule.action in ['pull', 'pull_push'] and rule.delay])
+        if self.env.context.get('bypass_delay_description'):
+            delay_description = ""
+        else:
+            delay_description = ''.join(['<tr><td>%s %s</td><td class="text-right">+ %d %s</td></tr>' % (_('Delay on'), html_escape(rule.name), rule.delay, _('day(s)')) for rule in self if rule.action in ['pull', 'pull_push'] and rule.delay])
         return delay, delay_description
 
 

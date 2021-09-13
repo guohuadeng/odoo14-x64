@@ -29,6 +29,7 @@
 # Jenni Heikkilä <jenni.heikkila@sv-oy.fi>, 2020
 # Miku Laitinen <miku.laitinen@gmail.com>, 2020
 # Mikko Virtanen <mikko.virtanen2013@gmail.com>, 2021
+# Miika Nissi <miika.nissi@tawasta.fi>, 2021
 # Jarmo Kortetjärvi <jarmo.kortetjarvi@gmail.com>, 2021
 # 
 msgid ""
@@ -57,7 +58,7 @@ msgstr ""
 #: code:addons/project/static/src/js/project_task_kanban_examples.js:0
 #, python-format
 msgid "\"This Month\""
-msgstr ""
+msgstr "\"Tässä kuussa\""
 
 #. module: project
 #. openerp-web
@@ -1876,7 +1877,7 @@ msgstr "Kanban-tila"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__kanban_state_label
 msgid "Kanban State Label"
-msgstr ""
+msgstr "Kanban -tilan otsikko"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__legend_done
@@ -2737,7 +2738,7 @@ msgstr "Arvostelu"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__rating_avg
 msgid "Rating Average"
-msgstr ""
+msgstr "Keskimääräinen arvio"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task_type__rating_template_id
@@ -2752,17 +2753,17 @@ msgstr "Arvostelujen toistuvuus"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__rating_last_feedback
 msgid "Rating Last Feedback"
-msgstr ""
+msgstr "Arvio viimeisin palaute"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__rating_last_image
 msgid "Rating Last Image"
-msgstr ""
+msgstr "Arvio viimeinen kuva"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__rating_last_value
 msgid "Rating Last Value"
-msgstr ""
+msgstr "Arvio viimeisin arvo"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__rating_request_deadline
@@ -2785,7 +2786,7 @@ msgstr ""
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__rating_count
 msgid "Rating count"
-msgstr ""
+msgstr "Arvioiden määrä"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_project__rating_status__stage
@@ -2836,7 +2837,7 @@ msgstr "Valmiina uudelleenavattavaksi"
 #. module: project
 #: model:ir.model.fields,help:project.field_project_task__rating_last_feedback
 msgid "Reason of the rating"
-msgstr ""
+msgstr "Syy arviolle"
 
 #. module: project
 #: model:mail.template,subject:project.mail_template_data_project_task
@@ -2979,7 +2980,7 @@ msgstr "Raportointi"
 #: code:addons/project/static/src/js/project_task_kanban_examples.js:0
 #, python-format
 msgid "Research"
-msgstr ""
+msgstr "Tutkimus"
 
 #. module: project
 #. openerp-web
@@ -3223,7 +3224,7 @@ msgstr "Vaihe muutettu"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.task_type_edit
 msgid "Stage Description and Tooltips"
-msgstr ""
+msgstr "Vaiheen kuvaus ja työkaluvihjeet"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task_type__name
@@ -3965,6 +3966,8 @@ msgid ""
 "You can also add a description to help your coworkers understand the meaning"
 " and purpose of the stage."
 msgstr ""
+"Voit myös lisätä kuvauksen, joka auttaa työtovereitasi ymmärtämään vaiheen "
+"merkityksen ja tarkoituksen."
 
 #. module: project
 #: code:addons/project/models/project.py:0

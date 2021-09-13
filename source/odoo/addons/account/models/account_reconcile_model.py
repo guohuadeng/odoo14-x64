@@ -30,7 +30,7 @@ class AccountReconcileModelPartnerMapping(models.Model):
                     re.compile(record.payment_ref_regex)
                 if record.narration_regex:
                     current_regex = record.narration_regex
-                    re.compile(record.narration_regex) 
+                    re.compile(record.narration_regex)
             except re.error:
                 raise ValidationError(_("The following regular expression is invalid to create a partner mapping: %s") % current_regex)
 
@@ -276,8 +276,18 @@ class AccountReconcileModel(models.Model):
         '''
         self.ensure_one()
         balance = base_line_dict['balance']
+        tax_type = tax.type_tax_use
+        is_refund = (tax_type == 'sale' and balance < 0) or (tax_type == 'purchase' and balance > 0)
 
-        res = tax.compute_all(balance)
+        res = tax.compute_all(balance, is_refund=is_refund)
+
+        if (tax_type == 'sale' and not is_refund) or (tax_type == 'purchase' and is_refund):
+            base_tags = self.env['account.account.tag'].browse(res['base_tags'])
+            res['base_tags'] = self.env['account.move.line']._revert_signed_tags(base_tags).ids
+
+            for tax_result in res['taxes']:
+                tax_tags = self.env['account.account.tag'].browse(tax_result['tag_ids'])
+                tax_result['tag_ids'] = self.env['account.move.line']._revert_signed_tags(tax_tags).ids
 
         new_aml_dicts = []
         for tax_res in res['taxes']:
@@ -336,8 +346,11 @@ class AccountReconcileModel(models.Model):
                 match = re.search(line.amount_string, st_line.payment_ref)
                 if match:
                     sign = 1 if residual_balance > 0.0 else -1
-                    extracted_balance = float(re.sub(r'\D' + self.decimal_separator, '', match.group(1)).replace(self.decimal_separator, '.'))
-                    balance = copysign(extracted_balance * sign, residual_balance)
+                    try:
+                        extracted_balance = float(re.sub(r'\D' + self.decimal_separator, '', match.group(1)).replace(self.decimal_separator, '.'))
+                        balance = copysign(extracted_balance * sign, residual_balance)
+                    except ValueError:
+                        balance = 0
                 else:
                     balance = 0
             else:
@@ -612,6 +625,7 @@ class AccountReconcileModel(models.Model):
         LEFT JOIN account_move move             ON move.id = aml.move_id AND move.state = 'posted'
         LEFT JOIN account_account account       ON account.id = aml.account_id
         LEFT JOIN res_partner aml_partner       ON aml.partner_id = aml_partner.id
+        LEFT JOIN account_payment payment       ON payment.move_id = move.id
         WHERE
             aml.company_id = st_line_move.company_id
             AND move.state = 'posted'
@@ -725,9 +739,11 @@ class AccountReconcileModel(models.Model):
             st_ref_list += ['st_line_move.ref']
         if not st_ref_list:
             return "FALSE"
-        return r'''(move.payment_reference IS NOT NULL AND ({}))'''.format(
+
+        # payment_reference is not used on account.move for payments; ref is used instead
+        return r'''((move.payment_reference IS NOT NULL OR (payment.id IS NOT NULL AND move.ref IS NOT NULL)) AND ({}))'''.format(
             ' OR '.join(
-                rf"regexp_replace(move.payment_reference, '\s+', '', 'g') = regexp_replace({st_ref}, '\s+', '', 'g')"
+                rf"regexp_replace(CASE WHEN payment.id IS NULL THEN move.payment_reference ELSE move.ref END, '\s+', '', 'g') = regexp_replace({st_ref}, '\s+', '', 'g')"
                 for st_ref in st_ref_list
             )
         )
@@ -881,8 +897,8 @@ class AccountReconcileModel(models.Model):
         # Statement line amount is equal to the total residual.
         if line_currency.is_zero(line_residual_after_reconciliation):
             return True
-
-        reconciled_percentage = (abs(line_residual) - abs(line_residual_after_reconciliation)) / abs(line_residual) * 100
+        residual_difference = line_residual - line_residual_after_reconciliation
+        reconciled_percentage = 100 - abs(line_residual_after_reconciliation) / abs(residual_difference) * 100 if (residual_difference != 0) else 0
         return reconciled_percentage >= self.match_total_amount_param
 
     def _filter_candidates(self, candidates, aml_ids_to_exclude, reconciled_amls_ids):

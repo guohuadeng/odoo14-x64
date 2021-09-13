@@ -330,7 +330,6 @@ Or send your receipts at <a href="mailto:%(email)s?subject=Lunch%%20with%%20cust
 
     def action_submit_expenses(self):
         sheet = self._create_sheet_from_expenses()
-        sheet.action_submit_sheet()
         return {
             'name': _('New Expense Report'),
             'type': 'ir.actions.act_window',
@@ -461,6 +460,7 @@ Or send your receipts at <a href="mailto:%(email)s?subject=Lunch%%20with%%20cust
                 if tax['tax_repartition_line_id']:
                     rep_ln = self.env['account.tax.repartition.line'].browse(tax['tax_repartition_line_id'])
                     base_amount = self.env['account.move']._get_base_amount_to_display(tax['base'], rep_ln)
+                    base_amount = expense.currency_id._convert(base_amount, company_currency, expense.company_id, account_date)
                 else:
                     base_amount = None
 
@@ -510,37 +510,11 @@ Or send your receipts at <a href="mailto:%(email)s?subject=Lunch%%20with%%20cust
         move_line_values_by_expense = self._get_account_move_line_values()
 
         for expense in self:
-            company_currency = expense.company_id.currency_id
-            different_currency = expense.currency_id != company_currency
-
             # get the account move of the related sheet
             move = move_group_by_sheet[expense.sheet_id.id]
 
             # get move line values
             move_line_values = move_line_values_by_expense.get(expense.id)
-            move_line_dst = move_line_values[-1]
-            total_amount = move_line_dst['debit'] or -move_line_dst['credit']
-            total_amount_currency = move_line_dst['amount_currency']
-
-            # create one more move line, a counterline for the total on payable account
-            if expense.payment_mode == 'company_account':
-                if not expense.sheet_id.bank_journal_id.default_account_id:
-                    raise UserError(_("No account found for the %s journal, please configure one.") % (expense.sheet_id.bank_journal_id.name))
-                journal = expense.sheet_id.bank_journal_id
-                # create payment
-                payment_methods = journal.outbound_payment_method_ids if total_amount < 0 else journal.inbound_payment_method_ids
-                journal_currency = journal.currency_id or journal.company_id.currency_id
-                payment = self.env['account.payment'].create({
-                    'payment_method_id': payment_methods and payment_methods[0].id or False,
-                    'payment_type': 'outbound' if total_amount < 0 else 'inbound',
-                    'partner_id': expense.employee_id.sudo().address_home_id.commercial_partner_id.id,
-                    'partner_type': 'supplier',
-                    'journal_id': journal.id,
-                    'date': expense.date,
-                    'currency_id': expense.currency_id.id if different_currency else journal_currency.id,
-                    'amount': abs(total_amount_currency) if different_currency else abs(total_amount),
-                    'ref': expense.name,
-                })
 
             # link move lines to move, and move to expense sheet
             move.write({'line_ids': [(0, 0, line) for line in move_line_values]})
@@ -971,8 +945,7 @@ class HrExpenseSheet(models.Model):
 
             if not self.env.user in current_managers and not self.user_has_groups('hr_expense.group_hr_expense_user') and self.employee_id.expense_manager_id != self.env.user:
                 raise UserError(_("You can only approve your department expenses"))
-
-        responsible_id = self.user_id.id or self.env.user.id    
+        
         notification = {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -982,14 +955,17 @@ class HrExpenseSheet(models.Model):
                 'sticky': False,  #True/False will display for few seconds if false
             },
         }
-        sheet_to_approve = self.filtered(lambda s: s.state in ['submit', 'draft'])
-        if sheet_to_approve:
-            notification['params'].update({
-                'title': _('The expense reports were successfully approved.'),
-                'type': 'success',
-                'next': {'type': 'ir.actions.act_window_close'},
-            })
-            sheet_to_approve.write({'state': 'approve', 'user_id': responsible_id})
+        filtered_sheet = self.filtered(lambda s: s.state in ['submit', 'draft'])
+        if not filtered_sheet:
+            return notification
+        for sheet in filtered_sheet:
+            sheet.write({'state': 'approve', 'user_id': sheet.user_id.id or self.env.user.id})
+        notification['params'].update({
+            'title': _('The expense reports were successfully approved.'),
+            'type': 'success',
+            'next': {'type': 'ir.actions.act_window_close'},
+        })
+            
         self.activity_update()
         return notification
 

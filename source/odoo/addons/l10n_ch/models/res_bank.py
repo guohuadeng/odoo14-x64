@@ -90,7 +90,7 @@ class ResPartnerBank(models.Model):
     def _compute_l10n_ch_show_subscription(self):
         for bank in self:
             if bank.partner_id:
-                bank.l10n_ch_show_subscription = bool(bank.partner_id.ref_company_ids)
+                bank.l10n_ch_show_subscription = bank.partner_id.ref_company_ids.country_id.code =='CH'
             elif bank.company_id:
                 bank.l10n_ch_show_subscription = bank.company_id.country_id.code == 'CH'
             else:
@@ -265,7 +265,8 @@ class ResPartnerBank(models.Model):
         """
         self.ensure_one()
 
-        return self.acc_type == 'iban' \
+        return self.sanitized_acc_number.startswith('CH')\
+               and self.acc_type == 'iban'\
                and self._check_qr_iban_range(self.sanitized_acc_number)
 
     @api.model

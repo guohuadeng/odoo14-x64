@@ -363,9 +363,9 @@ class MrpWorkorder(models.Model):
             self.name = self.operation_id.name
             self.workcenter_id = self.operation_id.workcenter_id.id
 
-    @api.onchange('date_planned_start', 'duration_expected')
+    @api.onchange('date_planned_start', 'duration_expected', 'workcenter_id')
     def _onchange_date_planned_start(self):
-        if self.date_planned_start and self.duration_expected:
+        if self.date_planned_start and self.duration_expected and self.workcenter_id:
             self.date_planned_finished = self.workcenter_id.resource_calendar_id.plan_hours(
                 self.duration_expected / 60.0, self.date_planned_start,
                 compute_leaves=True, domain=[('time_type', 'in', ['leave', 'other'])]
@@ -517,6 +517,8 @@ class MrpWorkorder(models.Model):
 
         if self.product_tracking == 'serial':
             self.qty_producing = 1.0
+        else:
+            self.qty_producing = self.qty_remaining
 
         self.env['mrp.workcenter.productivity'].create(
             self._prepare_timeline_vals(self.duration, datetime.now())
@@ -693,7 +695,7 @@ class MrpWorkorder(models.Model):
             if duration_expected_working < 0:
                 duration_expected_working = 0
             return alternative_workcenter.time_start + alternative_workcenter.time_stop + cycle_number * duration_expected_working * 100.0 / alternative_workcenter.time_efficiency
-        time_cycle = self.operation_id and self.operation_id.time_cycle or 60.0
+        time_cycle = self.operation_id.time_cycle
         return self.workcenter_id.time_start + self.workcenter_id.time_stop + cycle_number * time_cycle * 100.0 / self.workcenter_id.time_efficiency
 
     def _get_conflicted_workorder_ids(self):

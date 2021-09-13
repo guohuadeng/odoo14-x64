@@ -12,8 +12,8 @@
 # Dejan Sraka <dejan.sraka@picolabs.si>, 2021
 # matjaz k <matjaz@mentis.si>, 2021
 # Boris Kodelja <boris@hbs.si>, 2021
-# Tadej Lupšina <tadej@hbs.si>, 2021
 # Jasmina Macur <jasmina@hbs.si>, 2021
+# Tadej Lupšina <tadej@hbs.si>, 2021
 # 
 msgid ""
 msgstr ""
@@ -21,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-27 13:50+0000\n"
 "PO-Revision-Date: 2020-09-07 08:17+0000\n"
-"Last-Translator: Jasmina Macur <jasmina@hbs.si>, 2021\n"
+"Last-Translator: Tadej Lupšina <tadej@hbs.si>, 2021\n"
 "Language-Team: Slovenian (https://www.transifex.com/odoo/teams/41243/sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,6 +54,12 @@ msgstr "št. postavk"
 #: model:mail.template,subject:purchase.email_template_edi_purchase_reminder
 msgid "${object.company_id.name} Order (Ref ${object.name or 'n/a' })"
 msgstr "${object.company_id.name} Naročilo (Ref ${object.name or 'n/a' })"
+
+#. module: purchase
+#: code:addons/purchase/models/purchase.py:0
+#, python-format
+msgid "%(name)s confirmed the receipt will take place on %(date)s."
+msgstr ""
 
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.mail_notification_confirm
@@ -99,6 +105,26 @@ msgid ""
 "    </p>\n"
 "</div>"
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Spoštovani ${object.partner_id.name}\n"
+"        % if object.partner_id.parent_id:\n"
+"            (${object.partner_id.parent_id.name})\n"
+"        % endif\n"
+"        <br/><br/>\n"
+"        Pošiljamo opomnik, da se dostava nabavnega naloga <strong>${object.name}</strong>\n"
+"        % if object.partner_ref:\n"
+"            <strong>(${object.partner_ref})</strong>\n"
+"        % endif \n"
+"        pričakuje za \n"
+"        % if object.date_planned:\n"
+"            <strong>${format_date(object.date_planned)}</strong>.\n"
+"        % else:\n"
+"            <strong>undefined</strong>.\n"
+"        % endif\n"
+"        Ali lahko potrdite, da bo dostava pravočasna?\n"
+"    </p>\n"
+"</div>"
 
 #. module: purchase
 #: model:mail.template,body_html:purchase.email_template_edi_purchase_done
@@ -125,6 +151,27 @@ msgid ""
 "    </p>\n"
 "</div>"
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Spoštovanji ${object.partner_id.name}\n"
+"        % if object.partner_id.parent_id:\n"
+"            (${object.partner_id.parent_id.name})\n"
+"        % endif\n"
+"        <br/><br/>\n"
+"        V priponki je nabavni nalog za nakup <strong>${object.name}</strong>\n"
+"        % if object.partner_ref:\n"
+"            with reference: ${object.partner_ref}\n"
+"        % endif\n"
+"        v vrednosti <strong>${format_amount(object.amount_total, object.currency_id)}</strong>\n"
+"        od ${object.company_id.name}. \n"
+"        <br/><br/>\n"
+"        % if object.date_planned:\n"
+"            Prejem se pričakuje <strong>${format_date(object.date_planned)}</strong>.\n"
+"            <br/><br/>\n"
+"           Ali lahko prosim potrdite prejem tega naročila?\n"
+"        % endif\n"
+"    </p>\n"
+"</div>"
 
 #. module: purchase
 #: model:mail.template,body_html:purchase.email_template_edi_purchase
@@ -1666,7 +1713,7 @@ msgstr "Datum naročila"
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_order__date_order
 msgid "Order Deadline"
-msgstr ""
+msgstr "Rok za naročilo"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_order__order_line
@@ -2498,6 +2545,12 @@ msgid "Terms and Conditions"
 msgstr "Pravila in pogoji"
 
 #. module: purchase
+#: code:addons/purchase/models/purchase.py:0
+#, python-format
+msgid "The order receipt has been acknowledged by %(name)s."
+msgstr ""
+
+#. module: purchase
 #: model_terms:ir.actions.act_window,help:purchase.act_res_partner_2_purchase_order
 msgid ""
 "The request for quotation is the first step of the purchases flow. Once\n"
@@ -2596,7 +2649,7 @@ msgstr "Količina za obračun"
 #: code:addons/purchase/static/src/xml/purchase_dashboard.xml:0
 #, python-format
 msgid "To Send"
-msgstr ""
+msgstr "Za poslati"
 
 #. module: purchase
 #: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search

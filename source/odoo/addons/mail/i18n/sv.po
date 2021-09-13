@@ -15,13 +15,15 @@
 # Jakob Krabbe <jakob.krabbe@vertel.se>, 2021
 # Lisa <lisa.oskoma@vertel.se>, 2021
 # Kristoffer Grundström <lovaren@gmail.com>, 2021
-# Anders Wallenquist <anders.wallenquist@vertel.se>, 2021
 # Christelle Wehbe <libanon_cristelle@hotmail.com>, 2021
 # lasch a <bmail440@gmail.com>, 2021
 # Haojun Zou <apollo_zhj@msn.com>, 2021
 # Patrik Lermon <patrik.lermon@gmail.com>, 2021
 # Martin Trigaux, 2021
+# STefan Rundgren <stefanrundgren@cellglas.com>, 2021
 # Chrille Hedberg <hedberg.chrille@gmail.com>, 2021
+# Anders Wallenquist <anders.wallenquist@vertel.se>, 2021
+# Simon Strömberg <simon.stromberg@vertel.se>, 2021
 # 
 msgid ""
 msgstr ""
@@ -29,7 +31,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-27 11:23+0000\n"
 "PO-Revision-Date: 2020-09-07 08:14+0000\n"
-"Last-Translator: Chrille Hedberg <hedberg.chrille@gmail.com>, 2021\n"
+"Last-Translator: Simon Strömberg <simon.stromberg@vertel.se>, 2021\n"
 "Language-Team: Swedish (https://www.transifex.com/odoo/teams/41243/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -87,7 +89,7 @@ msgstr "%d Meddelanden"
 #: code:addons/mail/static/src/js/activity.js:0
 #, python-format
 msgid "%d days overdue"
-msgstr ""
+msgstr "%ddagar försenad"
 
 #. module: mail
 #. openerp-web
@@ -470,7 +472,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mail.field_mail_activity__activity_category
 #: model:ir.model.fields,field_description:mail.field_mail_activity_type__category
 msgid "Action to Perform"
-msgstr ""
+msgstr "Saker som måste göras"
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_activity__activity_category
@@ -479,6 +481,8 @@ msgid ""
 "Actions may trigger specific behavior like opening calendar view or "
 "automatically mark as done when a document is uploaded"
 msgstr ""
+"Åtgärder kan utlösa specifika beteende såsom att öppna kalendervy eller "
+"automatiskt markeras som utfört när ett dokument laddas upp"
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_message_subtype__default
@@ -537,7 +541,7 @@ msgstr "Aktivitet"
 #: model:ir.model.fields,field_description:mail.field_res_partner__activity_exception_decoration
 #: model:ir.model.fields,field_description:mail.field_res_users__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr ""
+msgstr "Dekoration för aktivitetsundantag"
 
 #. module: mail
 #: model:ir.model,name:mail.model_mail_activity_mixin
@@ -549,7 +553,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mail.field_res_partner__activity_state
 #: model:ir.model.fields,field_description:mail.field_res_users__activity_state
 msgid "Activity State"
-msgstr ""
+msgstr "Aktivitetsstatus"
 
 #. module: mail
 #: model:ir.model,name:mail.model_mail_activity_type
@@ -563,7 +567,7 @@ msgstr "Aktivitetstyp"
 #: model:ir.model.fields,field_description:mail.field_res_partner__activity_type_icon
 #: model:ir.model.fields,field_description:mail.field_res_users__activity_type_icon
 msgid "Activity Type Icon"
-msgstr ""
+msgstr "Aktivitetstypsikon"
 
 #. module: mail
 #: model:ir.actions.act_window,name:mail.mail_activity_type_action
@@ -647,7 +651,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/composer/composer.xml:0
 #, python-format
 msgid "Add attachment"
-msgstr ""
+msgstr "Lägg till bilaga"
 
 #. module: mail
 #. openerp-web
@@ -1634,7 +1638,7 @@ msgstr "Tidsfrist"
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.message_user_assigned
 msgid "Dear"
-msgstr ""
+msgstr "Bästa"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity__activity_decoration
@@ -1774,7 +1778,7 @@ msgstr "Direktmeddelanden"
 #: model_terms:ir.ui.view,arch_db:mail.mail_blacklist_remove_view_form
 #, python-format
 msgid "Discard"
-msgstr "Förkasta"
+msgstr "Avbryt"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_resend_cancel_view_form
@@ -1921,7 +1925,7 @@ msgstr "Dokumentföljare"
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity__res_model_id
 msgid "Document Model"
-msgstr ""
+msgstr "Dokumentmodell"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity__res_name
@@ -1982,7 +1986,7 @@ msgstr ""
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.view_document_file_kanban
 msgid "Dropdown menu"
-msgstr ""
+msgstr "Rullgardinsmeny"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity__date_deadline
@@ -2000,7 +2004,7 @@ msgstr ""
 #: code:addons/mail/static/src/js/activity.js:0
 #, python-format
 msgid "Due in %d days"
-msgstr ""
+msgstr "Förfaller om %d dagar"
 
 #. module: mail
 #. openerp-web
@@ -2522,7 +2526,7 @@ msgstr ""
 #: model:ir.model.fields,help:mail.field_res_partner__activity_type_icon
 #: model:ir.model.fields,help:mail.field_res_users__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
-msgstr ""
+msgstr "Font awesomeikon t.ex fa-tasks"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_res_company__email_formatted
@@ -2685,6 +2689,8 @@ msgstr ""
 msgid ""
 "Hide to public / portal users, independently from subtype configuration."
 msgstr ""
+"Göm för offentliga- / portalanvändare, oberoende av konfigurationen för "
+"undertyper."
 
 #. module: mail
 #. openerp-web
@@ -2764,7 +2770,7 @@ msgstr "Ikon"
 #: model:ir.model.fields,help:mail.field_res_partner__activity_exception_icon
 #: model:ir.model.fields,help:mail.field_res_users__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr ""
+msgstr "Ikon för att indikera en undantagsaktivitet."
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_followers__res_id
@@ -2808,7 +2814,7 @@ msgstr ""
 #: model:ir.model.fields,help:mail.field_res_partner__message_has_error
 #: model:ir.model.fields,help:mail.field_res_users__message_has_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
+msgstr "Om markerad så har det blivit ett leveransfel för några  meddelanden."
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_wizard_invite__send_mail
@@ -3369,7 +3375,7 @@ msgstr "Lägg till en notering"
 #: model:ir.model.fields,field_description:mail.field_mail_notification__mail_id
 #, python-format
 msgid "Mail"
-msgstr ""
+msgstr "Epost"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_ir_model__is_mail_activity
@@ -3478,7 +3484,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mail.field_res_partner__message_main_attachment_id
 #: model:ir.model.fields,field_description:mail.field_res_users__message_main_attachment_id
 msgid "Main Attachment"
-msgstr ""
+msgstr "Huvudbilaga"
 
 #. module: mail
 #. openerp-web
@@ -3590,7 +3596,7 @@ msgstr "Meddelande"
 #: model:ir.model.fields,field_description:mail.field_res_partner__message_has_error
 #: model:ir.model.fields,field_description:mail.field_res_users__message_has_error
 msgid "Message Delivery error"
-msgstr ""
+msgstr "Fel vid meddelandeleverans"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_tracking_value__mail_message_id
@@ -4070,21 +4076,21 @@ msgstr "Nästa aktivitet"
 #: model:ir.model.fields,field_description:mail.field_res_partner__activity_date_deadline
 #: model:ir.model.fields,field_description:mail.field_res_users__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr ""
+msgstr "Nästa slutdatum för aktivitet"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity_mixin__activity_summary
 #: model:ir.model.fields,field_description:mail.field_res_partner__activity_summary
 #: model:ir.model.fields,field_description:mail.field_res_users__activity_summary
 msgid "Next Activity Summary"
-msgstr ""
+msgstr "Nästa aktivitetssummering"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity_mixin__activity_type_id
 #: model:ir.model.fields,field_description:mail.field_res_partner__activity_type_id
 #: model:ir.model.fields,field_description:mail.field_res_users__activity_type_id
 msgid "Next Activity Type"
-msgstr ""
+msgstr "Nästa aktivitetstyp"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity__has_recommended_activities
@@ -4168,7 +4174,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mail.field_mail_mail__no_auto_thread
 #: model:ir.model.fields,field_description:mail.field_mail_message__no_auto_thread
 msgid "No threading for answers"
-msgstr ""
+msgstr "Ingen trådning för svar"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_type__category__default
@@ -4263,7 +4269,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mail.field_res_partner__message_has_error_counter
 #: model:ir.model.fields,field_description:mail.field_res_users__message_has_error_counter
 msgid "Number of errors"
-msgstr ""
+msgstr "Antal fel"
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_blacklist__message_needaction_counter
@@ -4285,7 +4291,7 @@ msgstr "Antal meddelanden som kräver en åtgärd"
 #: model:ir.model.fields,help:mail.field_res_partner__message_has_error_counter
 #: model:ir.model.fields,help:mail.field_res_users__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr ""
+msgstr "Antal meddelanden med leveransfel"
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_blacklist__message_unread_counter
@@ -5671,6 +5677,10 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
+"Status baserad på aktiviteter\n"
+"Försenade: Förfallodagen har passerat\n"
+"Idag: Aktivitetsdatum är idag\n"
+"Kommande: Framtida aktiviteter."
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_render_mixin__sub_model_object_field
@@ -5946,7 +5956,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/message_list/message_list.xml:0
 #, python-format
 msgid "There are no messages in this conversation."
-msgstr ""
+msgstr "Inga meddelanden ännu i denna konversation."
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.message_origin_link
@@ -6165,7 +6175,7 @@ msgstr ""
 #: model:ir.model.fields,help:mail.field_res_partner__activity_exception_decoration
 #: model:ir.model.fields,help:mail.field_res_users__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
+msgstr "Typ av undantagsaktivitet i posten"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_channel__uuid

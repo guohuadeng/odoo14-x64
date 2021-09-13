@@ -18,8 +18,8 @@
 # Yihya Hugirat <hugirat@gmail.com>, 2020
 # דודי מלכה <Dudimalka6@gmail.com>, 2020
 # ZVI BLONDER <ZVIBLONDER@gmail.com>, 2020
-# hed shefetr <hed@laylinetech.com>, 2020
 # yotam linder <linder@laylinetech.com>, 2021
+# hed shefetr <hed@laylinetech.com>, 2021
 # Lilach Gilliam <lilach.gilliam@gmail.com>, 2021
 # 
 msgid ""
@@ -6741,12 +6741,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid ""
 "<span class=\"o_form_label o_td_label\" name=\"address_name\">\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'contact')]}\">Company Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'invoice')]}\">Invoice Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'delivery')]}\">Delivery Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'other')]}\">Other Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', 'private')]}\">Private Address</b>\n"
-"                                <b attrs=\"{'invisible': [('type', '!=', False)]}\">Address</b>\n"
+"                                <b attrs=\"{'invisible': [('company_type', '!=', 'company')]}\">Company Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'invoice'), ('company_type', '=', 'company')]}\">Invoice Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'delivery'), ('company_type', '=', 'company')]}\">Delivery Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'other'), ('company_type', '=', 'company')]}\">Other Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', '!=', 'private'), ('company_type', '=', 'company')]}\">Private Address</b>\n"
+"                                <b attrs=\"{'invisible': ['|', ('type', 'not in', (False, 'contact')), ('company_type', '=', 'company')]}\">Address</b>\n"
 "                            </span>"
 msgstr ""
 
@@ -10230,7 +10230,7 @@ msgstr "נכס החברה"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__company_registry
 msgid "Company Registry"
-msgstr "מס' ח.פ"
+msgstr "איחוד עוסקים"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__report_header
@@ -15837,7 +15837,7 @@ msgstr "ישראל"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_il
 msgid "Israel - Accounting"
-msgstr ""
+msgstr "ישראל - הנהלת חשבונות"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.form_res_users_key_description
@@ -23785,7 +23785,7 @@ msgstr "יומני פעילות"
 #: model:ir.model.fields,field_description:base.field_res_partner__vat
 #: model:ir.model.fields,field_description:base.field_res_users__vat
 msgid "Tax ID"
-msgstr "מס' עוסק מורשה/ איחוד עוסקים"
+msgstr "ח.פ / ע.מ"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_website_sale_taxcloud_delivery
@@ -26803,8 +26803,8 @@ msgstr "לא ניתן להפעיל את משתמש-העל."
 #. module: base
 #: code:addons/base/models/res_partner.py:0
 #, python-format
-msgid "You cannot archive a contact linked to an internal user."
-msgstr "לא ניתן לשלוח לארכיון איש קשר המקושר למשתמש פנימי."
+msgid "You cannot archive a contact linked to a portal or internal user."
+msgstr ""
 
 #. module: base
 #: code:addons/base/models/res_partner.py:0

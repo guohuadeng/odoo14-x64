@@ -7,8 +7,8 @@
 # Seongseok Shin <shinss61@hotmail.com>, 2020
 # Martin Trigaux, 2020
 # Link Up링크업 <linkup.way@gmail.com>, 2020
-# Linkup <link-up@naver.com>, 2021
 # JH CHOI <hwangtog@gmail.com>, 2021
+# Linkup <link-up@naver.com>, 2021
 # 
 msgid ""
 msgstr ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-29 15:48+0000\n"
 "PO-Revision-Date: 2020-09-07 08:14+0000\n"
-"Last-Translator: JH CHOI <hwangtog@gmail.com>, 2021\n"
+"Last-Translator: Linkup <link-up@naver.com>, 2021\n"
 "Language-Team: Korean (https://www.transifex.com/odoo/teams/41243/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -392,7 +392,7 @@ msgstr "제조 주문이 이미 완료되었거나 취소되었습니다."
 #, python-format
 msgid ""
 "A product with a kit-type bill of materials can not have a reordering rule."
-msgstr ""
+msgstr "키트 형식의 재료 명세서가 있는 제품은 재주문 규칙을 가질 수 없습니다."
 
 #. module: mrp
 #: code:addons/mrp/models/mrp_workcenter.py:0
@@ -687,12 +687,12 @@ msgstr "참조된 재료 명세서의 상세 내역"
 #. module: mrp
 #: model:ir.model,name:mrp.model_mrp_production_backorder_line
 msgid "Backorder Confirmation Line"
-msgstr ""
+msgstr "잔여주문 승인 내역"
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_production_backorder__mrp_production_backorder_line_ids
 msgid "Backorder Confirmation Lines"
-msgstr ""
+msgstr "가용주문 승인 내역"
 
 #. module: mrp
 #: code:addons/mrp/models/mrp_production.py:0
@@ -2591,7 +2591,7 @@ msgstr "기타"
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_immediate_production__mo_ids
 msgid "Mo"
-msgstr ""
+msgstr "월"
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_production__move_byproduct_ids
@@ -2694,7 +2694,7 @@ msgstr ""
 #. module: mrp
 #: model_terms:ir.actions.act_window,help:mrp.product_template_action
 msgid "No product found. Let's create one!"
-msgstr ""
+msgstr "품목이 없습니다. 생성해봅시다!"
 
 #. module: mrp
 #: model_terms:ir.actions.act_window,help:mrp.mrp_workcenter_productivity_report_blocked
@@ -2732,7 +2732,7 @@ msgstr "일반"
 #: code:addons/mrp/models/mrp_production.py:0
 #, python-format
 msgid "Not Available"
-msgstr ""
+msgstr "사용불가"
 
 #. module: mrp
 #: model:ir.model.fields,help:mrp.field_stock_scrap__workorder_id
@@ -4303,7 +4303,7 @@ msgstr ""
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_production_backorder_line__to_backorder
 msgid "To Backorder"
-msgstr ""
+msgstr "잔여주문으로"
 
 #. module: mrp
 #: model:ir.model.fields.selection,name:mrp.selection__mrp_production__state__to_close
@@ -5016,7 +5016,7 @@ msgstr "컴퓨터에서 파일을 업로드하거나 인터넷 링크를 복사�
 msgid ""
 "You can not create a kit-type bill of materials for products that have at "
 "least one reordering rule."
-msgstr ""
+msgstr "하나 이상의 재주문 규칙이 있는 제품에는 키트 유형의 재료 청구서를 만들 수 없습니다."
 
 #. module: mrp
 #: code:addons/mrp/models/mrp_bom.py:0
@@ -5107,6 +5107,14 @@ msgid ""
 "<i>apply</i> Odoo will produce all the finished products and consume all "
 "components."
 msgstr ""
+
+#. module: mrp
+#: code:addons/mrp/models/mrp_production.py:0
+#, python-format
+msgid ""
+"You must indicate a non-zero amount consumed for at least one of your "
+"components"
+msgstr "구성 요소 중 하나 이상에 대해 0이 아닌 값을 지정해야 합니다."
 
 #. module: mrp
 #: code:addons/mrp/models/mrp_workorder.py:0
@@ -5204,7 +5212,7 @@ msgstr "일"
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.stock_warn_insufficient_qty_unbuild_form_view
 msgid "from location"
-msgstr ""
+msgstr "출발공간"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_routing_workcenter_form_view

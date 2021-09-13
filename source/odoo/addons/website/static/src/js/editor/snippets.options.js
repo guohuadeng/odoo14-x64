@@ -140,7 +140,9 @@ const FontFamilyPickerUserValueWidget = SelectUserValueWidget.extend({
             }
         }
         const activeWidget = this._userValueWidgets.find(widget => !widget.isPreviewed() && widget.isActive());
-        this.menuTogglerEl.classList.add(`o_we_option_font_${activeWidget.el.dataset.font}`);
+        if (activeWidget) {
+            this.menuTogglerEl.classList.add(`o_we_option_font_${activeWidget.el.dataset.font}`);
+        }
     },
 
     //--------------------------------------------------------------------------
@@ -464,6 +466,11 @@ options.Class.include({
                 return weUtils.getCSSVariableValue(params.variable);
             }
             case 'customizeWebsiteColor': {
+                // TODO adapt in master
+                const bugfixedValue = weUtils.getCSSVariableValue(`bugfixed-${params.color}`);
+                if (bugfixedValue) {
+                    return bugfixedValue;
+                }
                 return weUtils.getCSSVariableValue(params.color);
             }
         }
@@ -997,6 +1004,14 @@ options.registry.OptionsTab = options.Class.extend({
         });
         return aceEditor;
     },
+    /**
+     * @override
+     */
+    async _renderCustomXML(uiFragment) {
+        uiFragment.querySelectorAll('we-colorpicker').forEach(el => {
+            el.dataset.lazyPalette = 'true';
+        });
+    },
 });
 
 options.registry.ThemeColors = options.registry.OptionsTab.extend({
@@ -1062,6 +1077,8 @@ options.registry.ThemeColors = options.registry.OptionsTab.extend({
             }
             uiFragment.appendChild(collapseEl);
         }
+
+        await this._super(...arguments);
     },
 });
 
@@ -1685,8 +1702,6 @@ options.registry.collapse = options.Class.extend({
      * @override
      */
     onClone: function () {
-        this.$target.find('[data-toggle="collapse"]').removeAttr('data-target').removeData('target');
-        this.$target.find('.collapse').removeAttr('id');
         this._createIDs();
     },
     /**
@@ -1715,30 +1730,30 @@ options.registry.collapse = options.Class.extend({
      * @private
      */
     _createIDs: function () {
-        var time = new Date().getTime();
-        var $tab = this.$target.find('[data-toggle="collapse"]');
+        let time = new Date().getTime();
+        const $tablist = this.$target.closest('[role="tablist"]');
+        const $tab = this.$target.find('[role="tab"]');
+        const $panel = this.$target.find('[role="tabpanel"]');
 
-        // link to the parent group
-        var $tablist = this.$target.closest('.accordion');
-        var tablist_id = $tablist.attr('id');
-        if (!tablist_id) {
-            tablist_id = 'myCollapse' + time;
-            $tablist.attr('id', tablist_id);
-        }
-        $tab.attr('data-parent', '#' + tablist_id);
-        $tab.data('parent', '#' + tablist_id);
-
-        // link to the collapse
-        var $panel = this.$target.find('.collapse');
-        var panel_id = $panel.attr('id');
-        if (!panel_id) {
-            while ($('#' + (panel_id = 'myCollapseTab' + time)).length) {
-                time++;
+        const setUniqueId = ($elem, label) => {
+            let elemId = $elem.attr('id');
+            if (!elemId || $('[id="' + elemId + '"]').length > 1) {
+                do {
+                    time++;
+                    elemId = label + time;
+                } while ($('#' + elemId).length);
+                $elem.attr('id', elemId);
             }
-            $panel.attr('id', panel_id);
-        }
-        $tab.attr('data-target', '#' + panel_id);
-        $tab.data('target', '#' + panel_id);
+            return elemId;
+        };
+
+        const tablistId = setUniqueId($tablist, 'myCollapse');
+        $panel.attr('data-parent', '#' + tablistId);
+        $panel.data('parent', '#' + tablistId);
+
+        const panelId = setUniqueId($panel, 'myCollapseTab');
+        $tab.attr('data-target', '#' + panelId);
+        $tab.data('target', '#' + panelId);
     },
 });
 

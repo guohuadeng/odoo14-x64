@@ -635,6 +635,9 @@ msgid ""
 "Analytic account to which this project is linked for financial management. "
 "Use an analytic account to record cost and revenue on your project."
 msgstr ""
+"Compte analític al que està vinculat aquest projecte per a gestió financera."
+" Utilitzeu un compte analític per a enregistrar costos i ingressos del "
+"projecte."
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_month__april
@@ -723,7 +726,7 @@ msgstr "Data d'assignació"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_report_project_task_user__date_assign
 msgid "Assignment Date"
-msgstr ""
+msgstr "Data d'assignació"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.task_type_edit
@@ -1135,31 +1138,31 @@ msgstr "Diàriament"
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_on_month__date
 #: model:ir.model.fields.selection,name:project.selection__project_task_recurrence__repeat_on_month__date
 msgid "Date of the Month"
-msgstr ""
+msgstr "Data del mes"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_on_year__date
 #: model:ir.model.fields.selection,name:project.selection__project_task_recurrence__repeat_on_year__date
 msgid "Date of the Year"
-msgstr ""
+msgstr "Data de l'any"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__repeat_weekday
 #: model:ir.model.fields,field_description:project.field_project_task_recurrence__repeat_weekday
 msgid "Day Of The Week"
-msgstr ""
+msgstr "Dia de la setmana"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_on_month__day
 #: model:ir.model.fields.selection,name:project.selection__project_task_recurrence__repeat_on_month__day
 msgid "Day of the Month"
-msgstr ""
+msgstr "Dia del mes"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_on_year__day
 #: model:ir.model.fields.selection,name:project.selection__project_task_recurrence__repeat_on_year__day
 msgid "Day of the Year"
-msgstr ""
+msgstr "Dia de l'any"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_unit__day
@@ -1529,7 +1532,7 @@ msgstr "Seguidors (Clients)"
 #. module: project
 #: model:ir.model.fields,help:project.field_project_task__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
-msgstr ""
+msgstr "Icona Font Awesome p.e. fa-tasks"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task__repeat_type__forever
@@ -3069,7 +3072,7 @@ msgstr "Cerca projecte"
 #: code:addons/project/controllers/portal.py:0
 #, python-format
 msgid "Search in All"
-msgstr ""
+msgstr "Cerqueu a tots"
 
 #. module: project
 #: code:addons/project/controllers/portal.py:0
@@ -3087,7 +3090,7 @@ msgstr ""
 #: code:addons/project/controllers/portal.py:0
 #, python-format
 msgid "Search in Project"
-msgstr ""
+msgstr "Cercar a Projecte"
 
 #. module: project
 #: code:addons/project/controllers/portal.py:0

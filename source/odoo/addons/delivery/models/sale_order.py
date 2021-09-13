@@ -18,7 +18,7 @@ class SaleOrder(models.Model):
     @api.depends('order_line')
     def _compute_is_service_products(self):
         for so in self:
-            so.is_all_service = all(line.product_id.type == 'service' for line in so.order_line)
+            so.is_all_service = all(line.product_id.type == 'service' for line in so.order_line.filtered(lambda x: not x.display_type))
 
     def _compute_amount_total_without_delivery(self):
         self.ensure_one()
@@ -30,14 +30,24 @@ class SaleOrder(models.Model):
         for order in self:
             order.delivery_set = any(line.is_delivery for line in order.order_line)
 
-    @api.onchange('order_line', 'partner_id')
+    @api.onchange('order_line', 'partner_id', 'partner_shipping_id')
     def onchange_order_line(self):
+        self.ensure_one()
         delivery_line = self.order_line.filtered('is_delivery')
         if delivery_line:
             self.recompute_delivery_price = True
 
     def _remove_delivery_line(self):
-        self.env['sale.order.line'].search([('order_id', 'in', self.ids), ('is_delivery', '=', True)]).unlink()
+        delivery_lines = self.env['sale.order.line'].search([('order_id', 'in', self.ids), ('is_delivery', '=', True)])
+        if not delivery_lines:
+            return
+        to_delete = delivery_lines.filtered(lambda x: x.qty_invoiced == 0)
+        if not to_delete:
+            raise UserError(
+                _('You can not update the shipping costs on an order where it was already invoiced!\n\nThe following delivery lines (product, invoiced quantity and price) have already been processed:\n\n')
+                + '\n'.join(['- %s: %s x %s' % (line.product_id.with_context(display_default_code=False).display_name, line.qty_invoiced, line.price_unit) for line in delivery_lines])
+            )
+        to_delete.unlink()
 
     def set_delivery_line(self, carrier, amount):
 

@@ -3,6 +3,7 @@
 import itertools
 import logging
 import re
+import psycopg2
 from ast import literal_eval
 from collections import defaultdict
 from collections.abc import Mapping
@@ -430,8 +431,18 @@ class IrModel(models.Model):
             if tools.table_kind(cr, Model._table) not in ('r', None):
                 # not a regular table, so disable schema upgrades
                 Model._auto = False
-                cr.execute('SELECT * FROM %s LIMIT 0' % Model._table)
-                columns = {desc[0] for desc in cr.description}
+                cr.execute(
+                    '''
+                    SELECT a.attname
+                      FROM pg_attribute a
+                      JOIN pg_class t
+                        ON a.attrelid = t.oid
+                       AND t.relname = %s
+                     WHERE a.attnum > 0 -- skip system columns
+                    ''',
+                    [Model._table]
+                )
+                columns = {colinfo[0] for colinfo in cr.fetchall()}
                 Model._log_access = set(models.LOG_ACCESS_COLUMNS) <= columns
 
 
@@ -1023,6 +1034,8 @@ class IrModelFields(models.Model):
             model_id = self.env['ir.model']._get_id(model_name)
             for field in self.env[model_name]._fields.values():
                 rows.append(self._reflect_field_params(field, model_id))
+        if not rows:
+            return
         cols = list(unique(['model', 'name'] + list(rows[0])))
         expected = [tuple(row[col] for col in cols) for row in rows]
 
@@ -1377,7 +1390,7 @@ class IrModelSelection(models.Model):
             except Exception as e:
                 # going through the ORM failed, probably because of an exception
                 # in an override or possibly a constraint.
-                _logger.warning(
+                _logger.runbot(
                     "Could not fulfill ondelete action for field %s.%s, "
                     "attempting ORM bypass...", records._name, fname,
                 )
@@ -2185,8 +2198,25 @@ class IrModelData(models.Model):
         # remove models
         delete(self.env['ir.model'].browse(unique(model_ids)))
 
+        # sort out which undeletable model data may have become deletable again because
+        # of records being cascade-deleted or tables being dropped just above
+        for data in self.browse(undeletable_ids).exists():
+            record = self.env[data.model].browse(data.res_id)
+            try:
+                with self.env.cr.savepoint():
+                    if record.exists():
+                        # record exists therefore the data is still undeletable,
+                        # remove it from module_data
+                        module_data -= data
+                        continue
+            except psycopg2.ProgrammingError:
+                # This most likely means that the record does not exist, since record.exists()
+                # is rougly equivalent to `SELECT id FROM table WHERE id=record.id` and it may raise
+                # a ProgrammingError because the table no longer exists (and so does the
+                # record), also applies to ir.model.fields, constraints, etc.
+                pass
         # remove remaining module data records
-        (module_data - self.browse(undeletable_ids)).unlink()
+        module_data.unlink()
 
     @api.model
     def _process_end(self, modules):

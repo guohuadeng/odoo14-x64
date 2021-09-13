@@ -11,6 +11,7 @@
 # דודי מלכה <Dudimalka6@gmail.com>, 2020
 # ZVI BLONDER <ZVIBLONDER@gmail.com>, 2020
 # Yves Goldberg <admin@ygol.com>, 2020
+# hed shefetr <hed@laylinetech.com>, 2021
 # Lilach Gilliam <lilach.gilliam@gmail.com>, 2021
 # 
 msgid ""
@@ -814,6 +815,7 @@ msgid "Last Updated on"
 msgstr "עדכון אחרון ב"
 
 #. module: sale_timesheet
+#. openerp-web
 #: code:addons/sale_timesheet/models/project_overview.py:0
 #, python-format
 msgid "Late"
@@ -1245,6 +1247,8 @@ msgid ""
 "Select a billable project on which tasks can be created. This setting must "
 "be set for each company."
 msgstr ""
+"בחר פרויקט שניתן לחייבו וניתן ליצור עליו משימות. יש להגדיר הגדרה זו לכל "
+"חברה."
 
 #. module: sale_timesheet
 #: model:ir.model.fields,help:sale_timesheet.field_product_product__project_template_id
@@ -1253,6 +1257,8 @@ msgid ""
 "Select a billable project to be the skeleton of the new created project when"
 " selling the current product. Its stages and tasks will be duplicated."
 msgstr ""
+"בחר פרויקט לחיוב שיהיה השלד של הפרויקט החדש שנוצר בעת מכירת המוצר הנוכחי. "
+"שלביו ומשימותיו יוכפלו."
 
 #. module: sale_timesheet
 #: model:ir.model.fields,help:sale_timesheet.field_sale_order__project_id
@@ -1318,7 +1324,7 @@ msgstr "משימה"
 #. module: sale_timesheet
 #: model:ir.model,name:sale_timesheet.model_project_task_recurrence
 msgid "Task Recurrence"
-msgstr ""
+msgstr "הישנות המשימות"
 
 #. module: sale_timesheet
 #: model:ir.model.fields,help:sale_timesheet.field_project_task_create_sale_order__task_id
@@ -1740,4 +1746,4 @@ msgstr "שעות"
 #: code:addons/sale_timesheet/models/project_overview.py:0
 #, python-format
 msgid "in Overtime"
-msgstr ""
+msgstr "בשעות נוספות"

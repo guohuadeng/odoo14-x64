@@ -13,12 +13,16 @@ class TestDDT(TestSaleCommon):
         cls.company_data['company'].write({
                         'vat':"IT12345670017",
                         'country_id': cls.env.ref('base.it'),
-                        'l10n_it_codice_fiscale': '0123456789987654',
+                        'l10n_it_codice_fiscale': '01234560157',
                         'l10n_it_tax_system': 'RF01',
                         'street': 'Via Giovanni Maria Platina 66',
                         'zip': '26100',
                         'city': 'Cremona',
                         })
+        bank_account = cls.env['res.partner.bank'].create({
+            'acc_number': 'IT60X0542811101000000123456',
+            'partner_id': cls.company_data['company'].partner_id.id,
+        })
         cls.partner_a.write({
             'street': 'Piazza Guglielmo Marconi 5',
             'zip': '26100',

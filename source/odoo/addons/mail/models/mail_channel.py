@@ -25,7 +25,7 @@ class ChannelPartner(models.Model):
 
     custom_channel_name = fields.Char('Custom channel name')
     partner_id = fields.Many2one('res.partner', string='Recipient', ondelete='cascade')
-    partner_email = fields.Char('Email', related='partner_id.email', readonly=False)
+    partner_email = fields.Char('Email', related='partner_id.email', depends=['partner_id'], readonly=False)
     channel_id = fields.Many2one('mail.channel', string='Channel', ondelete='cascade')
     fetched_message_id = fields.Many2one('mail.message', string='Last Fetched')
     seen_message_id = fields.Many2one('mail.message', string='Last Seen')
@@ -748,10 +748,14 @@ class Channel(models.Model):
                     state = 'folded'
                 else:
                     state = 'open'
-            session_state.write({
-                'fold_state': state,
-                'is_minimized': bool(state != 'closed'),
-            })
+            is_minimized = bool(state != 'closed')
+            vals = {}
+            if session_state.fold_state != state:
+                vals['fold_state'] = state
+            if session_state.is_minimized != is_minimized:
+                vals['is_minimized'] = is_minimized
+            if vals:
+                session_state.write(vals)
             self.env['bus.bus'].sendone((self._cr.dbname, 'res.partner', self.env.user.partner_id.id), session_state.channel_id.channel_info()[0])
 
     @api.model
@@ -775,7 +779,7 @@ class Channel(models.Model):
         """ Hook for website_livechat channel unpin and cleaning """
         self.ensure_one()
         channel_partners = self.env['mail.channel.partner'].search(
-            [('partner_id', '=', self.env.user.partner_id.id), ('channel_id', '=', self.id)])
+            [('partner_id', '=', self.env.user.partner_id.id), ('channel_id', '=', self.id), ('is_pinned', '!=', pinned)])
         self.env['bus.bus'].sendone((self._cr.dbname, 'res.partner', self.env.user.partner_id.id), self.channel_info('unsubscribe' if not pinned else False)[0])
         if channel_partners:
             channel_partners.write({'is_pinned': pinned})

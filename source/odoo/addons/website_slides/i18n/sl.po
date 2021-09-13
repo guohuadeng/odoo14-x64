@@ -9,8 +9,8 @@
 # Matjaz Mozetic <m.mozetic@matmoz.si>, 2021
 # matjaz k <matjaz@mentis.si>, 2021
 # Grega Vavtar <grega@hbs.si>, 2021
-# Tadej Lupšina <tadej@hbs.si>, 2021
 # Martin Trigaux, 2021
+# Tadej Lupšina <tadej@hbs.si>, 2021
 # Jasmina Macur <jasmina@hbs.si>, 2021
 # 
 msgid ""
@@ -214,7 +214,7 @@ msgstr "<i class=\"fa fa-circle-o-notch fa-spin mr-2\"/><b>Nalaganje...</b>"
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.rating_rating_view_kanban_slide_channel
 msgid "<i class=\"fa fa-clock-o mr-2\" aria-label=\"Create date\"/>"
-msgstr ""
+msgstr "<i class=\"fa fa-clock-o mr-2\" aria-label=\"Create date\"/>"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.slide_slide_view_kanban
@@ -755,6 +755,7 @@ msgstr ""
 #. module: website_slides
 #. openerp-web
 #: code:addons/website_slides/static/src/js/slides_course_fullscreen_player.js:0
+#: code:addons/website_slides/static/src/js/slides_share.js:0
 #, python-format
 msgid "<strong>Thank you!</strong> Mail has been sent."
 msgstr ""
@@ -767,6 +768,15 @@ msgstr ""
 #. module: website_slides
 #: model:slide.answer,text_value:website_slides.slide_slide_demo_0_4_question_0_0
 msgid "A fruit"
+msgstr ""
+
+#. module: website_slides
+#. openerp-web
+#: code:addons/website_slides/static/src/js/tours/slides_tour.js:0
+#, python-format
+msgid ""
+"A good course has a structure. Pick a name for your first section and click "
+"<b>Save</b> to create it."
 msgstr ""
 
 #. module: website_slides
@@ -2135,7 +2145,7 @@ msgstr "Dokumentacija"
 #: code:addons/website_slides/static/src/xml/website_slides_channel.xml:0
 #, python-format
 msgid "Documentation Layout"
-msgstr ""
+msgstr "Postavitev dokumentacije"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__nbr_document
@@ -4888,7 +4898,7 @@ msgstr "Naložil"
 #: code:addons/website_slides/static/src/xml/website_slides_upload.xml:0
 #, python-format
 msgid "Uploading document ..."
-msgstr ""
+msgstr "Nalaganje dokumenta..."
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel_invite__template_id
@@ -5397,6 +5407,13 @@ msgstr ""
 "npr. V tem videoposnetku vam bomo dali napotke, kako vam lahko Odoo pomaga "
 "pri razvoju vašega podjetja. Na koncu vam predlagamo kviz za preizkus "
 "znanja."
+
+#. module: website_slides
+#. openerp-web
+#: code:addons/website_slides/static/src/xml/slide_management.xml:0
+#, python-format
+msgid "e.g. Introduction"
+msgstr ""
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.view_slide_slide_form

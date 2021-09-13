@@ -44,6 +44,7 @@ var PrinterMixin = {
     init: function() {
         this.receipt_queue = [];
         this.printResultGenerator = new PrintResultGenerator();
+        this.htmlToImgLetterRendering = false; // Whether to render each letter seperately. Necessary if letter-spacing is used.
     },
 
     /**
@@ -101,7 +102,8 @@ var PrinterMixin = {
                 onrendered: function (canvas) {
                     $('.pos-receipt-print').empty();
                     resolve(self.process_canvas(canvas));
-                }
+                },
+                letterRendering: self.htmlToImgLetterRendering,
             })
         });
         return promise;
@@ -130,6 +132,7 @@ var Printer = core.Class.extend(PrinterMixin, {
     init: function (url, pos) {
         PrinterMixin.init.call(this, arguments);
         this.pos = pos;
+        this.htmlToImgLetterRendering = pos.htmlToImgLetterRendering();
         this.connection = new Session(undefined, url || 'http://localhost:8069', { use_cors: true});
     },
 

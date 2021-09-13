@@ -25,7 +25,18 @@ $-seen-urls: ();
 
     // 2) The values in the $theme-colors map are already printed by Bootstrap.
 
-    // 3) The values in the $colors map are also printed by Bootstrap.
+    // 3) The values in the $colors map are also printed by Bootstrap. However,
+    // we have color variables which can contain a reference to a color
+    // combination and that is the info we want in that case. As a stable fix,
+    // we'll leave the original variable untouched but print a prefixed version
+    // of the variable with the correct reference value.
+    // TODO adapt in master
+    @each $key in ('menu', 'header-boxed', 'footer', 'copyright') {
+        $-value: map-get($o-color-palette, $key);
+        @if type-of($-value) == 'number' {
+            @include print-variable('bugfixed-#{$key}', $-value);
+        }
+    }
 
     // 4) The Odoo values map, $o-website-values, must be printed.
     @each $key, $value in $o-website-values {
@@ -172,6 +183,23 @@ $-seen-urls: ();
                     @include border-bottom-radius($-inner-border-radius);
                 }
             }
+        }
+    }
+}
+
+body:not(.o_fullscreen) {
+    #oe_main_menu_navbar:not(.o_hidden) + #wrapwrap {
+        .o_header_affixed, .modal {
+            // For these elements, in #wrapwrap, position top should be size of
+            // the navbar.
+            top: $o-navbar-height;
+        }
+        .modal {
+            // As the default bootstrap style no longer uses 'bottom: 0' and
+            // added 'height: 100%' since the V4.2 because of a bug on Android.
+            // We have to adapt the height of the modal by removing the height
+            // of the navbar.
+            height: calc(100vh - #{$o-navbar-height});
         }
     }
 }
@@ -762,9 +790,6 @@ $-transition-duration: 200ms;
         }
     }
 }
-#oe_main_menu_navbar + #wrapwrap .o_header_affixed {
-    top: $o-navbar-height;
-}
 
 // Navbar
 .navbar .o_extra_menu_items.show > ul {
@@ -1073,8 +1098,15 @@ header {
                 }
             }
         }
-        body.o_connected_user:not(.editor_has_snippets) #wrapwrap > header {
-            top: $o-navbar-height;
+        body.o_connected_user {
+            &:not(.editor_has_snippets) #wrapwrap > header {
+                top: $o-navbar-height;
+            }
+            &.editor_has_snippets #wrapwrap > header {
+                @if $-hamburger-right {
+                    right: $o-we-sidebar-width;
+                }
+            }
         }
     }
 } @else if o-website-value('header-template') == 'boxed' {
@@ -1128,9 +1160,13 @@ header {
     }
 }
 .o_mega_menu_container_size {
-    @include media-breakpoint-up(md) {
-        left: 50%;
-        transform: translateX(-50%);
+    $-header-template: o-website-value('header-template');
+    @if not index(('sidebar', 'hamburger', 'magazine'), $-header-template) {
+        $bp: if($-header-template == 'minimalist', md, lg);
+        @include media-breakpoint-up($bp) {
+            left: 50%;
+            transform: translateX(-50%);
+        }
     }
 
     $-mm-max-widths: ();
@@ -1409,4 +1445,11 @@ $ribbon-padding: 100px;
     // value of "align-self" is "strech". We put this code here to
     // avoid having to create a new scss file in a stable version.
     align-self: flex-start;
+}
+
+// Bottom fixed element (e.g. livechat button)
+.modal-open .o_bottom_fixed_element, .o_bottom_fixed_element_hidden {
+    // Prevent bottom fixed elements from hidding buttons and
+    // hide them if a modal is open.
+    display: none !important;
 }

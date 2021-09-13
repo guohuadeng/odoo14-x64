@@ -7,10 +7,10 @@
 # Jan Horzinka <jan.horzinka@centrum.cz>, 2020
 # Martin Trigaux, 2020
 # Michal Veselý <michal@veselyberanek.net>, 2020
-# Rastislav Brencic <rastislav.brencic@azet.sk>, 2020
 # karolína schusterová <karolina.schusterova@vdp.sk>, 2021
 # Damian Brencic <brencicdamian12313@gmail.com>, 2021
 # trendspotter, 2021
+# Rastislav Brencic <rastislav.brencic@azet.sk>, 2021
 # 
 msgid ""
 msgstr ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-27 14:12+0000\n"
 "PO-Revision-Date: 2020-09-07 08:21+0000\n"
-"Last-Translator: trendspotter, 2021\n"
+"Last-Translator: Rastislav Brencic <rastislav.brencic@azet.sk>, 2021\n"
 "Language-Team: Czech (https://www.transifex.com/odoo/teams/41243/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -468,7 +468,7 @@ msgstr "<i class=\"fa fa-check-square-o fa-fw\"/> K ověření"
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.forum_nav_header
 msgid "<i class=\"fa fa-chevron-left mr-1\"/>Back"
-msgstr ""
+msgstr "<i class=\"fa fa-chevron-left mr-1\"/>Zpět"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.new_question
@@ -1164,6 +1164,7 @@ msgid ""
 "Click here to send a verification email allowing you to participate in the "
 "forum."
 msgstr ""
+"Kliknutím sem odešlete ověřovací e-mail, který vám umožní účastnit se fóra."
 
 #. module: website_forum
 #. openerp-web
@@ -2684,6 +2685,9 @@ msgid ""
 "Signed In: Forum is visible for signed in users\n"
 "Some users: Forum and their content are hidden for non members of selected group"
 msgstr ""
+"Veřejné: Fórum je veřejné\n"
+"Přihlášení: Fórum je viditelné pro přihlášené uživatele\n"
+"Někteří uživatelé: Fórum a jeho obsah jsou skryté pro uživatele, kteří nejsou členy vybrané skupiny."
 
 #. module: website_forum
 #. openerp-web
@@ -2694,6 +2698,9 @@ msgid ""
 "users\\nSome users: Forum and their content are hidden for non members of "
 "selected group"
 msgstr ""
+"Veřejnost: Fórum je veřejné\\ Přihlášen: Fórum je viditelné pro přihlášené "
+"uživatele\\ Někteří uživatelé: Fórum a jeho obsah jsou skryté pro nečleny "
+"vybrané skupiny."
 
 #. module: website_forum
 #: model:gamification.badge,name:website_forum.badge_25
@@ -3705,7 +3712,7 @@ msgstr "Na tomto fóru (zatím) nemáte žádné příspěvky."
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.header
 msgid "You may now participate in our forums."
-msgstr ""
+msgstr "Nyní se můžete účastnit našich fór."
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.edit_post

@@ -4,8 +4,8 @@
 # 
 # Translators:
 # Martin Trigaux, 2020
-# JH CHOI <hwangtog@gmail.com>, 2020
 # Link Up링크업 <linkup.way@gmail.com>, 2020
+# JH CHOI <hwangtog@gmail.com>, 2021
 # Linkup <link-up@naver.com>, 2021
 # 
 msgid ""
@@ -796,7 +796,7 @@ msgstr "구현자"
 #. module: website_crm_partner_assign
 #: model:ir.model.fields,field_description:website_crm_partner_assign.field_crm_partner_report_assign__date
 msgid "Invoice Account Date"
-msgstr "송장 계정 날짜"
+msgstr "청구서 회계 일자"
 
 #. module: website_crm_partner_assign
 #: model:ir.model.fields,field_description:website_crm_partner_assign.field_res_partner_grade__is_published
@@ -1033,7 +1033,7 @@ msgstr "파트너 활성화"
 #: model:ir.model.fields,field_description:website_crm_partner_assign.field_crm_lead_assignation__forward_id
 #: model:ir.model.fields,field_description:website_crm_partner_assign.field_crm_lead_forward_to_partner__assignation_lines
 msgid "Partner Assignment"
-msgstr ""
+msgstr "협력사 지정"
 
 #. module: website_crm_partner_assign
 #: model:ir.model.fields,field_description:website_crm_partner_assign.field_crm_lead__date_partner_assign
