@@ -680,13 +680,19 @@ class PoFileReader:
                         # unicity constrain on code translation
                         continue
                     found_code_occurrence = True
+                    try:
+                        l_n = int(line_number)
+                    except Exception as e:
+                        l_n = 0
+                        _logger.error('============= Convert line number error. type: %s, name: %s, src: %s, value: %s, comments: %s, module: %s'
+                                      % (type, name, source, translate, comments, module))
                     yield {
                         'type': type,
                         'name': name,
                         'src': source,
                         'value': translation,
                         'comments': comments,
-                        'res_id': int(line_number),
+                        'res_id': l_n,
                         'module': module,
                     }
                     continue
@@ -1279,6 +1285,8 @@ def resetlocale():
     # locale.resetlocale is bugged with some locales.
     for ln in get_locales():
         try:
+            if ln.find('.') >= 0:
+                ln = ln[0:ln.index('.')]
             return locale.setlocale(locale.LC_ALL, ln)
         except locale.Error:
             continue
