@@ -10,7 +10,7 @@ from werkzeug import urls
 
 from odoo import api, fields, models, _
 from odoo.addons.payment.models.payment_acquirer import ValidationError
-from odoo.tools.float_utils import float_compare
+from odoo.tools.float_utils import float_compare, float_round
 
 
 _logger = logging.getLogger(__name__)
@@ -46,7 +46,6 @@ class PaymentAcquirerPayulatam(models.Model):
         return md5(data_string.encode('utf-8')).hexdigest()
 
     def payulatam_form_generate_values(self, values):
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         tx = self.env['payment.transaction'].search([('reference', '=', values.get('reference'))])
         # payulatam will not allow any payment twise even if payment was failed last time.
         # so, replace reference code if payment is not done or pending.
@@ -58,12 +57,13 @@ class PaymentAcquirerPayulatam(models.Model):
             accountId=self.payulatam_account_id,
             description=values.get('reference'),
             referenceCode=tx.reference,
-            amount=values['amount'],
+            amount=float_round(values['amount'], 2),
             tax='0',  # This is the transaction VAT. If VAT zero is sent the system, 19% will be applied automatically. It can contain two decimals. Eg 19000.00. In the where you do not charge VAT, it should should be set as 0.
             taxReturnBase='0',
             currency=values['currency'].name,
             buyerEmail=values['partner_email'],
-            responseUrl=urls.url_join(base_url, '/payment/payulatam/response'),
+            responseUrl=urls.url_join(self.get_base_url(), '/payment/payulatam/response'),
+            confirmationUrl=urls.url_join(self.get_base_url(), '/payment/payulatam/webhook'),
         )
         payulatam_values['signature'] = self._payulatam_generate_sign("in", payulatam_values)
         return payulatam_values

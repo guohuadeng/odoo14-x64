@@ -14,7 +14,7 @@ from psycopg2 import sql
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.osv import expression
-from odoo.tools import pycompat, unique
+from odoo.tools import pycompat, unique, OrderedSet
 from odoo.tools.safe_eval import safe_eval, datetime, dateutil, time
 
 _logger = logging.getLogger(__name__)
@@ -201,7 +201,7 @@ class IrModel(models.Model):
         self.count = 0
         for model in self:
             records = self.env[model.model]
-            if not records._abstract:
+            if not records._abstract and records._auto:
                 cr.execute(sql.SQL('SELECT COUNT(*) FROM {}').format(sql.Identifier(records._table)))
                 model.count = cr.fetchone()[0]
 
@@ -826,16 +826,15 @@ class IrModelFields(models.Model):
         self._prepare_update()
 
         # determine registry fields corresponding to self
-        fields = []
+        fields = OrderedSet()
         for record in self:
             try:
-                fields.append(self.pool[record.model]._fields[record.name])
+                fields.add(self.pool[record.model]._fields[record.name])
             except KeyError:
                 pass
 
-        model_names = self.mapped('model')
-        self._drop_column()
-        res = super(IrModelFields, self).unlink()
+        # clean the registry from the fields to remove
+        self.pool.registry_invalidated = True
 
         # discard the removed fields from field triggers
         def discard_fields(tree):
@@ -850,7 +849,18 @@ class IrModelFields(models.Model):
                     discard_fields(subtree)
 
         discard_fields(self.pool.field_triggers)
-        self.pool.registry_invalidated = True
+
+        # discard the removed fields from field inverses
+        for Model in self.pool.values():
+            Model._field_inverses.discard_keys_and_values(fields)
+
+        # discard the removed fields from fields to compute
+        for field in fields:
+            self.env.all.tocompute.pop(field, None)
+
+        model_names = self.mapped('model')
+        self._drop_column()
+        res = super(IrModelFields, self).unlink()
 
         # The field we just deleted might be inherited, and the registry is
         # inconsistent in this case; therefore we reload the registry.
@@ -2219,6 +2229,10 @@ class IrModelData(models.Model):
         module_data.unlink()
 
     @api.model
+    def _process_end_unlink_record(self, record):
+        record.unlink()
+
+    @api.model
     def _process_end(self, modules):
         """ Clear records removed from updated module data.
         This method is called at the end of the module loading process.
@@ -2288,12 +2302,12 @@ class IrModelData(models.Model):
                 module = xmlid.split('.', 1)[0]
                 record = record.with_context(module=module)
                 if record._name == 'ir.model.fields' and not module.startswith('test_'):
-                    _logger.warning(
+                    _logger.runbot(
                         "Deleting field %s.%s (hint: fields should be"
                         " explicitly removed by an upgrade script)",
                         record.model, record.name,
                     )
-                record.unlink()
+                self._process_end_unlink_record(record)
             else:
                 bad_imd_ids.append(id)
         if bad_imd_ids:
@@ -2309,7 +2323,7 @@ class IrModelData(models.Model):
         """ Toggle the noupdate flag on the external id of the record """
         record = self.env[model].browse(res_id)
         if record.check_access_rights('write'):
-            for xid in  self.search([('model', '=', model), ('res_id', '=', res_id)]):
+            for xid in self.search([('model', '=', model), ('res_id', '=', res_id)]):
                 xid.noupdate = not xid.noupdate
 
 

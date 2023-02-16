@@ -100,7 +100,7 @@ msgstr "Zadnjič spremenjeno"
 #: model:ir.model.fields,field_description:hr_fleet.field_hr_employee__mobility_card
 #: model:ir.model.fields,field_description:hr_fleet.field_hr_employee_public__mobility_card
 msgid "Mobility Card"
-msgstr ""
+msgstr "Kartica mobilnosti"
 
 #. module: hr_fleet
 #: model:ir.model.fields,field_description:hr_fleet.field_fleet_vehicle_assignation_log__attachment_number
@@ -123,6 +123,11 @@ msgstr ""
 msgid ""
 "This report will contain only PDF files. If you want all documents, please "
 "go on vehicle page. Do you want to proceed?"
+msgstr ""
+
+#. module: hr_fleet
+#: code:addons/hr_fleet/controllers/main.py:0
+msgid "There is no pdf attached to generate a claim report."
 msgstr ""
 
 #. module: hr_fleet

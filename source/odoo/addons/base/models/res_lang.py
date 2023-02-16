@@ -122,7 +122,6 @@ class Lang(models.Model):
         iso_lang = tools.get_iso_codes(lang)
         for ln in tools.get_locales(lang):
             try:
-                ln = ln[0:ln.index('.')]
                 locale.setlocale(locale.LC_ALL, str(ln))
                 fail = False
                 break
@@ -212,8 +211,7 @@ class Lang(models.Model):
 
     @tools.ormcache('self.code', 'monetary')
     def _data_get(self, monetary=False):
-        conv = locale.localeconv()
-        thousands_sep = self.thousands_sep or conv[monetary and 'mon_thousands_sep' or 'thousands_sep']
+        thousands_sep = self.thousands_sep or ''
         decimal_point = self.decimal_point
         grouping = self.grouping
         return grouping, thousands_sep, decimal_point

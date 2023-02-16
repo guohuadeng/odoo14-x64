@@ -99,7 +99,7 @@ class PosConfig(models.Model):
 
     def _compute_customer_html(self):
         for config in self:
-            config.customer_facing_display_html = self.env['ir.qweb']._render('point_of_sale.customer_facing_display_html')
+            config.customer_facing_display_html = self.env['ir.qweb']._render('point_of_sale.customer_facing_display_html', {'company': self.company_id})
 
     name = fields.Char(string='Point of Sale', index=True, required=True, help="An internal identification of the point of sale.")
     is_installed_account_accountant = fields.Boolean(string="Is the Full Accounting Installed",
@@ -390,6 +390,14 @@ class PosConfig(models.Model):
                 _("You must have at least one payment method configured to launch a session.")
             )
 
+    @api.constrains('pricelist_id', 'available_pricelist_ids')
+    def _check_pricelists(self):
+        self._check_companies()
+        self = self.sudo()
+        if self.pricelist_id.company_id and self.pricelist_id.company_id != self.company_id:
+            raise ValidationError(
+                _("The default pricelist must belong to no company or the company of the point of sale."))
+
     @api.constrains('company_id', 'available_pricelist_ids')
     def _check_companies(self):
         if any(self.available_pricelist_ids.mapped(lambda pl: pl.company_id.id not in (False, self.company_id.id))):
@@ -574,7 +582,8 @@ class PosConfig(models.Model):
          }
 
     def _force_http(self):
-        if self.other_devices:
+        enforce_https = self.env['ir.config_parameter'].sudo().get_param('point_of_sale.enforce_https')
+        if not enforce_https and self.other_devices:
             return True
         return False
 
@@ -607,6 +616,7 @@ class PosConfig(models.Model):
         """
         self.ensure_one()
         if not self.current_session_id:
+            self._check_pricelists()
             self._check_company_journal()
             self._check_company_invoice_journal()
             self._check_company_payment()
@@ -629,6 +639,7 @@ class PosConfig(models.Model):
         return self._open_session(self.current_session_id.id)
 
     def _open_session(self, session_id):
+        self._check_pricelists()  # The pricelist company might have changed after the first opening of the session
         return {
             'name': _('Session'),
             'view_mode': 'form,tree',

@@ -63,6 +63,9 @@ const ReplenishReport = clientAction.extend({
             promController.then(() => {
                 this.iframe.removeEventListener('load', appendGraph);
                 const $reportGraphDiv = $(this.iframe).contents().find('.o_report_graph');
+                if (!$reportGraphDiv) {
+                    return;
+                }
                 dom.append(this.$el, viewController.$el, {
                     in_DOM: true,
                     callbacks: [{widget: viewController}],
@@ -106,6 +109,7 @@ const ReplenishReport = clientAction.extend({
                 modelName: model,
                 domain: this._getReportDomain(),
                 hasActionMenus: false,
+                context: {fill_temporal: false},
             };
             const graphView = new GraphView(viewInfo, params);
             return graphView.getController(this);

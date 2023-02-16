@@ -229,12 +229,17 @@ class MassMailing(models.Model):
     @api.depends('mailing_model_id')
     def _compute_model(self):
         for record in self:
-            record.mailing_model_real = (record.mailing_model_name != 'mailing.list') and record.mailing_model_name or 'mailing.contact'
+            record.mailing_model_real = (record.mailing_model_id.model != 'mailing.list') and record.mailing_model_id.model or 'mailing.contact'
 
-    @api.depends('mailing_model_real')
+    @api.depends('mailing_model_id')
     def _compute_reply_to_mode(self):
+        """ For main models not really using chatter to gather answers (contacts
+        and mailing contacts), set reply-to as email-based. Otherwise answers
+        by default go on the original discussion thread (business document). Note
+        that mailing_model being mailing.list means contacting mailing.contact
+        (see mailing_model_name versus mailing_model_real). """
         for mailing in self:
-            if mailing.mailing_model_real in ['res.partner', 'mailing.contact']:
+            if mailing.mailing_model_id.model in ['res.partner', 'mailing.list', 'mailing.contact']:
                 mailing.reply_to_mode = 'email'
             else:
                 mailing.reply_to_mode = 'thread'
@@ -247,10 +252,10 @@ class MassMailing(models.Model):
             elif mailing.reply_to_mode == 'thread':
                 mailing.reply_to = False
 
-    @api.depends('mailing_model_name', 'contact_list_ids')
+    @api.depends('mailing_model_id', 'contact_list_ids', 'mailing_type')
     def _compute_mailing_domain(self):
         for mailing in self:
-            if not mailing.mailing_model_name:
+            if not mailing.mailing_model_id:
                 mailing.mailing_domain = ''
             else:
                 mailing.mailing_domain = repr(mailing._get_default_mailing_domain())
@@ -265,12 +270,20 @@ class MassMailing(models.Model):
             values['name'] = "%s %s" % (values['subject'], datetime.strftime(fields.datetime.now(), tools.DEFAULT_SERVER_DATETIME_FORMAT))
         if values.get('body_html'):
             values['body_html'] = self._convert_inline_images_to_urls(values['body_html'])
-        return super(MassMailing, self).create(values)
+        return super().create(values)\
+            ._fix_attachment_ownership()
 
     def write(self, values):
         if values.get('body_html'):
             values['body_html'] = self._convert_inline_images_to_urls(values['body_html'])
-        return super(MassMailing, self).write(values)
+        super().write(values)
+        self._fix_attachment_ownership()
+        return True
+
+    def _fix_attachment_ownership(self):
+        for record in self:
+            record.attachment_ids.write({'res_model': record._name, 'res_id': record.id})
+        return self
 
     @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
@@ -468,7 +481,7 @@ class MassMailing(models.Model):
         """
 
         # Apply same 'get email field' rule from mail_thread.message_get_default_recipients
-        if 'partner_id' in target._fields:
+        if 'partner_id' in target._fields and target._fields['partner_id'].store:
             mail_field = 'email'
             query = """
                 SELECT lower(substring(p.%(mail_field)s, '([^ ,;<@]+@[^> ,;]+)'))
@@ -479,21 +492,21 @@ class MassMailing(models.Model):
             """
         elif issubclass(type(target), self.pool['mail.thread.blacklist']):
             mail_field = 'email_normalized'
-        elif 'email_from' in target._fields:
+        elif 'email_from' in target._fields and target._fields['email_from'].store:
             mail_field = 'email_from'
-        elif 'partner_email' in target._fields:
+        elif 'partner_email' in target._fields and target._fields['partner_email'].store:
             mail_field = 'partner_email'
-        elif 'email' in target._fields:
+        elif 'email' in target._fields and target._fields['email'].store:
             mail_field = 'email'
         else:
             raise UserError(_("Unsupported mass mailing model %s", self.mailing_model_id.name))
 
         if self.unique_ab_testing:
-            query +="""
+            query += """
                AND s.campaign_id = %%(mailing_campaign_id)s;
             """
         else:
-            query +="""
+            query += """
                AND s.mass_mailing_id = %%(mailing_id)s
                AND s.model = %%(target_model)s;
             """

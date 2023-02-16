@@ -421,6 +421,16 @@ class TestMultistepManufacturingWarehouse(TestMrpCommon):
         self.assertEqual(len(picking.move_lines), 1)
         picking.product_id = self.complex_product
 
+        # MOs are correctly linked to each other
+        self.assertEqual(production.mrp_production_child_count, 1)
+        self.assertEqual(production.mrp_production_source_count, 0)
+        self.assertEqual(subproduction.mrp_production_child_count, 0)
+        self.assertEqual(subproduction.mrp_production_source_count, 1)
+        child_action = production.action_view_mrp_production_childs()
+        source_action = subproduction.action_view_mrp_production_sources()
+        self.assertEqual(child_action.get('res_id'), subproduction.id)
+        self.assertEqual(source_action.get('res_id'), production.id)
+
     def test_3_steps_and_byproduct(self):
         """ Suppose a warehouse with Manufacture option set to '3 setps' and a product P01 with a reordering rule.
         Suppose P01 has a BoM and this BoM mentions that when some P01 are produced, some P02 are produced too.
@@ -505,3 +515,32 @@ class TestMultistepManufacturingWarehouse(TestMrpCommon):
         self.assertEqual(finished_product_SML.product_uom_qty, 2)
         self.assertEqual(secondary_product_SML.product_uom.id, four_units_uom.id)
         self.assertEqual(secondary_product_SML.product_uom_qty, 1)
+
+    def test_2_steps_and_additional_moves(self):
+        """ Suppose a 2-steps configuration. If a user adds a product to an existing draft MO and then
+        confirms it, the associated picking should includes this new product"""
+        self.warehouse.manufacture_steps = 'pbm'
+
+        mo_form = Form(self.env['mrp.production'])
+        mo_form.product_id = self.bom.product_id
+        mo_form.picking_type_id = self.warehouse.manu_type_id
+        mo = mo_form.save()
+
+        component_move = mo.move_raw_ids[0]
+        mo.with_context(default_raw_material_production_id=mo.id).move_raw_ids = [
+            [0, 0, {
+                'location_id': component_move.location_id.id,
+                'location_dest_id': component_move.location_dest_id.id,
+                'picking_type_id': component_move.picking_type_id.id,
+                'product_id': self.product_2.id,
+                'name': self.product_2.display_name,
+                'product_uom_qty': 1,
+                'product_uom': self.product_2.uom_id.id,
+                'warehouse_id': component_move.warehouse_id.id,
+                'raw_material_production_id': mo.id,
+            }]
+        ]
+
+        mo.action_confirm()
+
+        self.assertEqual(self.bom.bom_line_ids.product_id + self.product_2, mo.picking_ids.move_lines.product_id)

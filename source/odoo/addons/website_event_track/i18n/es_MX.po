@@ -5,7 +5,7 @@
 # Translators:
 # Cécile Collart <cco@odoo.com>, 2021
 # Braulio D. López Vázquez <bdl@odoo.com>, 2021
-# Lucia Pacheco <lpo@odoo.com>, 2021
+# Lucia Pacheco <lpo@odoo.com>, 2022
 # 
 msgid ""
 msgstr ""
@@ -13,13 +13,13 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-27 14:13+0000\n"
 "PO-Revision-Date: 2020-09-07 08:21+0000\n"
-"Last-Translator: Lucia Pacheco <lpo@odoo.com>, 2021\n"
+"Last-Translator: Lucia Pacheco <lpo@odoo.com>, 2022\n"
 "Language-Team: Spanish (Mexico) (https://www.transifex.com/odoo/teams/41243/es_MX/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Language: es_MX\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #. module: website_event_track
 #: code:addons/website_event_track/models/website.py:0
@@ -90,7 +90,7 @@ msgstr ""
 "    Encontrará más detalles aquí:\n"
 "    <div style=\"margin: 16px 0px 16px 0px;\">\n"
 "        <a href=\"/event/${object.event_id.id}/track/${object.id}\" style=\"padding: 8px 16px 8px 16px; font-size: 14px; color: #FFFFFF; text-decoration: none !important; background-color: #875A7B; border: 0px solid #875A7B; border-radius:3px\">\n"
-"            View Talk\n"
+"            Ver plática\n"
 "        </a>\n"
 "    </div>\n"
 "    <br/><br/>\n"
@@ -119,7 +119,7 @@ msgstr "<b>Propuesto por</b>:"
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_template_new
 msgid "<b>Speakers Biography</b>:"
-msgstr "<b>Biografía del ponente</b>:"
+msgstr "<b>Biografía del orador </b>:"
 
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_template_new
@@ -148,7 +148,7 @@ msgid ""
 "                                You can add multiple speakers by separating names, emails and phones with commas."
 msgstr ""
 "<i class=\"fa fa-info-circle\"/>\n"
-" Puede añadir múltiples ponentes al separar con comas sus nombres, correos electrónicos y teléfonos."
+" Puede añadir múltiples oradores al separar con comas sus nombres, correos electrónicos y teléfonos."
 
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.tracks_display_list
@@ -414,7 +414,7 @@ msgstr "Audiencia"
 #. module: website_event_track
 #: model:ir.model.fields,field_description:website_event_track.field_event_event__allowed_track_tag_ids
 msgid "Available Track Tags"
-msgstr "Etiquetas para grabaciones disponibles"
+msgstr "Etiquetas disponibles para grabaciones"
 
 #. module: website_event_track
 #: model_terms:event.track,description:website_event_track.event_7_track_18
@@ -1126,7 +1126,8 @@ msgstr ""
 #: model:ir.model.fields,help:website_event_track.field_event_track__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
-"Si se encuentra seleccionado, algunos mensajes tienen error de entrega."
+"Si se encuentra seleccionado, algunos mensajes presentan un error de "
+"entrega."
 
 #. module: website_event_track
 #: model:ir.model.fields,help:website_event_track.field_event_track_stage__mail_template_id
@@ -1134,8 +1135,8 @@ msgid ""
 "If set an email will be sent to the customer when the track reaches this "
 "step."
 msgstr ""
-"Si se selecciona, se enviará un correo electrónico al cliente cuando la "
-"grabación llegue a este paso."
+"Si esta opción está activada, se enviará un correo electrónico al cliente "
+"cuando la grabación llegue a este paso."
 
 #. module: website_event_track
 #: model:ir.model.fields,help:website_event_track.field_event_track__wishlisted_by_default
@@ -1143,8 +1144,8 @@ msgid ""
 "If set, the talk will be starred for each attendee registered to the event. "
 "The attendee won't be able to un-star this talk."
 msgstr ""
-"Si se selecciona, la plática se señalará con una estrella para cada "
-"asistente registrado en el evento. El asistente no podrá eliminar la "
+"Si esta opción está activada, la plática se señalará con una estrella para "
+"cada asistente registrado en el evento. El asistente no podrá eliminar la "
 "estrella de esta plática."
 
 #. module: website_event_track
@@ -1246,7 +1247,7 @@ msgstr "¿Está activado el recordatorio?"
 #. module: website_event_track
 #: model:ir.model.fields,field_description:website_event_track.field_event_track__is_track_done
 msgid "Is Track Done"
-msgstr "¿Acabo la grabación?"
+msgstr "¿Ya acabó la grabación?"
 
 #. module: website_event_track
 #: model:ir.model.fields,field_description:website_event_track.field_event_track__is_track_live
@@ -1924,50 +1925,50 @@ msgstr "Plata"
 #. module: website_event_track
 #: model:ir.model.fields,field_description:website_event_track.field_event_track__partner_id
 msgid "Speaker"
-msgstr "Ponente"
+msgstr "Orador"
 
 #. module: website_event_track
 #: code:addons/website_event_track/models/event_track.py:0
 #, python-format
 msgid "Speaker Email"
-msgstr "Correo electrónico del ponente"
+msgstr "Correo electrónico del orador "
 
 #. module: website_event_track
 #: model:ir.model.fields,field_description:website_event_track.field_event_track__image
 msgid "Speaker Photo"
-msgstr "Fotografía del ponente"
+msgstr "Fotografía del orador "
 
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_proposal
 msgid "Speaker(s) Biography"
-msgstr "Biografía de los ponentes"
+msgstr "Biografía de los oradores"
 
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_proposal
 msgid "Speaker(s) Email"
-msgstr "Correos electrónicos de los ponentes"
+msgstr "Correos electrónicos de los oradores"
 
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_proposal
 msgid "Speaker(s) Name"
-msgstr "Nombres de los ponentes"
+msgstr "Nombres de los oradores"
 
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_proposal
 msgid "Speaker(s) Phone"
-msgstr "Teléfonos de los ponentes"
+msgstr "Teléfonos de los oradores"
 
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_proposal
 msgid "Speaker(s) Picture"
-msgstr "Fotografías de los ponentes"
+msgstr "Fotografías de los oradores"
 
 #. module: website_event_track
 #: code:addons/website_event_track/models/event_track.py:0
 #: model_terms:ir.ui.view,arch_db:website_event_track.view_event_track_form
 #, python-format
 msgid "Speakers"
-msgstr "Ponentes"
+msgstr "Oradores"
 
 #. module: website_event_track
 #: code:addons/website_event_track/models/event_sponsor.py:0
@@ -2084,7 +2085,7 @@ msgid ""
 msgstr ""
 "Estado basado en actividades\n"
 "Vencida: ya pasó la fecha límite\n"
-"Hoy: La fecha límite es hoy\n"
+"Hoy: hoy es la fecha de la actividad\n"
 "Planificada: futuras actividades."
 
 #. module: website_event_track
@@ -2298,7 +2299,7 @@ msgstr "Grabación"
 #. module: website_event_track
 #: model:ir.model,name:website_event_track.model_event_track_visitor
 msgid "Track / Visitor Link"
-msgstr "Grabación / visitante del enlace"
+msgstr "Grabación/visitante del enlace"
 
 #. module: website_event_track
 #: model:mail.message.subtype,name:website_event_track.mt_track_blocked
@@ -2318,7 +2319,7 @@ msgstr "Fecha de la grabación"
 #. module: website_event_track
 #: model:ir.model.fields,field_description:website_event_track.field_event_track__date_end
 msgid "Track End Date"
-msgstr "Fecha final de la grabación"
+msgstr "Fecha de finalización de la grabación"
 
 #. module: website_event_track
 #: model:ir.ui.menu,name:website_event_track.menu_event_track_location
@@ -2494,7 +2495,7 @@ msgid ""
 "    ingenuity along with a couple boards, a sturdy strap and a few screws are all I use to easily haul\n"
 "    long boards from the lumberyard to the Next Level Carpentry shop or jobsite."
 msgstr ""
-"Siga estos sencillos pasos para transportar fácilmente madera LARGA en una camioneta con compartimiento pequeño. Lo único que necesito\n"
+"Siga estos sencillos pasos para transportar fácilmente tablas LARGAS en una camioneta con compartimiento pequeño. Lo único que necesito\n"
 "para transportar tablas largas desde el aserradero hasta el taller de Next Level Carpentry o el lugar de trabajo es \n"
 "una dosis de ingenio de carpintero junto con un par de tablas, una correa resistente y unos cuantos tornillos"
 
@@ -2554,7 +2555,7 @@ msgstr "No encontramos ninguna grabación que coincida con su"
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_proposal
 msgid "We require speakers to accept an agreement in which they commit to:"
 msgstr ""
-"Requerimos que los ponentes acepten un acuerdo en el que se comprometen a:"
+"Requerimos que los oradores acepten un acuerdo en el que se comprometen a:"
 
 #. module: website_event_track
 #: model_terms:ir.ui.view,arch_db:website_event_track.event_track_proposal

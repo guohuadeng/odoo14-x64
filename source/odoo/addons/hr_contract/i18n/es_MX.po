@@ -130,8 +130,8 @@ msgid ""
 "An employee can only have one contract at the same time. (Excluding Draft "
 "and Cancelled contracts)"
 msgstr ""
-"Un empleado solo puede tener un contrato al mismo tiempo. (Excluyendo "
-"borrador y contratos cancelados)"
+"Un empleado puede tener solo un contrato al mismo tiempo. (Excluyendo "
+"contratos en estado de borrador y cancelados)"
 
 #. module: hr_contract
 #: model_terms:ir.ui.view,arch_db:hr_contract.hr_contract_view_form
@@ -685,7 +685,7 @@ msgstr ""
 "Estado basado en actividades\n"
 "Vencida: la fecha límite ya ha pasado\n"
 "Hoy: La fecha límite es hoy\n"
-"Planificada: futuras actividades."
+"Planeada: futuras actividades."
 
 #. module: hr_contract
 #: model:ir.model.fields,help:hr_contract.field_hr_contract__state

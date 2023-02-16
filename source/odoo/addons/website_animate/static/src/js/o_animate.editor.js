@@ -22,6 +22,12 @@ function forceAnimation() {
 
 //  Animations
 sOptions.registry.o_animate = sOptions.Class.extend({
+    /**
+     * @override
+     */
+    async onBuilt() {
+        this.$target[0].classList.toggle('o_animate_preview', this.$target[0].classList.contains('o_animate'));
+    },
 
     //--------------------------------------------------------------------------
     // Options
@@ -36,6 +42,23 @@ sOptions.registry.o_animate = sOptions.Class.extend({
         if (params.isAnimationTypeSelection) {
             this.$target.toggleClass('o_animate_preview o_animate', !!widgetValue);
         }
+    },
+
+    //--------------------------------------------------------------------------
+    // Private
+    //--------------------------------------------------------------------------
+
+    /**
+     * @override
+     */
+    async _computeWidgetVisibility(widgetName, params) {
+        const classes = params.optionsPossibleValues.selectClass;
+        if (classes && classes.includes('o_animate_both_scroll')) {
+            // Hide the "Each time it becomes visible" option if the target is
+            // inside a dropdown (e.g. mega menu).
+            return !this.$target.closest('.dropdown').length;
+        }
+        return this._super(...arguments);
     },
 });
 });

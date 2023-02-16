@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import datetime
+from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
 from odoo.tools.float_utils import float_round
@@ -132,7 +133,7 @@ class HrEmployeeBase(models.AbstractModel):
             employee.leave_date_to = leave_data.get(employee.id, {}).get('leave_date_to')
             employee.current_leave_state = leave_data.get(employee.id, {}).get('current_leave_state')
             employee.current_leave_id = leave_data.get(employee.id, {}).get('current_leave_id')
-            employee.is_absent = leave_data.get(employee.id) and leave_data.get(employee.id, {}).get('current_leave_state') not in ['cancel', 'refuse', 'draft']
+            employee.is_absent = leave_data.get(employee.id) and leave_data.get(employee.id, {}).get('current_leave_state') in ['validate']
 
     @api.depends('parent_id')
     def _compute_leave_manager(self):
@@ -153,11 +154,16 @@ class HrEmployeeBase(models.AbstractModel):
                 employee.show_leaves = False
 
     def _search_absent_employee(self, operator, value):
+        # This search is only used for the 'Absent Today' filter however
+        # this only returns employees that are absent right now.
+        today_date = datetime.datetime.utcnow().date()
+        today_start = fields.Datetime.to_string(today_date)
+        today_end = fields.Datetime.to_string(today_date + relativedelta(hours=23, minutes=59, seconds=59))
         holidays = self.env['hr.leave'].sudo().search([
             ('employee_id', '!=', False),
             ('state', 'not in', ['cancel', 'refuse']),
-            ('date_from', '<=', datetime.datetime.utcnow()),
-            ('date_to', '>=', datetime.datetime.utcnow())
+            ('date_from', '<=', today_end),
+            ('date_to', '>=', today_start),
         ])
         return [('id', 'in', holidays.mapped('employee_id').ids)]
 

@@ -277,7 +277,7 @@ class AccountReconcileModel(models.Model):
         self.ensure_one()
         balance = base_line_dict['balance']
         tax_type = tax.type_tax_use
-        is_refund = (tax_type == 'sale' and balance < 0) or (tax_type == 'purchase' and balance > 0)
+        is_refund = (tax_type == 'sale' and balance > 0) or (tax_type == 'purchase' and balance < 0)
 
         res = tax.compute_all(balance, is_refund=is_refund)
 
@@ -291,12 +291,15 @@ class AccountReconcileModel(models.Model):
 
         new_aml_dicts = []
         for tax_res in res['taxes']:
+            if self.company_id.currency_id.is_zero(tax_res['amount']):
+                continue
             tax = self.env['account.tax'].browse(tax_res['id'])
             balance = tax_res['amount']
-
+            name = ' '.join([x for x in [base_line_dict.get('name', ''), tax_res['name']] if x])
             new_aml_dicts.append({
                 'account_id': tax_res['account_id'] or base_line_dict['account_id'],
-                'name': tax_res['name'],
+                'journal_id': base_line_dict.get('journal_id', False),
+                'name': name,
                 'partner_id': base_line_dict.get('partner_id'),
                 'balance': balance,
                 'debit': balance > 0 and balance or 0,
@@ -347,7 +350,8 @@ class AccountReconcileModel(models.Model):
                 if match:
                     sign = 1 if residual_balance > 0.0 else -1
                     try:
-                        extracted_balance = float(re.sub(r'\D' + self.decimal_separator, '', match.group(1)).replace(self.decimal_separator, '.'))
+                        extracted_match_group = re.sub(r'[^\d' + self.decimal_separator + ']', '', match.group(1))
+                        extracted_balance = float(extracted_match_group.replace(self.decimal_separator, '.'))
                         balance = copysign(extracted_balance * sign, residual_balance)
                     except ValueError:
                         balance = 0
@@ -366,13 +370,15 @@ class AccountReconcileModel(models.Model):
                 'analytic_account_id': line.analytic_account_id.id,
                 'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
                 'reconcile_model_id': self.id,
+                'journal_id': line.journal_id.id,
+                'tax_ids': [],
             }
             lines_vals_list.append(writeoff_line)
 
             residual_balance -= balance
 
             if line.tax_ids:
-                writeoff_line['tax_ids'] = [(6, None, line.tax_ids.ids)]
+                writeoff_line['tax_ids'] += [(6, None, line.tax_ids.ids)]
                 tax = line.tax_ids
                 # Multiple taxes with force_tax_included results in wrong computation, so we
                 # only allow to set the force_tax_included field if we have one tax selected
@@ -448,12 +454,24 @@ class AccountReconcileModel(models.Model):
 
         for line_vals in writeoff_vals_list:
             st_line_residual -= st_line.company_currency_id.round(line_vals['balance'])
+            line_vals['currency_id'] = st_line.company_currency_id.id
 
         # Check we have enough information to create an open balance.
         if open_balance_vals and not open_balance_vals.get('account_id'):
             return []
 
         return lines_vals_list + writeoff_vals_list
+
+    def _prepare_widget_writeoff_vals(self, st_line_id, write_off_vals):
+        counterpart_vals = st_line_id._prepare_counterpart_move_line_vals({
+                **write_off_vals,
+                'currency_id': st_line_id.company_id.currency_id.id,
+            })
+        return {
+            **counterpart_vals,
+            'balance': counterpart_vals['amount_currency'],
+            'reconcile_model_id': self.id,
+        }
 
     ####################################################
     # RECONCILIATION CRITERIA
@@ -546,7 +564,7 @@ class AccountReconcileModel(models.Model):
             or (self.match_amount == 'between' and (abs(st_line.amount) > self.match_amount_max or abs(st_line.amount) < self.match_amount_min))
             or (self.match_partner and not partner)
             or (self.match_partner and self.match_partner_ids and partner not in self.match_partner_ids)
-            or (self.match_partner and self.match_partner_category_ids and partner.category_id not in self.match_partner_category_ids)
+            or (self.match_partner and self.match_partner_category_ids and not (partner.category_id & self.match_partner_category_ids))
         ):
             return False
 
@@ -648,30 +666,42 @@ class AccountReconcileModel(models.Model):
             if partner:
                 st_line_subquery += r" AND aml.partner_id = %s" % partner.id
             else:
-                st_line_subquery += r"""
-                    AND
-                    (
-                        substring(REGEXP_REPLACE(st_line.payment_ref, '[^0-9\s]', '', 'g'), '\S(?:.*\S)*') != ''
-                        AND
-                        (
-                            (""" + self._get_select_communication_flag() + """)
-                            OR
-                            (""" + self._get_select_payment_reference_flag() + """)
-                        )
-                    )
-                    OR
-                    (
-                        /* We also match statement lines without partners with amls
-                        whose partner's name's parts (splitting on space) are all present
-                        within the payment_ref, in any order, with any characters between them. */
+                st_line_fields_consideration = [
+                    (self.match_text_location_label, 'st_line.payment_ref'),
+                    (self.match_text_location_note, 'st_line_move.narration'),
+                    (self.match_text_location_reference, 'st_line_move.ref'),
+                ]
 
-                        aml_partner.name IS NOT NULL
-                        AND """ + unaccent("st_line.payment_ref") + r""" ~* ('^' || (
-                            SELECT string_agg(concat('(?=.*\m', chunk[1], '\M)'), '')
-                              FROM regexp_matches(""" + unaccent("aml_partner.name") + r""", '\w{3,}', 'g') AS chunk
-                        ))
-                    )
-                """
+                no_partner_query = " OR ".join([
+                    r"""
+                        (
+                            substring(REGEXP_REPLACE(""" + sql_field + """, '[^0-9\s]', '', 'g'), '\S(?:.*\S)*') != ''
+                            AND
+                            (
+                                (""" + self._get_select_communication_flag() + """)
+                                OR
+                                (""" + self._get_select_payment_reference_flag() + """)
+                            )
+                        )
+                        OR
+                        (
+                            /* We also match statement lines without partners with amls
+                            whose partner's name's parts (splitting on space) are all present
+                            within the payment_ref, in any order, with any characters between them. */
+
+                            aml_partner.name IS NOT NULL
+                            AND """ + unaccent(sql_field) + r""" ~* ('^' || (
+                                SELECT string_agg(concat('(?=.*\m', chunk[1], '\M)'), '')
+                                  FROM regexp_matches(""" + unaccent("aml_partner.name") + r""", '\w{3,}', 'g') AS chunk
+                            ))
+                        )
+                    """
+                    for consider_field, sql_field in st_line_fields_consideration
+                    if consider_field
+                ])
+
+                if no_partner_query:
+                    st_line_subquery += " AND " + no_partner_query
 
             st_lines_queries.append(r"st_line.id = %s AND (%s)" % (st_line.id, st_line_subquery))
 

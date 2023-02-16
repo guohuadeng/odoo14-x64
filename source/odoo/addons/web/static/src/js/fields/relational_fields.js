@@ -576,7 +576,14 @@ var FieldMany2One = AbstractField.extend({
             domain.push(['id', 'not in', blackListedIds]);
         }
 
-        const nameSearch = this._rpc({
+        if (this.lastNameSearch) {
+            this.lastNameSearch.catch((reason) => {
+                // the last rpc name_search will be aborted, so we want to ignore its rejection
+                reason.event.preventDefault();
+            })
+            this.lastNameSearch.abort(false)
+        }
+        this.lastNameSearch = this._rpc({
             model: this.field.relation,
             method: "name_search",
             kwargs: {
@@ -587,7 +594,7 @@ var FieldMany2One = AbstractField.extend({
                 context,
             }
         });
-        const results = await this.orderer.add(nameSearch);
+        const results = await this.orderer.add(this.lastNameSearch);
 
         // Format results to fit the options dropdown
         let values = results.map((result) => {
@@ -1869,7 +1876,7 @@ var FieldOne2Many = FieldX2Many.extend({
                         index = self.value.data.length - 1;
                     }
                     var newID = self.value.data[index].id;
-                    self.renderer.editRecord(newID);
+                    return self.renderer.editRecord(newID);
                 }
             }
         });
@@ -3095,6 +3102,14 @@ var FieldRadio = FieldSelection.extend({
     //--------------------------------------------------------------------------
 
     /**
+     * @override
+     * @returns {boolean} always true
+     */
+    isSet: function () {
+        return true;
+    },
+
+    /**
      * Returns the currently-checked radio button, or the first one if no radio
      * button is checked.
      *
@@ -3103,14 +3118,6 @@ var FieldRadio = FieldSelection.extend({
     getFocusableElement: function () {
         var checked = this.$("[checked='true']");
         return checked.length ? checked : this.$("[data-index='0']");
-    },
-
-    /**
-     * @override
-     * @returns {boolean} always true
-     */
-    isSet: function () {
-        return true;
     },
 
     /**

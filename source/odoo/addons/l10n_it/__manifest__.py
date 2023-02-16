@@ -22,10 +22,13 @@ Italian accounting chart and localization.
         'data/l10n_it_chart_data.xml',
         'data/account.account.template.csv',
         'data/account.tax.group.csv',
+        'data/account_tax_report_data.xml',
         'data/account_tax_template.xml',
         'data/account.fiscal.position.template.csv',
         'data/account.chart.template.csv',
+        'data/account_fiscal_position_tax_template_data.xml',
         'data/account_chart_template_data.xml',
+        'data/report_invoice.xml'
     ],
     'demo': [
         'demo/demo_company.xml',

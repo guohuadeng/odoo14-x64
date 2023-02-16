@@ -22,11 +22,18 @@ import json
 from lxml import etree
 from contextlib import closing
 from distutils.version import LooseVersion
-from reportlab.graphics.barcode import createBarcodeDrawing
 from PyPDF2 import PdfFileWriter, PdfFileReader, utils
 from collections import OrderedDict
 from collections.abc import Iterable
 from PIL import Image, ImageFile
+
+# Ignore a deprecation warning `load_module` usage in importlib from python 3.10 (Jammy)
+# Catched here in order to not miss the same warning from elsewhere
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from reportlab.graphics.barcode import createBarcodeDrawing
+
 # Allow truncated images
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -374,12 +381,16 @@ class IrActionsReport(models.Model):
             footer_node.append(node)
 
         # Retrieve bodies
+        layout_sections = None
         for node in root.xpath(match_klass.format('article')):
             layout_with_lang = layout
-            # set context language to body language
             if node.get('data-oe-lang'):
+                # context language to body language
                 layout_with_lang = layout_with_lang.with_context(lang=node.get('data-oe-lang'))
-            body = layout_with_lang._render(dict(subst=False, body=lxml.html.tostring(node), base_url=base_url))
+                # set header/lang to body lang prioritizing current user language
+                if not layout_sections or node.get('data-oe-lang') == self.env.lang:
+                    layout_sections = layout_with_lang
+            body = layout_with_lang._render(dict(subst=False, body=lxml.html.tostring(node), base_url=base_url, report_xml_id=self.xml_id))
             bodies.append(body)
             if node.get('data-oe-model') == self.model:
                 res_ids.append(int(node.get('data-oe-id', 0)))
@@ -397,8 +408,8 @@ class IrActionsReport(models.Model):
             if attribute[0].startswith('data-report-'):
                 specific_paperformat_args[attribute[0]] = attribute[1]
 
-        header = layout._render(dict(subst=True, body=lxml.html.tostring(header_node), base_url=base_url))
-        footer = layout._render(dict(subst=True, body=lxml.html.tostring(footer_node), base_url=base_url))
+        header = (layout_sections or layout)._render(dict(subst=True, body=lxml.html.tostring(header_node), base_url=base_url))
+        footer = (layout_sections or layout)._render(dict(subst=True, body=lxml.html.tostring(footer_node), base_url=base_url))
 
         return bodies, res_ids, header, footer, specific_paperformat_args
 
@@ -501,7 +512,75 @@ class IrActionsReport(models.Model):
         return report_obj.with_context(context).sudo().search(conditions, limit=1)
 
     @api.model
-    def barcode(self, barcode_type, value, width=600, height=100, humanreadable=0, quiet=1, mask=None):
+    def get_barcode_check_digit(self, numeric_barcode):
+        """ Computes and returns the barcode check digit. The used algorithm
+        follows the GTIN specifications and can be used by all compatible
+        barcode nomenclature, like as EAN-8, EAN-12 (UPC-A) or EAN-13.
+
+        https://www.gs1.org/sites/default/files/docs/barcodes/GS1_General_Specifications.pdf
+        https://www.gs1.org/services/how-calculate-check-digit-manually
+
+        :param numeric_barcode: the barcode to verify/recompute the check digit
+        :type numeric_barcode: str
+        :return: the number corresponding to the right check digit
+        :rtype: int
+        """
+        # Multiply value of each position by
+        # N1  N2  N3  N4  N5  N6  N7  N8  N9  N10 N11 N12 N13 N14 N15 N16 N17 N18
+        # x3  X1  x3  x1  x3  x1  x3  x1  x3  x1  x3  x1  x3  x1  x3  x1  x3  CHECKSUM
+        oddsum = evensum = 0
+        code = numeric_barcode[-2::-1]  # Remove the check digit and reverse the barcode.
+        # The CHECKSUM digit is removed because it will be recomputed and it must not interfer with
+        # the computation. Also, the barcode is inverted, so the barcode length doesn't matter.
+        # Otherwise, the digits' group (even or odd) could be different according to the barcode length.
+        for i, digit in enumerate(code):
+            if i % 2 == 0:
+                evensum += int(digit)
+            else:
+                oddsum += int(digit)
+        total = evensum * 3 + oddsum
+        return (10 - total % 10) % 10
+
+    @api.model
+    def check_barcode_encoding(self, barcode, encoding):
+        """ Checks if the given barcode is correctly encoded.
+
+        :return: True if the barcode string is encoded with the provided encoding.
+        :rtype: bool
+        """
+        if encoding == "any":
+            return True
+        barcode_sizes = {
+            'ean8': 8,
+            'ean13': 13,
+            'upca': 12,
+        }
+        barcode_size = barcode_sizes[encoding]
+        return (encoding != 'ean13' or barcode[0] != '0') \
+               and len(barcode) == barcode_size \
+               and re.match(r"^\d+$", barcode) \
+               and self.get_barcode_check_digit(barcode) == int(barcode[-1])
+
+    @api.model
+    def barcode(self, barcode_type, value, **kwargs):
+        defaults = {
+            'width': (600, int),
+            'height': (100, int),
+            'humanreadable': (False, lambda x: bool(int(x))),
+            'quiet': (True, lambda x: bool(int(x))),
+            'mask': (None, lambda x: x),
+            'barBorder': (4, int),
+            # The QR code can have different layouts depending on the Error Correction Level
+            # See: https://en.wikipedia.org/wiki/QR_code#Error_correction
+            # Level 'L' – up to 7% damage   (default)
+            # Level 'M' – up to 15% damage  (i.e. required by l10n_ch QR bill)
+            # Level 'Q' – up to 25% damage
+            # Level 'H' – up to 30% damage
+            'barLevel': ('L', lambda x: x in ('L', 'M', 'Q', 'H') and x or 'L'),
+        }
+        kwargs = {k: validator(kwargs.get(k, v)) for k, (v, validator) in defaults.items()}
+        kwargs['humanReadable'] = kwargs.pop('humanreadable')
+
         if barcode_type == 'UPCA' and len(value) in (11, 12, 13):
             barcode_type = 'EAN13'
             if len(value) in (11, 12):
@@ -509,34 +588,39 @@ class IrActionsReport(models.Model):
         elif barcode_type == 'auto':
             symbology_guess = {8: 'EAN8', 13: 'EAN13'}
             barcode_type = symbology_guess.get(len(value), 'Code128')
-        try:
-            width, height, humanreadable, quiet = int(width), int(height), bool(int(humanreadable)), bool(int(quiet))
+        elif barcode_type == 'QR':
             # for `QR` type, `quiet` is not supported. And is simply ignored.
             # But we can use `barBorder` to get a similar behaviour.
-            bar_border = 4
-            if barcode_type == 'QR' and quiet:
-                bar_border = 0
+            if kwargs['quiet']:
+                kwargs['barBorder'] = 0
 
-            barcode = createBarcodeDrawing(
-                barcode_type, value=value, format='png', width=width, height=height,
-                humanReadable=humanreadable, quiet=quiet, barBorder=bar_border
-            )
+        if barcode_type in ('EAN8', 'EAN13') and not self.check_barcode_encoding(value, barcode_type.lower()):
+            # If the barcode does not respect the encoding specifications, convert its type into Code128.
+            # Otherwise, the report-lab method may return a barcode different from its value. For instance,
+            # if the barcode type is EAN-8 and the value 11111111, the report-lab method will take the first
+            # seven digits and will compute the check digit, which gives: 11111115 -> the barcode does not
+            # match the expected value.
+            barcode_type = 'Code128'
+
+        try:
+            barcode = createBarcodeDrawing(barcode_type, value=value, format='png', **kwargs)
 
             # If a mask is asked and it is available, call its function to
             # post-process the generated QR-code image
-            if mask:
+            if kwargs['mask']:
                 available_masks = self.get_available_barcode_masks()
-                mask_to_apply = available_masks.get(mask)
+                mask_to_apply = available_masks.get(kwargs['mask'])
                 if mask_to_apply:
-                    mask_to_apply(width, height, barcode)
+                    mask_to_apply(kwargs['width'], kwargs['height'], barcode)
 
             return barcode.asString('png')
         except (ValueError, AttributeError):
             if barcode_type == 'Code128':
                 raise ValueError("Cannot convert into barcode.")
+            elif barcode_type == 'QR':
+                raise ValueError("Cannot convert into QR code.")
             else:
-                return self.barcode('Code128', value, width=width, height=height,
-                    humanreadable=humanreadable, quiet=quiet)
+                return self.barcode('Code128', value, **kwargs)
 
     @api.model
     def get_available_barcode_masks(self):
@@ -575,7 +659,7 @@ class IrActionsReport(models.Model):
             time=time,
             context_timestamp=lambda t: fields.Datetime.context_timestamp(self.with_context(tz=user.tz), t),
             user=user,
-            res_company=user.company_id,
+            res_company=self.env.company,
             website=website,
             web_base_url=self.env['ir.config_parameter'].sudo().get_param('web.base.url', default=''),
         )
@@ -692,11 +776,13 @@ class IrActionsReport(models.Model):
     def _get_unreadable_pdfs(self, streams):
         unreadable_streams = []
 
-        writer = PdfFileWriter()
         for stream in streams:
+            writer = PdfFileWriter()
+            result_stream = io.BytesIO()
             try:
                 reader = PdfFileReader(stream)
                 writer.appendPagesFromReader(reader)
+                writer.write(result_stream)
             except utils.PdfReadError:
                 unreadable_streams.append(stream)
 
@@ -728,13 +814,13 @@ class IrActionsReport(models.Model):
             data = {}
         data.setdefault('report_type', 'pdf')
 
-        # access the report details with sudo() but evaluation context as current user
+        # access the report details with sudo() but evaluation context as sudo(False)
         self_sudo = self.sudo()
 
         # In case of test environment without enough workers to perform calls to wkhtmltopdf,
         # fallback to render_html.
         if (tools.config['test_enable'] or tools.config['test_file']) and not self.env.context.get('force_report_rendering'):
-            return self._render_qweb_html(res_ids, data=data)
+            return self_sudo._render_qweb_html(res_ids, data=data)
 
         # As the assets are generated during the same transaction as the rendering of the
         # templates calling them, there is a scenario where the assets are unreachable: when
@@ -831,7 +917,7 @@ class IrActionsReport(models.Model):
             data = {}
         data.setdefault('report_type', 'text')
         data = self._get_rendering_context(docids, data)
-        return self._render_template(self.sudo().report_name, data), 'text'
+        return self._render_template(self.report_name, data), 'text'
 
     @api.model
     def _render_qweb_html(self, docids, data=None):
@@ -841,29 +927,29 @@ class IrActionsReport(models.Model):
             data = {}
         data.setdefault('report_type', 'html')
         data = self._get_rendering_context(docids, data)
-        return self._render_template(self.sudo().report_name, data), 'html'
+        return self._render_template(self.report_name, data), 'html'
 
     def _get_rendering_context_model(self):
         report_model_name = 'report.%s' % self.report_name
         return self.env.get(report_model_name)
 
     def _get_rendering_context(self, docids, data):
-        # access the report details with sudo() but evaluation context as current user
-        self_sudo = self.sudo()
-
         # If the report is using a custom model to render its html, we must use it.
         # Otherwise, fallback on the generic html rendering.
-        report_model = self_sudo._get_rendering_context_model()
+        report_model = self._get_rendering_context_model()
 
         data = data and dict(data) or {}
 
         if report_model is not None:
+            # _render_ may be executed in sudo but evaluation context as real user
+            report_model = report_model.sudo(False)
             data.update(report_model._get_report_values(docids, data=data))
         else:
-            docs = self.env[self_sudo.model].browse(docids)
+            # _render_ may be executed in sudo but evaluation context as real user
+            docs = self.env[self.model].sudo(False).browse(docids)
             data.update({
                 'doc_ids': docids,
-                'doc_model': self_sudo.model,
+                'doc_model': self.model,
                 'docs': docs,
             })
         return data

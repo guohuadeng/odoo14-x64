@@ -181,7 +181,7 @@
 
                     <!-- (17) CUIT -->
                     <t t-if="o.partner_id.vat and o.partner_id.l10n_latam_identification_type_id and o.partner_id.l10n_latam_identification_type_id.l10n_ar_afip_code != '99'">
-                        <br/><strong><t t-esc="o.partner_id.l10n_latam_identification_type_id.name or o.company_id.country_id.vat_label" id="inv_tax_id_label"/>:</strong> <span t-esc="o.partner_id.l10n_ar_formatted_vat if o.partner_id.l10n_latam_identification_type_id.is_vat else o.partner_id.vat"/>
+                        <br/><strong><t t-esc="o.partner_id.l10n_latam_identification_type_id.name or o.company_id.country_id.vat_label" id="inv_tax_id_label"/>:</strong> <span t-esc="o.partner_id.l10n_ar_formatted_vat if o.partner_id.l10n_ar_vat else o.partner_id.vat"/>
                     </t>
 
                 </div>
@@ -239,6 +239,14 @@
                 </t>
 
             </div>
+        </xpath>
+
+        <!-- Show total amount in letters for MiPyMEs document types according to the law
+         http://biblioteca.afip.gob.ar/dcp/LEY_C_027440_2018_05_09 article 5.f -->
+        <xpath expr="//div[@id='total']/div/table" position="after">
+            <t t-if="o.l10n_latam_document_type_id.code in ['201', '202', '203', '206', '207', '208', '211', '212', '213']">
+                <strong>Son: </strong><span t-esc="o.currency_id.with_context(lang='es_AR').amount_to_text(o.amount_total)"/>
+            </t>
         </xpath>
 
         <!-- RG 5003: Add legend for 'A' documents that have a Monotribuista receptor -->

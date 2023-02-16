@@ -1158,8 +1158,7 @@ msgid ""
 "Once you have created your expense, submit it to your manager who will "
 "validate it."
 msgstr ""
-"នៅពេលដែលអ្នកបានបង្កើតការចំណាយរបស់អ្នកហើយបញ្ជូនទៅអ្នកគ្រប់គ្រងរបស់អ្នកដែលនឹងធ្វើឱ្យវាមានសុពលភាព។"
-" "
+"នៅពេលដែលអ្នកបានបង្កើតការចំណាយរបស់អ្នកហើយបញ្ជូនទៅអ្នកគ្រប់គ្រងរបស់អ្នកដែលនឹងធ្វើឱ្យវាមានសុពលភាព។ "
 
 #. module: hr_expense
 #. openerp-web
@@ -1916,4 +1915,10 @@ msgstr ""
 #. module: hr_expense
 #: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
 msgid "use OCR to fill data from a picture of the bill"
+msgstr ""
+
+#. module: hr_expense
+#: code:addons/hr_expense/models/account_move.py:0
+#, python-format
+msgid "Payment Cancelled"
 msgstr ""

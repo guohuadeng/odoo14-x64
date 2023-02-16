@@ -561,7 +561,7 @@ msgstr "Declaratie"
 #. module: hr_expense
 #: model:mail.activity.type,name:hr_expense.mail_act_expense_approval
 msgid "Expense Approval"
-msgstr "Declaratie goedgekeurd"
+msgstr "Declaratie goedkeuren"
 
 #. module: hr_expense
 #: model_terms:ir.ui.view,arch_db:hr_expense.view_employee_tree_inherit_expense
@@ -1964,3 +1964,9 @@ msgstr "goed te keuren"
 #: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
 msgid "use OCR to fill data from a picture of the bill"
 msgstr "gebruik OCR om gegevens uit een foto van de rekening in te vullen."
+
+#. module: hr_expense
+#: code:addons/hr_expense/models/account_move.py:0
+#, python-format
+msgid "Payment Cancelled"
+msgstr "Betaling geannuleerd"

@@ -16,6 +16,7 @@ odoo.define('web.filter_menu_generator_tests', function (require) {
                 date_field: { name: 'date_field', string: "A date", type: 'date', searchable: true },
                 date_time_field: { name: 'date_time_field', string: "DateTime", type: 'datetime', searchable: true },
                 boolean_field: { name: 'boolean_field', string: "Boolean Field", type: 'boolean', default: true, searchable: true },
+                binary_field: { name: 'binary_field', string: "Binary Field", type: 'binary', searchable: true },
                 char_field: { name: 'char_field', string: "Char Field", type: 'char', default: "foo", trim: true, searchable: true },
                 float_field: { name: 'float_field', string: "Floaty McFloatface", type: 'float', searchable: true },
                 color: { name: 'color', string: "Color", type: 'selection', selection: [['black', "Black"], ['white', "White"]], searchable: true },
@@ -70,6 +71,49 @@ odoo.define('web.filter_menu_generator_tests', function (require) {
             cfi.destroy();
         });
 
+        QUnit.test('binary field: basic search', async function (assert) {
+            assert.expect(4);
+
+            let expectedFilters;
+            class MockedSearchModel extends ActionModel {
+                dispatch(method, ...args) {
+                    assert.strictEqual(method, 'createNewFilters');
+                    const preFilters = args[0];
+                    assert.deepEqual(preFilters, expectedFilters);
+                }
+            }
+            const searchModel = new MockedSearchModel();
+            const cfi = await createComponent(CustomFilterItem, {
+                props: {
+                    fields: this.fields,
+                },
+                env: { searchModel },
+            });
+
+            // Default value
+            expectedFilters = [{
+                description: 'Binary Field is set',
+                domain: '[["binary_field","!=",False]]',
+                type: 'filter',
+            }];
+            await cpHelpers.toggleAddCustomFilter(cfi);
+            await testUtils.fields.editSelect(cfi.el.querySelector('.o_generator_menu_field'), 'binary_field');
+            await cpHelpers.applyFilter(cfi);
+
+            // Updated value
+            expectedFilters = [{
+                description: 'Binary Field is not set',
+                domain: '[["binary_field","=",False]]',
+                type: 'filter',
+            }];
+            await cpHelpers.toggleAddCustomFilter(cfi);
+            await testUtils.fields.editSelect(cfi.el.querySelector('.o_generator_menu_field'), 'binary_field');
+            await testUtils.fields.editSelect(cfi.el.querySelector('.o_generator_menu_operator'), '=');
+            await cpHelpers.applyFilter(cfi);
+
+            cfi.destroy();
+        });
+
         QUnit.test('selection field: default and updated value', async function (assert) {
             assert.expect(4);
 
@@ -91,7 +135,7 @@ odoo.define('web.filter_menu_generator_tests', function (require) {
 
             // Default value
             expectedFilters = [{
-                description: 'Color is "black"',
+                description: 'Color is "Black"',
                 domain: '[["color","=","black"]]',
                 type: 'filter',
             }];
@@ -101,7 +145,7 @@ odoo.define('web.filter_menu_generator_tests', function (require) {
 
             // Updated value
             expectedFilters = [{
-                description: 'Color is "white"',
+                description: 'Color is "White"',
                 domain: '[["color","=","white"]]',
                 type: 'filter',
             }];
@@ -112,6 +156,38 @@ odoo.define('web.filter_menu_generator_tests', function (require) {
 
             cfi.destroy();
         });
+        QUnit.test('selection field: no value', async function (assert) {
+            assert.expect(2);
+
+            this.fields.color.selection = [];
+            let expectedFilters;
+            class MockedSearchModel extends ActionModel {
+                dispatch(method, ...args) {
+                    assert.strictEqual(method, 'createNewFilters');
+                    const preFilters = args[0];
+                    assert.deepEqual(preFilters, expectedFilters);
+                }
+            }
+            const searchModel = new MockedSearchModel();
+            const cfi = await createComponent(CustomFilterItem, {
+                props: {
+                    fields: this.fields,
+                },
+                env: { searchModel },
+            });
+
+            // Default value
+            expectedFilters = [{
+                description: 'Color is ""',
+                domain: '[["color","=",""]]',
+                type: 'filter',
+            }];
+            await cpHelpers.toggleAddCustomFilter(cfi);
+            await testUtils.fields.editSelect(cfi.el.querySelector('.o_generator_menu_field'), 'color');
+            await cpHelpers.applyFilter(cfi);
+
+            cfi.destroy();
+        })
 
         QUnit.test('adding a simple filter works', async function (assert) {
             assert.expect(6);
@@ -137,6 +213,7 @@ odoo.define('web.filter_menu_generator_tests', function (require) {
             });
 
             await cpHelpers.toggleAddCustomFilter(cfi);
+            await testUtils.fields.editSelect(cfi.el.querySelector('.o_generator_menu_field'), 'boolean_field');
             await cpHelpers.applyFilter(cfi);
 
             // The only thing visible should be the button 'Add Custome Filter';
@@ -327,6 +404,45 @@ odoo.define('web.filter_menu_generator_tests', function (require) {
             const valueInputs = cfi.el.querySelectorAll('.o_generator_menu_value .o_input');
             await testUtils.fields.editSelect(valueInputs[0], '02/22/2017 11:00:00'); // in TZ
             await testUtils.fields.editSelect(valueInputs[1], '02-22-2017 17:00:00'); // in TZ
+            await cpHelpers.applyFilter(cfi);
+
+            cfi.destroy();
+        });
+
+        QUnit.test('default custom filter datetime', async function (assert) {
+            assert.expect(5);
+
+            class MockedSearchModel extends ActionModel {
+                dispatch(method, ...args) {
+                    assert.strictEqual(method, 'createNewFilters');
+                    const domain = JSON.parse(args[0][0].domain);
+                    assert.strictEqual(domain[0][2].split(' ')[1],
+                        '04:00:00',
+                        "domain should be in UTC format");
+                    assert.strictEqual(domain[1][2].split(' ')[1],
+                        '03:59:59',
+                        "domain should be in UTC format");
+                }
+            }
+            const searchModel = new MockedSearchModel();
+            const cfi = await createComponent(CustomFilterItem, {
+                props: {
+                    fields: this.fields,
+                },
+                session: {
+                    getTZOffset() {
+                        return -240;
+                    },
+                },
+                env: { searchModel },
+            });
+
+            await cpHelpers.toggleAddCustomFilter(cfi);
+            await testUtils.fields.editSelect(cfi.el.querySelector('.o_generator_menu_field'), 'date_time_field');
+
+            assert.strictEqual(cfi.el.querySelector('.o_generator_menu_field').value, 'date_time_field');
+            assert.strictEqual(cfi.el.querySelector('.o_generator_menu_operator').value, 'between');
+
             await cpHelpers.applyFilter(cfi);
 
             cfi.destroy();

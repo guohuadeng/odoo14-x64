@@ -27,6 +27,7 @@ const BaseAnimatedHeader = animations.Animation.extend({
         this.fixedHeader = false;
         this.scrolledPoint = 0;
         this.hasScrolled = false;
+        this.scrollHeightTooShort = false;
     },
     /**
      * @override
@@ -49,7 +50,10 @@ const BaseAnimatedHeader = animations.Animation.extend({
         // We can rely on transitionend which is well supported but not on
         // transitionstart, so we listen to a custom odoo event.
         this._transitionCount = 0;
-        this.$el.on('odoo-transitionstart.BaseAnimatedHeader', () => this._adaptToHeaderChangeLoop(1));
+        this.$el.on('odoo-transitionstart.BaseAnimatedHeader', () => {
+            this.el.classList.add('o_transitioning');
+            this._adaptToHeaderChangeLoop(1);
+        });
         this.$el.on('transitionend.BaseAnimatedHeader', () => this._adaptToHeaderChangeLoop(-1));
 
         return this._super(...arguments);
@@ -59,7 +63,7 @@ const BaseAnimatedHeader = animations.Animation.extend({
      */
     destroy: function () {
         this._toggleFixedHeader(false);
-        this.$el.removeClass('o_header_affixed o_header_is_scrolled o_header_no_transition');
+        this.$el.removeClass('o_header_affixed o_header_is_scrolled o_header_no_transition o_transitioning');
         this.$navbarCollapses.off('.BaseAnimatedHeader');
         this.$el.off('.BaseAnimatedHeader');
         this._super(...arguments);
@@ -80,7 +84,9 @@ const BaseAnimatedHeader = animations.Animation.extend({
      */
     _adaptToHeaderChange: function () {
         this._updateMainPaddingTop();
-        this.el.classList.toggle('o_top_fixed_element', this.fixedHeader && this._isShown());
+        // Take menu into account when `dom.scrollTo()` is used whenever it is
+        // visible - be it floating, fully displayed or partially hidden.
+        this.el.classList.toggle('o_top_fixed_element', this._isShown());
 
         for (const callback of extraMenuUpdateCallbacks) {
             callback();
@@ -113,6 +119,7 @@ const BaseAnimatedHeader = animations.Animation.extend({
             // When we detected all transitionend events, we need to stop the
             // setTimeout fallback.
             clearTimeout(this._changeLoopTimer);
+            this.el.classList.remove('o_transitioning');
         }
     },
     /**
@@ -149,6 +156,33 @@ const BaseAnimatedHeader = animations.Animation.extend({
         }
         this.$main.css('padding-top', this.fixedHeader ? this.headerHeight : '');
     },
+    /**
+     * Checks if the size of the header will decrease by adding the
+     * 'o_header_is_scrolled' class. If so, we do not add this class if the
+     * remaining scroll height is not enough to stay above 'this.scrolledPoint'
+     * after the transition, otherwise it causes the scroll position to move up
+     * again below 'this.scrolledPoint' and trigger an infinite loop.
+     *
+     * @todo header effects should be improved in the future to not ever change
+     * the page scroll-height during their animation. The code would probably be
+     * simpler but also prevent having weird scroll "jumps" during animations
+     * (= depending on the logo height after/before scroll, a scroll step (one
+     * mousewheel event for example) can be bigger than other ones).
+     *
+     * @private
+     * @returns {boolean}
+     */
+    _scrollHeightTooShort() {
+        const scrollEl = $().getScrollingElement()[0];
+        const remainingScroll = (scrollEl.scrollHeight - scrollEl.clientHeight) - this.scrolledPoint;
+        const clonedHeader = this.el.cloneNode(true);
+        scrollEl.append(clonedHeader);
+        clonedHeader.classList.add('o_header_is_scrolled', 'o_header_affixed', 'o_header_no_transition');
+        const endHeaderHeight = clonedHeader.offsetHeight;
+        clonedHeader.remove();
+        const heightDiff = this.headerHeight - endHeaderHeight;
+        return heightDiff > 0 ? remainingScroll <= heightDiff : false;
+    },
 
     //--------------------------------------------------------------------------
     // Handlers
@@ -174,9 +208,12 @@ const BaseAnimatedHeader = animations.Animation.extend({
         // Indicates the page is scrolled, the logo size is changed.
         const headerIsScrolled = (scroll > this.scrolledPoint);
         if (this.headerIsScrolled !== headerIsScrolled) {
-            this.el.classList.toggle('o_header_is_scrolled', headerIsScrolled);
-            this.$el.trigger('odoo-transitionstart');
-            this.headerIsScrolled = headerIsScrolled;
+            this.scrollHeightTooShort = headerIsScrolled && this._scrollHeightTooShort();
+            if (!this.scrollHeightTooShort) {
+                this.el.classList.toggle('o_header_is_scrolled', headerIsScrolled);
+                this.$el.trigger('odoo-transitionstart');
+                this.headerIsScrolled = headerIsScrolled;
+            }
         }
 
         // Close opened menus
@@ -216,6 +253,13 @@ publicWidget.registry.StandardAffixedHeader = BaseAnimatedHeader.extend({
         this.headerHeight = this.$el.outerHeight();
         return this._super.apply(this, arguments);
     },
+    /**
+     * @override
+     */
+    destroy() {
+        this.$el.css('transform', '');
+        this._super(...arguments);
+    },
 
     //--------------------------------------------------------------------------
     // Handlers
@@ -230,32 +274,39 @@ publicWidget.registry.StandardAffixedHeader = BaseAnimatedHeader.extend({
     /**
      * Called when the window is scrolled
      *
-     * @private
+     * @override
      * @param {integer} scroll
      */
     _updateHeaderOnScroll: function (scroll) {
         this._super(...arguments);
 
         const mainPosScrolled = (scroll > this.headerHeight + this.topGap);
-        const reachPosScrolled = (scroll > this.scrolledPoint + this.topGap);
+        const reachPosScrolled = (scroll > this.scrolledPoint + this.topGap) && !this.scrollHeightTooShort;
+        const fixedUpdate = (this.fixedHeader !== mainPosScrolled);
+        const showUpdate = (this.fixedHeaderShow !== reachPosScrolled);
 
-        // Switch between static/fixed position of the header
-        if (this.fixedHeader !== mainPosScrolled) {
-            this.$el.css('transform', mainPosScrolled ? 'translate(0, -100%)' : '');
+        if (fixedUpdate || showUpdate) {
+            this.$el.css('transform',
+                reachPosScrolled
+                ? `translate(0, -${this.topGap}px)`
+                : mainPosScrolled
+                ? 'translate(0, -100%)'
+                : '');
             void this.$el[0].offsetWidth; // Force a paint refresh
-            this._toggleFixedHeader(mainPosScrolled);
         }
-        // Show/hide header
-        if (this.fixedHeaderShow !== reachPosScrolled) {
-            this.$el.css('transform', reachPosScrolled ? `translate(0, -${this.topGap}px)` : 'translate(0, -100%)');
-            this.fixedHeaderShow = reachPosScrolled;
+
+        this.fixedHeaderShow = reachPosScrolled;
+
+        if (fixedUpdate) {
+            this._toggleFixedHeader(mainPosScrolled);
+        } else if (showUpdate) {
             this._adaptToHeaderChange();
         }
     },
 });
 
 publicWidget.registry.FixedHeader = BaseAnimatedHeader.extend({
-    selector: 'header.o_header_fixed',
+    selector: 'header.o_header_fixed:not(.o_header_sidebar)',
 
     //--------------------------------------------------------------------------
     // Handlers
@@ -367,7 +418,7 @@ const BaseDisappearingHeader = publicWidget.registry.FixedHeader.extend({
 });
 
 publicWidget.registry.DisappearingHeader = BaseDisappearingHeader.extend({
-    selector: 'header.o_header_disappears',
+    selector: 'header.o_header_disappears:not(.o_header_sidebar)',
 
     //--------------------------------------------------------------------------
     // Private
@@ -390,7 +441,7 @@ publicWidget.registry.DisappearingHeader = BaseDisappearingHeader.extend({
 });
 
 publicWidget.registry.FadeOutHeader = BaseDisappearingHeader.extend({
-    selector: 'header.o_header_fade_out',
+    selector: 'header.o_header_fade_out:not(.o_header_sidebar)',
 
     //--------------------------------------------------------------------------
     // Private

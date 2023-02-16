@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from lxml import etree
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
@@ -44,10 +45,14 @@ class AccountPayment(models.Model):
     is_matched = fields.Boolean(string="Is Matched With a Bank Statement", store=True,
         compute='_compute_reconciliation_status',
         help="Technical field indicating if the payment has been matched with a statement line.")
+    available_partner_bank_ids = fields.Many2many(
+        comodel_name='res.partner.bank',
+        compute='_compute_available_partner_bank_ids',
+    )
     partner_bank_id = fields.Many2one('res.partner.bank', string="Recipient Bank Account",
         readonly=False, store=True,
         compute='_compute_partner_bank_id',
-        domain="[('partner_id', '=', partner_id)]",
+        domain="[('id', 'in', available_partner_bank_ids)]",
         check_company=True)
     is_internal_transfer = fields.Boolean(string="Is Internal Transfer",
         readonly=False, store=True,
@@ -170,6 +175,18 @@ class AccountPayment(models.Model):
 
         return liquidity_lines, counterpart_lines, writeoff_lines
 
+    def _prepare_payment_display_name(self):
+        '''
+        Hook method for inherit
+        When you want to set a new name for payment, you can extend this method
+        '''
+        return {
+            'outbound-customer': _("Customer Reimbursement"),
+            'inbound-customer': _("Customer Payment"),
+            'outbound-supplier': _("Vendor Payment"),
+            'inbound-supplier': _("Vendor Reimbursement"),
+        }
+
     def _prepare_move_line_default_vals(self, write_off_line_vals=None):
         ''' Prepare the dictionary to create the default account.move.lines for the current payment.
         :param write_off_line_vals: Optional dictionary to create a write-off account.move.line easily containing:
@@ -225,12 +242,7 @@ class AccountPayment(models.Model):
 
         # Compute a default label to set on the journal items.
 
-        payment_display_name = {
-            'outbound-customer': _("Customer Reimbursement"),
-            'inbound-customer': _("Customer Payment"),
-            'outbound-supplier': _("Vendor Payment"),
-            'inbound-supplier': _("Vendor Reimbursement"),
-        }
+        payment_display_name = self._prepare_payment_display_name()
 
         default_line_name = self.env['account.move.line']._get_default_line_name(
             _("Internal Transfer") if self.is_internal_transfer else payment_display_name['%s-%s' % (self.payment_type, self.partner_type)],
@@ -324,16 +336,21 @@ class AccountPayment(models.Model):
             payment.show_partner_bank_account = payment.payment_method_code in self._get_method_codes_using_bank_account()
             payment.require_partner_bank_account = payment.state == 'draft' and payment.payment_method_code in self._get_method_codes_needing_bank_account()
 
-    @api.depends('partner_id')
+    @api.depends('partner_id', 'company_id', 'payment_type')
+    def _compute_available_partner_bank_ids(self):
+        for pay in self:
+            if pay.payment_type == 'inbound':
+                pay.available_partner_bank_ids = pay.journal_id.bank_account_id
+            else:
+                pay.available_partner_bank_ids = pay.partner_id.bank_ids\
+                        .filtered(lambda x: x.company_id.id in (False, pay.company_id.id))._origin
+
+    @api.depends('available_partner_bank_ids', 'journal_id')
     def _compute_partner_bank_id(self):
         ''' The default partner_bank_id will be the first available on the partner. '''
         for pay in self:
-            available_partner_bank_accounts = pay.partner_id.bank_ids.filtered(lambda x: x.company_id in (False, pay.company_id))
-            if available_partner_bank_accounts:
-                if pay.partner_bank_id not in available_partner_bank_accounts:
-                    pay.partner_bank_id = available_partner_bank_accounts[0]._origin
-            else:
-                pay.partner_bank_id = False
+            if pay.partner_bank_id not in pay.available_partner_bank_ids._origin:
+                pay.partner_bank_id = pay.available_partner_bank_ids[:1]._origin
 
     @api.depends('partner_id', 'destination_account_id', 'journal_id')
     def _compute_is_internal_transfer(self):
@@ -426,7 +443,7 @@ class AccountPayment(models.Model):
                 and pay.currency_id:
 
                 if pay.partner_bank_id:
-                    qr_code = pay.partner_bank_id.build_qr_code_url(pay.amount, pay.ref, pay.ref, pay.currency_id, pay.partner_id)
+                    qr_code = pay.partner_bank_id.build_qr_code_base64(pay.amount, pay.ref, pay.ref, pay.currency_id, pay.partner_id)
                 else:
                     qr_code = None
 
@@ -561,6 +578,29 @@ class AccountPayment(models.Model):
     # LOW-LEVEL METHODS
     # -------------------------------------------------------------------------
 
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        # OVERRIDE to add the 'available_partner_bank_ids' field dynamically inside the view.
+        # TO BE REMOVED IN MASTER
+        res = super().fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
+        if view_type == 'form':
+            form_view_id = self.env['ir.model.data'].xmlid_to_res_id('account.view_account_payment_form')
+            if res.get('view_id') == form_view_id:
+                tree = etree.fromstring(res['arch'])
+                if len(tree.xpath("//field[@name='available_partner_bank_ids']")) == 0:
+                    # Don't force people to update the account module.
+                    form_view = self.env.ref('account.view_account_payment_form')
+                    arch_tree = etree.fromstring(form_view.arch)
+                    if arch_tree.tag == 'form':
+                        arch_tree.insert(0, etree.Element('field', attrib={
+                            'name': 'available_partner_bank_ids',
+                            'invisible': '1',
+                        }))
+                        form_view.sudo().write({'arch': etree.tostring(arch_tree, encoding='unicode')})
+                        return super().fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
+
+        return res
+
     @api.model_create_multi
     def create(self, vals_list):
         # OVERRIDE
@@ -683,10 +723,11 @@ class AccountPayment(models.Model):
                         "To be consistent, the journal items must share the same partner."
                     ) % move.display_name)
 
-                if counterpart_lines.account_id.user_type_id.type == 'receivable':
-                    partner_type = 'customer'
-                else:
-                    partner_type = 'supplier'
+                if not pay.is_internal_transfer:
+                    if counterpart_lines.account_id.user_type_id.type == 'receivable':
+                        payment_vals_to_write['partner_type'] = 'customer'
+                    else:
+                        payment_vals_to_write['partner_type'] = 'supplier'
 
                 liquidity_amount = liquidity_lines.amount_currency
 
@@ -696,7 +737,6 @@ class AccountPayment(models.Model):
                 })
                 payment_vals_to_write.update({
                     'amount': abs(liquidity_amount),
-                    'partner_type': partner_type,
                     'currency_id': liquidity_lines.currency_id.id,
                     'destination_account_id': counterpart_lines.account_id.id,
                     'partner_id': liquidity_lines.partner_id.id,
@@ -718,7 +758,7 @@ class AccountPayment(models.Model):
 
         if not any(field_name in changed_fields for field_name in (
             'date', 'amount', 'payment_type', 'partner_type', 'payment_reference', 'is_internal_transfer',
-            'currency_id', 'partner_id', 'destination_account_id', 'partner_bank_id',
+            'currency_id', 'partner_id', 'destination_account_id', 'partner_bank_id', 'journal_id',
         )):
             return
 
@@ -728,7 +768,8 @@ class AccountPayment(models.Model):
             # Make sure to preserve the write-off amount.
             # This allows to create a new payment with custom 'line_ids'.
 
-            if writeoff_lines:
+            if liquidity_lines and counterpart_lines and writeoff_lines:
+
                 counterpart_amount = sum(counterpart_lines.mapped('amount_currency'))
                 writeoff_amount = sum(writeoff_lines.mapped('amount_currency'))
 
@@ -751,10 +792,20 @@ class AccountPayment(models.Model):
 
             line_vals_list = pay._prepare_move_line_default_vals(write_off_line_vals=write_off_line_vals)
 
-            line_ids_commands = [
-                (1, liquidity_lines.id, line_vals_list[0]),
-                (1, counterpart_lines.id, line_vals_list[1]),
-            ]
+            line_ids_commands = []
+            if len(liquidity_lines) == 1:
+                line_ids_commands.append((1, liquidity_lines.id, line_vals_list[0]))
+            else:
+                for line in liquidity_lines:
+                    line_ids_commands.append((2, line.id, 0))
+                line_ids_commands.append((0, 0, line_vals_list[0]))
+
+            if len(counterpart_lines) == 1:
+                line_ids_commands.append((1, counterpart_lines.id, line_vals_list[1]))
+            else:
+                for line in counterpart_lines:
+                    line_ids_commands.append((2, line.id, 0))
+                line_ids_commands.append((0, 0, line_vals_list[1]))
 
             for line in writeoff_lines:
                 line_ids_commands.append((2, line.id))

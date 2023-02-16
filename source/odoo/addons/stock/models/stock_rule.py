@@ -293,6 +293,15 @@ class StockRule(models.Model):
         if not self.location_id.should_bypass_reservation():
             move_dest_ids = values.get('move_dest_ids', False) and [(4, x.id) for x in values['move_dest_ids']] or []
 
+        # when create chained moves for inter-warehouse transfers, set the warehouses as partners
+        if not partner and move_dest_ids:
+            move_dest = values['move_dest_ids']
+            if location_id == company_id.internal_transit_location_id:
+                partners = move_dest.location_dest_id.get_warehouse().partner_id
+                if len(partners) == 1:
+                    partner = partners
+                move_dest.partner_id = self.location_src_id.get_warehouse().partner_id or self.company_id.partner_id
+
         move_values = {
             'name': name[:2000],
             'company_id': self.company_id.id or self.location_src_id.company_id.id or self.location_id.company_id.id or company_id.id,
@@ -521,7 +530,7 @@ class ProcurementGroup(models.Model):
         # Search all confirmed stock_moves and try to assign them
         domain = self._get_moves_to_assign_domain(company_id)
         moves_to_assign = self.env['stock.move'].search(domain, limit=None,
-            order='priority desc, date asc')
+            order='priority desc, date asc, id asc')
         for moves_chunk in split_every(100, moves_to_assign.ids):
             self.env['stock.move'].browse(moves_chunk).sudo()._action_assign()
             if use_new_cursor:
@@ -544,6 +553,9 @@ class ProcurementGroup(models.Model):
                 self = self.with_env(self.env(cr=cr))  # TDE FIXME
 
             self._run_scheduler_tasks(use_new_cursor=use_new_cursor, company_id=company_id)
+        except Exception:
+            _logger.error("Error during stock scheduler", exc_info=True)
+            raise
         finally:
             if use_new_cursor:
                 try:

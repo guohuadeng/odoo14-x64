@@ -398,10 +398,7 @@ body.editor_enable.editor_has_snippets {
                 border-left: $o-we-sidebar-blocks-content-snippet-spacing solid transparent;
                 margin-bottom: $o-we-sidebar-blocks-content-snippet-spacing;
                 user-select: none;
-
-                cursor: pointer;
-                cursor: copy;
-                cursor: grab;
+                @include o-grab-cursor;
 
                 .oe_snippet_thumbnail_title {
                     display: block;
@@ -944,6 +941,7 @@ body.editor_enable.editor_has_snippets {
                 height: $o-we-sidebar-content-field-colorpicker-size;
                 border: $o-we-sidebar-content-field-border-width solid $o-we-sidebar-content-field-border-color;
                 border-radius: 10rem;
+                cursor: pointer;
 
                 &::after {
                     box-shadow: $o-we-sidebar-content-field-colorpicker-shadow;
@@ -1538,6 +1536,11 @@ body.editor_enable.editor_has_snippets {
             margin: 0 (-$o-we-dropzone-size/2);
         }
     }
+    &.oe_drop_zone_danger {
+        background-color: rgba($o-we-color-danger, 0.15);
+        color: $o-we-color-danger;
+        border-color: $o-we-color-danger;
+    }
 }
 
 // MANIPULATORS
@@ -1717,9 +1720,14 @@ body.editor_enable.editor_has_snippets {
                         color: $o-we-fg-lighter;
                     }
                 }
-                > .oe_snippet_remove {
+                // TODO In master: restore `.oe_snippet_remove`.
+                > .fa-trash {
                     margin-left: $o-we-sidebar-content-field-button-group-button-spacing;
-                    background-color: mix($o-we-color-danger, $o-we-sidebar-content-field-clickable-bg);;
+                    background-color: mix($o-we-color-danger, $o-we-sidebar-content-field-clickable-bg);
+                    // TODO In master: use `.o_disabled`.
+                    &:not(.oe_snippet_remove) {
+                        opacity: 0.5;
+                    }
                 }
                 > .o_overlay_move_options > .o_move_handle {
                     cursor: move;
@@ -1740,9 +1748,14 @@ body.editor_enable.editor_has_snippets {
                             }
                         }
                     }
-                    > .oe_snippet_remove:hover {
+                    // TODO In master: restore `.oe_snippet_remove`.
+                    > .fa-trash:hover {
                         border-color: mix($o-we-color-danger, $o-we-sidebar-content-field-pressed-bg, .4);
                         background-color: $o-we-color-danger;
+                        // TODO In master: use `.o_disabled`.
+                        &:not(.oe_snippet_remove) {
+                            opacity: 0.5;
+                        }
                     }
                 }
             }
@@ -1771,7 +1784,7 @@ body.editor_enable.editor_has_snippets {
             z-index: auto;
 
             .o_we_overlay_content {
-                cursor: grab;
+                @include o-grab-cursor;
 
                 .o_we_grabbing {
                     cursor: grabbing;
